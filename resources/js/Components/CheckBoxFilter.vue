@@ -9,7 +9,7 @@ const props = defineProps({
     },
     values: {
         type: Object
-    },
+    }
 });
 
 const extractedValue = ref(props.values.value)

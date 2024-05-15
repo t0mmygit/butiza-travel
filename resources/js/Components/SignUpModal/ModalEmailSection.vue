@@ -52,8 +52,8 @@ import InputGroupAddon from 'primevue/inputgroupaddon';
         </div>
         <small class="text-gray-500 text-center mt-12">
             By signing in, you are agreeing to our <br> 
-            <a href="#" class="underline">Privacy Policy</a>, and 
-            <a href="#" class="underline">Terms of Use</a>.
+            <a href="#">Privacy Policy</a>, and 
+            <a href="#">Terms of Use</a>.
         </small>
     </div>
 </template>
