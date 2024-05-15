@@ -2,7 +2,6 @@
 import '../css/app.css';
 import 'primeicons/primeicons.css';
 import 'primevue/resources/themes/aura-light-indigo/theme.css';
-// import 'primevue/resources/themes/aura-light-green/theme.css';
 
 // import './bootstrap';
 
@@ -16,6 +15,8 @@ import PrimeVue from 'primevue/config';
 import ToastService from 'primevue/toastservice';
 import BadgeDirective from 'primevue/badgedirective';
 
+import SvgLogo from '@/Components/SvgLogo.vue';
+
 const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
 
 createInertiaApp({
@@ -28,7 +29,8 @@ createInertiaApp({
             .use(PrimeVue)
             .use(ToastService)
             .directive('badge', BadgeDirective)
-            .mount(el);
+            .component('SvgLogo', SvgLogo)
+            .mount(el); 
     },
     progress: {
         color: '#4B5563',

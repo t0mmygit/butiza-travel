@@ -23,10 +23,10 @@ const back = () => {
 </script>
 
 <template>
-    <div class="bg-primary-200 h-20">
+    <div class="bg-white h-20 shadow">
         <div id="content" class="flex items-center h-full m-auto lg:w-5/6 xl:w-11/12 2xl:w-7/12">
             <div id="left" class="mr-auto">
-                <a :href="route('main')">Logo</a>
+                <SvgLogo />
             </div>
             <div id="middle" class="flex gap-4">
                 <NavLink label="Package" :href="route('package.index')" :active="route().current('package.index')"></NavLink>

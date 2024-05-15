@@ -21,6 +21,7 @@ const budget = ref([0, 5000]);
 const duration = ref([2, 30]);
 const restriction = ref(false);
 const filterDestination = ref(null);
+const isFlexible = ref(false);
 
 const useSelection = () => {
     const selectedItems = ref([]);
@@ -32,16 +33,14 @@ const useSelection = () => {
     };
 
     const sliderItem = (item, column) => {
-        let sliderObject = { key: column, item: item.value }
-        console.log(item.value, column)
-        console.log(selectedItems.value)
+        const sliderObject = { key: column, item: item.value };
 
         const index = selectedItems.value.findIndex(selectedItem => selectedItem['key'] === column);
-        console.log(index)
-        // if (item.value[0] == 0 & item.value[1] == 5000) selectedItems.value.splice(index, 1);
-        if (index != -1) selectedItems.value[index] = sliderObject; 
-        else selectedItems.value.push(sliderObject);
-    }
+        if ((item.value[0] == 0 && item.value[1] == 5000) && column === 'budget') selectedItems.value.splice(index, 1);
+        else if ((item.value[0] == 2 && item.value[1] == 30) && column === 'duration') selectedItems.value.splice(index, 1);
+        else if (index != -1) selectedItems.value[index] = sliderObject; 
+        else selectedItems.value.push(sliderObject);    
+    };
 
     return { selectedItems, selectItem, sliderItem };
 };
@@ -53,6 +52,8 @@ const selectedActivity = useSelection();
 const selectedLodging = useSelection();
 const selectedAge = useSelection();
 const selectedBudget = useSelection();
+const selectedDate = useSelection();
+const selectedDuration = useSelection();
 
 const useTripDetails = (selections) => {
     return {
@@ -74,7 +75,9 @@ const tripDetails = useTripDetails({
     activity: selectedActivity.selectedItems,
     lodging: selectedLodging.selectedItems,
     age: selectedAge.selectedItems,
-    budget: selectedBudget.selectedItems
+    budget: selectedBudget.selectedItems,
+    date: selectedDate.selectedItems,
+    duration: selectedDuration.selectedItems
 });
 
 const searchDestination = computed(() => {
@@ -96,6 +99,8 @@ const getMonths = () => {
     } 
     return months;
 };
+
+const setFlexibleDate = (status) => isFlexible.value = !!status;
 
 const months = getMonths();
 
@@ -253,14 +258,20 @@ const restrictions = [
 <template>
     <MarginLayout>
         <div id="stepper" class="bg-white h-fit shadow py-6">
-            <div class="m-auto max-w-sm lg:max-w-4xl">
-                <Steps v-model:activeStep="active" :model="items" :readonly="false" class="text-xs" />
+            <div class="max-w-sm lg:max-w-full lg:mx-16 flex items-center relative">
+                <SvgLogo />
+                <Steps 
+                    v-model:activeStep="active" 
+                    :model="items" 
+                    :readonly="false" 
+                    class="text-xs mx-auto grow lg:max-w-5xl" 
+                />
             </div>
         </div>
         <section class="my-8 mx-auto lg:flex xl:flex max-w-2xl xl:max-w-7xl">
             <Avatar icon="pi pi-user" class="mt-3 bg-white" size="large" shape="circle" />
             <div class="grow">
-                <div class="m-auto
+                <div class="mx-auto
                     max-w-sm
                     lg:max-w-lg
                     xl:max-w-4xl
@@ -429,7 +440,11 @@ const restrictions = [
                             <TabPanel header="Start Date">
                                 <p class="mb-4">Not sure yet? Choose 'I'm flexible'.</p>
                                 <div class="flex items-start">
-                                    <Checkbox label="I'm flexible" value="flexible" />
+                                    <Checkbox 
+                                        label="I'm flexible" 
+                                        value="flexible" 
+                                        @update:checked="setFlexibleDate" 
+                                    />
                                     <div class="m-auto">
                                         <p class="mb-4">Or select the months in which you want to start your trip:</p>
                                         <div class="grid grid-cols-2 gap-y-2 pl-2">
@@ -437,6 +452,9 @@ const restrictions = [
                                                 v-for="(month, index) in months"
                                                 :key="index"
                                                 :label="month"
+                                                :value="month"
+                                                :disabled="isFlexible"
+                                                @update:checked="selectedDate.selectItem(month)"
                                             />
                                         </div>
                                     </div>
@@ -454,6 +472,7 @@ const restrictions = [
                                         :max="30"
                                         v-model="duration"
                                         range
+                                        @slideend="(event) => selectedDuration.sliderItem(event, 'duration')"
                                     >
                                     </Slider>
                                 </div>
@@ -474,6 +493,8 @@ const restrictions = [
                         />
                     </div>
                 </div>  
+
+                <!-- Age Restriction Details -->
                 <div v-if="active == 4 && restriction" class="m-auto
                     max-w-sm
                     lg:max-w-4xl
@@ -500,13 +521,16 @@ const restrictions = [
                         class="grid grid-cols-2"
                     >
                         <h5 class="capitalize">{{ categoryName }}</h5>
-                        <div v-if="categoryName != 'budget'">
+                        <div v-if="categoryName != 'budget' && categoryName != 'duration'">
                             <div v-for="value in categoryValue.value">
                                 <h5 class="font-semibold text-black">{{ value }}</h5>
                             </div>
                         </div>
-                        <div v-else v-for="event in categoryValue.value">
-                            <h5 class="font-semibold text-black">RM{{ event.value[0] }} - RM{{ event.value[1] }}</h5>
+                        <div v-else-if="categoryName == 'budget'" v-for="event in categoryValue.value">
+                            <h5 class="font-semibold text-black">RM{{ event.item[0] }} - RM{{ event.item[1] }}</h5>
+                        </div>
+                        <div v-else-if="categoryName == 'duration'" v-for="event in categoryValue.value">
+                            <h5 class="font-semibold text-black">{{ event.item[0] }} - {{ event.item[1] }} Days</h5>
                         </div>
                     </div>
                 </div>

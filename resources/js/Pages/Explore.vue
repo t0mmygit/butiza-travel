@@ -120,7 +120,7 @@ const formatReadable = (text) => {
             :items="items"
             @remove-compare-tour="removeCompareTour"
         />
-        <div id="heading-container" class="bg-white font-sans py-4">
+        <div id="heading-container" class="bg-gradient-to-r from-primary-200 to-primary-400 font-sans py-4 shadow border">
             <div id="heading" class="m-auto lg:w-5/6 xl:w-10/12 2xl:w-7/12">
                 <h1 class="text-2xl font-bold">Explore Malaysia</h1>
             </div>

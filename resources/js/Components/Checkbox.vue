@@ -13,18 +13,30 @@ const props = defineProps({
     label: {
         type: String,
         required: true
+    },
+    disabled: {
+        type: Boolean,
     }
 });
 
 const proxyChecked = computed({
     get() {
-        return props.checked;
+        // 
     },
 
     set(val) {
-        emit('update:checked', val);
+        if (val) emit('update:checked', props.value);
+        else emit('update:checked', val);
     },
 });
+
+const classes = computed(() => 
+    props.disabled 
+        ? 'whitespace-nowrap ml-6 text-gray-300'
+        : 'whitespace-nowrap ml-6'
+);
+
+
 </script>
 
 <template>
@@ -33,8 +45,9 @@ const proxyChecked = computed({
             type="checkbox"
             :value="value"
             v-model="proxyChecked"
+            :disabled="disabled"
             class="rounded border-gray-300 text-indigo-600 shadow-sm focus:ring-indigo-500"
         />
-        <span class="whitespace-nowrap ml-6">{{ label }}</span>
+        <span :class="classes">{{ label }}</span>
     </label>
 </template>
