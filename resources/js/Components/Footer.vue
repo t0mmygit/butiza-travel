@@ -3,11 +3,11 @@ import Button from 'primevue/button';
 </script>
 
 <template>
-    <footer class="h-fit py-8 outline outline-1">
+    <footer class="h-fit py-8 bg-white">
         <div id="section-container" class="m-auto lg:w-5/6 xl:w-11/12 2xl:w-7/12">
             <div class="flex flex-row gap-x-24">
                 <div id="section-1">
-                    <h1 class="text-2xl font-black">LOGO</h1>
+                    <SvgLogo />
                     <h3 class="text-lg font-bold">Travel Malaysia With Us!</h3>
                     <p class="xl:max-w-xl">
                         We helps you search and compare 50,000+ 

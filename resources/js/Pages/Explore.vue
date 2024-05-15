@@ -1,12 +1,13 @@
 <script setup>
 import NavBar from '@/Components/NavBar.vue';
+import Footer from '@/Components/Footer.vue';
 import CheckBoxFilter from '@/Components/CheckBoxFilter.vue';
 import DropdownFilter from '@/Components/DropdownFilter.vue';
 import HorizontalCard from '@/Components/HorizontalCard.vue';
 import InputTextFilter from '@/Components/InputTextFilter.vue';
 import CompareBox from '@/Components/CompareBox/CompareBox.vue';
-import MarginLayout from '@/Layouts/MarginLayout.vue';
 import AgeFilter from '@/Components/AgeFilter.vue';
+import MarginLayout from '@/Layouts/MarginLayout.vue';
 
 // PrimeVue 
 import Slider from 'primevue/slider';
@@ -35,7 +36,7 @@ const showToast = () => {
 const addCompareTour = (tour) => {
     const index = items.value.findIndex(item => item.id === tour.id);
     if (index != -1) items.value.splice(index, 1);
-    else if (items.value.length >= 2) showToast(); 
+    else if (items.value.length >= 3) showToast(); 
     else items.value.push(tour);
 }
 
@@ -125,7 +126,7 @@ const formatReadable = (text) => {
                 <h1 class="text-2xl font-bold">Explore Malaysia</h1>
             </div>
         </div>
-        <div id="content-container" class="grid lg:grid-cols-8 h-screen lg:w-5/6 xl:w-10/12 2xl:w-7/12 m-auto gap-6 my-4">
+        <section id="content-container" class="grid lg:grid-cols-8 lg:w-5/6 xl:w-10/12 2xl:w-7/12 m-auto gap-6 my-4">
             <div id="filter" class="col-span-2 lg:block hidden">
                 <div id="applied" class="bg-primary-100 h-fit mb-4 rounded-md p-4 shadow">
                     <h3 class="font-bold text-xl">Applied Filters</h3>
@@ -196,6 +197,8 @@ const formatReadable = (text) => {
                     </div>
                 </div>
             </div>
-        </div>
+        </section>
+
+        <Footer />
     </MarginLayout>
 </template>

@@ -9,10 +9,12 @@ import { ref } from 'vue';
 
 const emailModal = ref(false);
 const detailModal = ref(false);
+const email = ref();
 
-const confirm = () => {
+const confirm = (data) => {
     emailModal.value = false;
     detailModal.value = true;
+    email.value = data;
 }
 
 const back = () => {
@@ -52,6 +54,9 @@ const back = () => {
         @previous="back"
         @close="detailModal = false"
     >
-        <ModalDetailSection @previous="back" />
+        <ModalDetailSection 
+            :email="email"
+            @previous="back" 
+        />
     </Modal>
 </template>

@@ -2,7 +2,7 @@
 </script>
 
 <template>
-        <main class="bg-gray-100 h-screen">
+        <main class="bg-neutral min-h-screen">
             <slot />
         </main>
 </template>

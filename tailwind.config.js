@@ -22,7 +22,10 @@ export default {
                     ...colors.indigo,
                     DEFAULT: colors.indigo['500']
                 },
-                neutral: colors.gray
+                neutral: {
+                    ...colors.gray,
+                    DEFAULT: colors.gray['100']
+                }
             }
         },
     },

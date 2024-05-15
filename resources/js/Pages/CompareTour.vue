@@ -25,11 +25,13 @@ const view = (tourId) => {
 <template>
     <NavBar />
 
-    <div id="heading-container" class="bg-white font-sans py-4">
-        <div id="heading" class="m-auto lg:w-5/6 xl:w-10/12 2xl:w-7/12">
-            <h1 class="text-4xl font-black">Compare Tours</h1>
+    <header class="mt-2">
+        <div id="heading-container" class="bg-white font-sans py-4">
+            <div id="heading" class="m-auto lg:w-5/6 xl:w-10/12 2xl:w-7/12">
+                <h1 class="text-4xl font-black">Compare Tours</h1>
+            </div>
         </div>
-    </div>
+    </header>
     
     <section class="m-auto lg:w-5/6 xl:w-10/12 2xl:w-7/12 overflow-x-auto">
         <div id="table-container" class="text-left text-lg">

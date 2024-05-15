@@ -4,6 +4,7 @@ use App\Http\Controllers\ExploreController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\PackageController;
 use App\Http\Controllers\MainController;
+use App\Http\Controllers\SignUpController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -14,6 +15,8 @@ Route::resource('/', MainController::class)
 Route::get('/', function () {
    return Inertia::render('Main'); 
 })->name('main');
+
+Route::post('/send-email', [SignUpController::class, 'sendEmail'])->name('signup.email');
 
 Route::get('/customize', function () {
     return Inertia::render('Customize');

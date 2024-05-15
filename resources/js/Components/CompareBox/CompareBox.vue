@@ -1,46 +1,48 @@
 <script setup>
-import { ref, watch } from 'vue';
-import { router, useForm } from '@inertiajs/vue3';
-// import CompareBoxInput from '@/Components/CompareBoxInput.vue'
+import { ref, computed } from 'vue';
+import { router } from '@inertiajs/vue3';
+import CompareBoxInput from '@/Components/CompareBox/CompareBoxInput.vue'
 import PrimaryButton from '@/Components/PrimaryButton.vue'
 
-const props = defineProps(['tours', 'items']);
+const emit = defineEmits(['remove-compare-tour']);
 
-const close = ref(true);
-const bodyVisible = ref(true);
-const first = ref([]);
-const second = ref([]);
-
-watch(props.items, (oldValue, newValue) => {
-    if (newValue.length > 0) {
-        close.value = false;
-        first.value = props.items[0];
-        second.value = props.items[1];
-
-        if (props.items.length == 1) second.value = [];
-    } else {
-        first.value = []
+const props = defineProps({
+    items: {
+        value: Array
     }
 });
 
+const bodyVisible = ref(true);
+
+const removeTour = (tour) => {
+    emit('remove-compare-tour', tour)
+}
+
+const tours = computed(() => {
+    const items = [];
+    for (let i = 0; i < 3; i++) {
+        if (props.items[i]) items.push(props.items[i]);
+        else items.push({});
+    };
+
+    return items;
+});
+
 const compare = () => {
-    let tours = []
-    if (first.value && second.value) {
-        tours = [first.value.id, second.value.id]
-    } else {
-        // Send a error message here!
-        console.log('Not enough tours for comparison.');
-        return;
-    }
+    let tour = [];
+
+    for (let i = 0; i < tours.value.length; i++) {
+        if (Object.entries(tours.value[i]).length != 0) tour.push(tours.value[i].id);
+    };
 
     try {
         router.get(route('explore.show', {
-            explore: tours,
-        }))
+            explore: tour,
+        }));
     } catch (error) {
-        console.error('Errors comparing tour:', error)
+        console.error('Errors comparing tour:', error);
     }
-}
+};
 
 </script>
 
@@ -64,51 +66,14 @@ const compare = () => {
                 </div>
                 <div v-if="bodyVisible == true">
                     <div id="body" class="flex flex-col p-4 gap-4">
-
-                        <!-- <CompareBoxInput
-                            :tour="first"
-                            @remove="remove"
-                        /> -->
-
-                        <div id="input">
-                            <div class="bg-slate-200 px-2.5 pt-2.5 pb-2 flex justify-between">
-                                <span v-if="!first.name" class="font-medium text-gray-500 ml-0.5">
-                                    Select first tour
-                                </span>
-                                <span else class="font-medium ml-0.5">
-                                    {{ first.name }}
-                                </span>
-                                <div id="remove-icon" class="relative"  @click="$emit('remove-compare-tour', first)">
-                                    <svg v-if="first.name" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" 
-                                        class="size-6 text-gray-500 hover:text-red-500 cursor-pointer">
-                                        <path fill-rule="evenodd" d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25Zm3 10.5a.75.75 0 0 0 0-1.5H9a.75.75 0 0 0 0 1.5h6Z" clip-rule="evenodd" />
-                                    </svg>
-                                </div>
-                            </div>
-                            <div class="bg-gray-400 h-0.5"></div>
-                        </div>
-
-                        <div id="input">
-                            <div class="bg-slate-200 px-2.5 pt-2.5 pb-2 flex justify-between">
-                                <span v-if="!second.name" class="font-medium text-gray-500 ml-0.5">
-                                    Select second tour
-                                </span>
-                                <span else class="font-medium ml-0.5">
-                                    {{ second.name }}
-                                </span>
-                                <div id="remove-icon" class="relative"  @click="$emit('remove-compare-tour', second)">
-                                    <svg v-if="second.name" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" 
-                                        class="size-6 text-gray-500 hover:text-red-500 cursor-pointer">
-                                        <path fill-rule="evenodd" d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25Zm3 10.5a.75.75 0 0 0 0-1.5H9a.75.75 0 0 0 0 1.5h6Z" clip-rule="evenodd" />
-                                    </svg>
-                                </div>
-                            </div>
-                            <div class="bg-gray-400 h-0.5"></div>
-                        </div>
-
+                        <CompareBoxInput
+                            v-for="tour in tours"
+                            :tour="tour"
+                            @remove-tour="removeTour"
+                        />
                     </div>
                     <div id="footer" class="px-4 pb-6 mt-4">
-                        <PrimaryButton :disabled="items.length != 2" @click="compare">
+                        <PrimaryButton :disabled="items.length < 2" @click="compare">
                             Compare
                         </PrimaryButton>
                     </div>
