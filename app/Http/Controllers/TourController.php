@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\ContactMethod;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use App\Models\Day;
@@ -39,21 +40,24 @@ class TourController extends Controller
     public function reserve($tourId)
     {
         return Inertia::render('Reserve', [
-            'tour' => Tour::where('id', $tourId)->firstOrFail()
+            'tour' => Tour::where('id', $tourId)->firstOrFail(),
+            'contact_methods' => ContactMethod::all()
         ]);
     }
 
     public function submitReservation(Request $request)
     {
         $validated = $request->validate([
-            'date'           => 'required|date',
-            'people'         => 'required|numeric',
-            'notes'          => 'required|string',
-            'first_name'     => 'required|string',
-            'last_name'      => 'required|string',
-            'email'          => 'required|string|email:rfc,dns|lowercase',
-            'phone_number'   => 'required|numeric',
-            'contact_option' => 'required|numeric'
+            'date'              => 'required|date',
+            'people'            => 'required|numeric',
+            'notes'             => 'string|nullable',
+            'first_name'        => 'required|string',
+            'last_name'         => 'required|string',
+            'email'             => 'required|string|email:rfc,dns|lowercase',
+            'phone_number'      => 'required|numeric',
+            'contact_method' => 'required|numeric'
         ]);
+
+        dd($validated);
     }
 }

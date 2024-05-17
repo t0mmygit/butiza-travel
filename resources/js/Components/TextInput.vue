@@ -2,7 +2,7 @@
 import { onMounted, ref } from 'vue';
 
 const model = defineModel({
-    type: String,
+    type: [String, Number],
 });
 
 const props = defineProps({
@@ -38,6 +38,6 @@ defineExpose({ focus: () => input.value.focus() });
             v-model="model"
             ref="input"
         />
-        <label>{{ error }}</label>
+        <p class="text-error text-sm mt-2">{{ error }}</p>
     </div>
 </template>

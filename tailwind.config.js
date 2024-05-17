@@ -25,6 +25,10 @@ export default {
                 neutral: {
                     ...colors.gray,
                     DEFAULT: colors.gray['100']
+                },
+                error: {
+                    ...colors.red,
+                    DEFAULT: colors.red['600']
                 }
             }
         },

@@ -1,45 +1,46 @@
 <script setup>
 import MarginLayout from '@/Layouts/MarginLayout.vue';
 import Avatar from 'primevue/avatar';
-import InputText from 'primevue/inputtext';
 import Calendar from 'primevue/calendar';
 import Button from 'primevue/button';
-import FloatInput from '@/Components/FloatInput.vue';
 import Checkbox from '@/Components/Checkbox.vue';
 import TextInput from '@/Components/TextInput.vue';
 import InputError from '@/Components/InputError.vue';
 
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
 import { useForm } from '@inertiajs/vue3';
 
-const contact = ref(false);
-const selectedContact = ref(0);
+const selectedContactMethod = ref(null);
 
-defineProps({
+const props = defineProps({
     tour: {
+        type: Object,
+        required: true
+    },
+    contact_methods: {
         type: Object,
         required: true
     }
 });
 
-const contactOption = [
-    {
-        title: "Call me",
-        icon: "pi pi-phone"
-    },
-    {
-        title: "Email me",
-        icon: "pi pi-envelope"
-    },
-    {
-        title: "Whatsapp me",
-        icon: "pi pi-whatsapp"
-    }
+const contactIcons = [
+    { call: 'pi pi-phone' },
+    { email: 'pi pi-envelope' },
+    { whatsapp: 'pi pi-whatsapp' }
 ];
 
-const handleContactOption = () => {
+const getContactMethodIcon = (iconName) => {
+    const icon = contactIcons.find(icon => {  return iconName.toLowerCase() in icon });
+    return icon ? icon[iconName.toLowerCase()] : '';
+}
 
-};
+const selectContactMethod = (contactMethodId) => {
+    selectedContactMethod.value = contactMethodId;
+    console.log("Form:", reactiveContactMethod.value);
+    console.log("Ref", selectedContactMethod.value);
+}
+
+const reactiveContactMethod = computed(() => selectedContactMethod.value);
 
 const reserve = () => {
     
@@ -53,8 +54,9 @@ const form = useForm({
     last_name: null,
     email: null,
     phone_number: null,
-    contact_option: selectedContact.value
+    contact_method: reactiveContactMethod 
 });
+
 
 </script>
 
@@ -84,9 +86,9 @@ const form = useForm({
                     <form @submit.prevent="form.post(route('tour.reserve-submit'))">
                         <div class="mb-8 flex flex-col gap-2">
                             <h4>When do you want your tour to start? *</h4>
-                            <Calendar v-model="form.date" placeholder="When?" :invalid="form.errors.date" />
+                            <Calendar v-model="form.date" dateFormat="dd MM yy" placeholder="When?" />
                             <InputError :message="form.errors.date" />
-                            <Checkbox label="I'm flexible"/>
+                            <!-- <Checkbox label="I'm flexible"/> -->
                         </div>
                         <div class="mb-8 flex flex-col gap-2">
                             <h4>How many people are traveling? *</h4>
@@ -96,7 +98,7 @@ const form = useForm({
                             <h2>Special Request & Questions</h2>
                             <textarea 
                                 v-model="form.notes"
-                                placeholder="Feel free to tell us anything you'd like or how you want to make the trip perfect for you (optional)"
+                                placeholder="Feel free to tell us anything you'd like or how you want to make the trip perfect for you. (optional)"
                                 class="rounded-md border-neutral-300 shadow"
                             ></textarea>
                             <InputError :message="form.errors.notes" />
@@ -104,28 +106,29 @@ const form = useForm({
                         <div class="mb-8 flex flex-col gap-2">
                             <h2>Contact Info</h2>
                             <div class="flex gap-6 mt-4">
-                                <TextInput v-model="form.first_name" label="First Name *" :error="form.errors.firstName" />
-                                <TextInput v-model="form.last_name" label="Last Name *" :error="form.errors.lastName" />
+                                <TextInput v-model="form.first_name" label="First Name *" :error="form.errors.first_name" />
+                                <TextInput v-model="form.last_name" label="Last Name *" :error="form.errors.last_name" />
                             </div>
                             <div class="flex gap-6 mt-4">
                                 <TextInput v-model="form.email" label="Email *" :error="form.errors.email" />
-                                <TextInput v-model="form.phone_number" label="Phone Number *" :error="form.errors.phoneNumber   " />
+                                <TextInput v-model="form.phone_number" label="Phone Number *" type="number" :error="form.errors.phone_number" />
                             </div>
                         </div>
                         <div class="mb-8 flex flex-col gap-2">
                             <h2>How should we contact you?</h2>
                             <div class="flex gap-4">
-                                <Button
-                                    v-for="option in contactOption"
-                                    :label="option.title"
-                                    :icon="option.icon"
+                                <Button 
+                                    v-for="method in contact_methods"
+                                    :key="method.id"
+                                    :label="method.method_name"
+                                    :icon="getContactMethodIcon(method.method_name)"
                                     plain text raised
                                     class="flex-1 shadow-none text-base outline outline-1 outline-gray-300 rounded hover:outline-indigo-500 hover:bg-white"
-                                    :class="[{'border-primary bg-primary-100 text-black': false}]"
-                                    @click="handleContactOption"
+                                    :class="[{'border-primary bg-primary-100 text-black': selectedContactMethod === method.id}]"
+                                    @click="selectContactMethod(method.id)"
                                 />
-                                <InputError :message="form.errors.contact_option" />
                             </div>
+                            <InputError :message="form.errors.contact_method" />
                         </div>
                         <div class="flex place-content-end">
                             <Button

@@ -5,6 +5,8 @@ import Footer from '@/Components/Footer.vue';
 import Button from '@/Components/PrimaryButton.vue';
 import SecondaryButton from '@/Components/SecondaryButton.vue'
 
+import Breadcrumb from 'primevue/breadcrumb';
+
 import TourContent from '@/Components/Tour/TourContent.vue';
 import TourStepper from '@/Components/Tour/TourStepper.vue';
 import TourIconBox from '@/Components/Tour/TourIconBox.vue';
@@ -45,6 +47,7 @@ const customizeTour = () => {
     <!-- Navbar -->
     <MarginLayout>
         <NavBar />
+        <!-- <Breadcrumb  /> -->
         <div id="container" class="m-auto lg:w-5/6 xl:w-11/12 2xl:w-8/12 py-8">
             <div class="flex gap-4 mb-8">
                 <div class="bg-gray-500 aspect-video w-full rounded-xl shadow">
