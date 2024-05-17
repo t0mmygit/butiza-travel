@@ -2,10 +2,9 @@
 
 use App\Http\Controllers\ExploreController;
 use App\Http\Controllers\ProfileController;
-use App\Http\Controllers\PackageController;
 use App\Http\Controllers\MainController;
 use App\Http\Controllers\SignUpController;
-use Illuminate\Foundation\Application;
+use App\Http\Controllers\TourController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -17,12 +16,15 @@ Route::get('/', function () {
 })->name('main');
 
 Route::post('/send-email', [SignUpController::class, 'sendEmail'])->name('signup.email');
+Route::post('/send-detail', [SignUpController::class, 'sendUserDetail'])->name('signup.detail');
 
 Route::get('/customize', function () {
     return Inertia::render('Customize');
 })->name('customize');
 
-Route::resource('/package', PackageController::class)
+Route::get('/reserve/{tour}', [TourController::class, 'reserve'])->name('tour.reserve');
+Route::post('/reserve-submit', [TourController::class, 'submitReservation'])->name('tour.reserve-submit');
+Route::resource('/tour', TourController::class)
     ->only(['index', 'show']);
 
 Route::resource('/explore', ExploreController::class)

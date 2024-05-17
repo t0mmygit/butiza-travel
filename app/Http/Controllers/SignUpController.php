@@ -2,29 +2,32 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\User;
 use Illuminate\Http\Request;
-use app\Models\User;
+use Inertia\Inertia;
 
 class SignUpController extends Controller
 {
     public function sendEmail(Request $request)
     {
         $request->validate([
-            'email' => 'required|string|email:rfc,dns|lowercase|unique'.User::class,
+            'email' => 'required|string|email:rfc,dns|lowercase',
         ]);
     }
 
     public function sendUserDetail(Request $request)
     {
         $validated = $request->validate([
-            'first_name' => 'required|string',
-            'last_name' => 'required|string',
-            'password' => 'required|string',
-            'confirm_password' => 'required|string'
+            'email'                 => 'required|string|email:rfc,dns|lowercase',
+            'first_name'            => 'required|string',
+            'last_name'             => 'required|string',
+            'password'              => 'required|confirmed|string',
+            'password_confirmation' => 'required|string',
+            'role'                  => 'required|string'
         ]);
 
         User::create($validated);
 
-        return redirect(route('main'));
+        return Inertia::render('Main');
     }
 }

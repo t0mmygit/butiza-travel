@@ -19,7 +19,7 @@ const activeCompareButton = ref(false);
 
 const viewTour = () => {
     try {
-        router.get(route('package.show', {
+        router.get(route('tour.show', {
             id: props.tour.id
         }));
     } catch (error) {

@@ -5,6 +5,19 @@ const model = defineModel({
     type: String,
 });
 
+const props = defineProps({
+    type: {
+        type: String,
+        default: 'text'
+    },
+    label: {
+        type: String
+    },
+    error: {
+        type: String
+    }
+});
+
 const input = ref(null);
 
 onMounted(() => {
@@ -17,9 +30,14 @@ defineExpose({ focus: () => input.value.focus() });
 </script>
 
 <template>
-    <input
-        class="border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm"
-        v-model="model"
-        ref="input"
-    />
+    <div class="flex flex-col flex-1">    
+        <label v-if="label" class="text-neutral-500 mb-2">{{ label }}</label>
+        <input
+            :type="type"
+            class="border-neutral-300 border focus:border-primary-100 rounded-md shadow"
+            v-model="model"
+            ref="input"
+        />
+        <label>{{ error }}</label>
+    </div>
 </template>

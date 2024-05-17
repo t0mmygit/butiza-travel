@@ -31,7 +31,7 @@ const back = () => {
                 <SvgLogo />
             </div>
             <div id="middle" class="flex gap-4">
-                <NavLink label="Package" :href="route('package.index')" :active="route().current('package.index')"></NavLink>
+                <NavLink label="Package" :href="route('tour.index')" :active="route().current('package.index')"></NavLink>
                 <NavLink label="Explore" :href="route('explore.index')" :active="route().current('explore.index')"></NavLink>
             </div>
             <div id="right" class="flex gap-4 ml-auto">

@@ -28,6 +28,9 @@
         small {
             @apply text-gray-500
         }
+        a {
+            @apply cursor-pointer
+        }
     }
 }
 

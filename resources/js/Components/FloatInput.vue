@@ -4,6 +4,10 @@ import InputText from 'primevue/inputtext';
 import Password from 'primevue/password';
 import { ref } from 'vue';
 
+const model = defineModel({
+    type: String,
+});
+
 defineProps({
     label: {
         type: String,
@@ -15,6 +19,7 @@ defineProps({
     },
     value: {
         type: String,
+        required: true
     },
     error: {
         type: String,
@@ -28,18 +33,21 @@ const value = ref(null);
 <!-- Merge two primevue's components  -->
 
 <template>
-    <div>
+    <div class="mb-2">
         <FloatLabel>
             <Password 
                 v-if="type === 'password'"
+                v-model="model"
+                :id="value"
                 toggleMask
                 :feedback="false"
             />
-            <InputText 
+            <InputText
                 v-else 
+                v-model="model"
                 class="w-full"
             />
-            <label>{{ label }}</label>
+            <label :for="value">{{ label }}</label>
         </FloatLabel>
         <small class="text-red-500">{{ error }}</small>
     </div>
