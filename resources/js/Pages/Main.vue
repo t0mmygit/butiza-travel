@@ -7,14 +7,27 @@ import InputText from 'primevue/inputtext';
 import InputIcon from 'primevue/inputicon';
 import InputGroup from 'primevue/inputgroup';
 import InputGroupAddon from 'primevue/inputgroupaddon';
+import Modal from '@/Components/Modal.vue';
+import ModalGroupTour from '@/Components/Modal/ModalGroupTour.vue';
 import { router } from '@inertiajs/vue3';
+import { ref } from 'vue';
+
+const tourModal = ref(false);
 
 const customize = () => {
     router.get(route('customize'));
-}
+};
+
 </script>
 
 <template>
+    <Modal
+        :show="tourModal"
+        @close="tourModal = false"
+    >
+        <ModalGroupTour />
+    </Modal>
+
     <div class="flex flex-col min-h-screen">
         <NavBar />
         <main class="flex-1">
@@ -43,7 +56,7 @@ const customize = () => {
                                     <h3 class="font-bold">Share the Adventure, Split the Cost</h3>
                                     <p>Traveling with friends made easy! Split bills hassle-free on group tours.</p>
                                 </div>
-                                <Button label="Group Tour" text raised class="rounded-full bg-white text-sm" />
+                                <Button @click="tourModal = true" label="Group Tour" text raised class="rounded-full bg-white text-sm" />
                             </div>
                         </div>
                     </div>

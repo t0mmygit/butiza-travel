@@ -8,7 +8,7 @@ const props = defineProps({
     },
     maxWidth: {
         type: String,
-        default: '2xl',
+        default: 'lg',
     },
     closeable: {
         type: Boolean,
@@ -76,7 +76,7 @@ const maxWidthClass = computed(() => {
                     leave-to-class="opacity-0"
                 >
                     <div v-show="show" class="fixed inset-0 transform transition-all" @click="close">
-                        <div class="absolute inset-0 bg-gray-500 opacity-75" />
+                        <div class="absolute inset-0 bg-neutral-500 opacity-75" />
                     </div>
                 </Transition>
 
@@ -94,7 +94,7 @@ const maxWidthClass = computed(() => {
                         :class="maxWidthClass"
                     >
                         <div v-if="allowPrevious"
-                            class="absolute top-0 left-0 p-4 cursor-pointer flex gap-2 text-gray-500"
+                            class="absolute top-0 left-0 p-4 cursor-pointer flex gap-2 text-neutral-500"
                             @click="$emit('previous')"
                         >
                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-6 h-6">
@@ -103,7 +103,7 @@ const maxWidthClass = computed(() => {
                             <span>Back</span>
                         </div>
                         <div 
-                            class="absolute top-0 right-0 p-4 cursor-pointer text-gray-500"
+                            class="absolute top-0 right-0 p-4 cursor-pointer text-neutral-500"
                             @click="close"
                         >
                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-6 h-6">

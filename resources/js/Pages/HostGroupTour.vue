@@ -9,41 +9,6 @@ import InputError from '@/Components/InputError.vue';
 import { ref, computed } from 'vue';
 import { useForm } from '@inertiajs/vue3';
 
-const selectedTour = ref(null);
-const selectedContactMethod = ref(null);
-
-const props = defineProps({
-    tour: {
-        type: Object,
-        required: true
-    },
-    contact_methods: {
-        type: Object,
-        required: true
-    }
-});
-
-const contactIcons = [
-    { call: 'pi pi-phone' },
-    { email: 'pi pi-envelope' },
-    { whatsapp: 'pi pi-whatsapp' }
-];
-
-const getContactMethodIcon = (iconName) => {
-    const icon = contactIcons.find(icon => {  return iconName.toLowerCase() in icon });
-    return icon ? icon[iconName.toLowerCase()] : '';
-}
-
-const selectContactMethod = (contactMethodId) => {
-    selectedContactMethod.value = contactMethodId;
-}
-
-const reactiveTour = computed(() => {
-    selectedTour.value = props.tour.id;
-    return selectedTour.value;
-});
-const reactiveContactMethod = computed(() => selectedContactMethod.value);
-
 const form = useForm({
     tours_id: reactiveTour,
     contact_methods: reactiveContactMethod,

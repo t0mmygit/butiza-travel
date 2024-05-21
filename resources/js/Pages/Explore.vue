@@ -126,7 +126,7 @@ const formatReadable = (text) => {
                 <h1 class="text-2xl font-bold">Explore Malaysia</h1>
             </div>
         </div>
-        <section id="content-container" class="grid lg:grid-cols-8 lg:w-5/6 xl:w-10/12 2xl:w-7/12 m-auto gap-6 my-4">
+        <section id="content-container" class="grid lg:grid-cols-8 lg:w-5/6 xl:w-11/12 2xl:w-7/12 m-auto gap-6 my-4">
             <div id="filter" class="col-span-2 lg:block hidden">
                 <div id="applied" class="bg-primary-100 h-fit mb-4 rounded-md p-4 shadow">
                     <h3 class="font-bold text-xl">Applied Filters</h3>
@@ -190,7 +190,7 @@ const formatReadable = (text) => {
                         <HorizontalCard
                             v-for="tour in filteredTours"
                             :key="tour.id"
-                            :tour="tour" 
+                            :tour="tour"
                             :items="items"
                             @compare-tour="addCompareTour"
                         />

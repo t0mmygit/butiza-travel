@@ -5,7 +5,6 @@ import InputError from '@/Components/InputError.vue';
 import InputGroup from 'primevue/inputgroup';
 import InputGroupAddon from 'primevue/inputgroupaddon';
 import { useForm } from '@inertiajs/vue3';
-import axios from 'axios';
 
 const form = useForm({
     email: null,
@@ -20,24 +19,28 @@ const form = useForm({
         </div>
         <h2 class="font-bold text-2xl mb-2">Sign in or create an account</h2>
         <p class="mb-6">Access member savings & community.</p>
-        <form @submit.prevent="form.post(route('signup.email', { email: form.email }), { 
-                onSuccess: () => { $emit('confirm', form.email ); form.reset();}, 
+        <form @submit.prevent="form.post(route('auth.email', { email: form.email }), { 
+                onSuccess: (user) => { 
+                    if (!user) $emit('confirm', form.email ); 
+                    else $emit('password', form.email);
+                    form.reset();
+                }, 
                 onError: (error) => console.error('Error sending email:', error)})"
         >
             <InputGroup class="group max-w-xs">
-                <InputGroupAddon class="group-hover:border-indigo-500 group-active:border-indigo-500">
+                <InputGroupAddon class="group-hover:border-primary group-focus:border-primary group-active:border-primary">
                     <i class="pi pi-envelope"></i>
                 </InputGroupAddon>
                 <InputText
                     v-model="form.email"
                     type="email"
                     placeholder="Email Address"
-                    class="group-active:border-indigo-500 group-focus:border-indigo-500 transition-none"
+                    class="group-hover:border-primary group-focus:border-primary group-active:border-primary transition-none"
                 />
                 <Button
                     type="submit"
                     label="Confirm"
-                    class="bg-indigo-500 border-indigo-500"
+                    class="bg-primary border-primary"
                 />
             </InputGroup>
             <InputError :message="form.errors.email" class="mt-2" />
@@ -48,13 +51,13 @@ const form = useForm({
                 label="Continue with Facebook" 
                 icon="pi pi-facebook"
                 plain text raised 
-                class="shadow-none text-base outline outline-1 outline-gray-300 rounded hover:outline-indigo-500 hover:bg-white"
+                class="shadow-none text-base outline outline-1 outline-gray-300 rounded hover:outline-primary hover:bg-white"
             />
             <Button
                 label="Continue with Google"
                 icon="pi pi-google"
                 plain text raised
-                class="shadow-none text-base outline outline-1 outline-gray-300 rounded hover:outline-indigo-500 hover:bg-white"
+                class="shadow-none text-base outline outline-1 outline-gray-300 rounded hover:outline-primary hover:bg-white"
             />
         </div>
         <small class="text-gray-500 text-center mt-12">

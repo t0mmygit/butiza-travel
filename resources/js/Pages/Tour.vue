@@ -56,20 +56,21 @@ const customizeTour = () => {
                         class="rounded-xl"
                     >
                 </div>
-                <div class="bg-white shadow w-full rounded-xl px-4 py-6">         
+                <div class="bg-white flex flex-col shadow w-full rounded-xl px-4 py-6">         
                     <h1 class="text-2xl uppercase font-black pb-4">{{ tour.name }}</h1>
                     <p class="text-neutral-600">{{ tour.description }}</p>
-                    <div class="flex flex-col gap-2 w-1/2 place-content-end">
-                        <Button @click="reserveTour" class="flex-1">Reserve</Button>
-                        <SecondaryButton @click="customizeTour" class="flex-1">Customize Tour</SecondaryButton>
+                    <div class="flex flex-col gap-2 mt-4">
+                        <Button @click="reserveTour">Reserve</Button>
+                        <SecondaryButton :icon="false" @click="customizeTour">Customize Tour</SecondaryButton>
                     </div>
                 </div>
             </div>
-            <div class="bg-white m-auto h-12 rounded-full w-fit flex items-center justify-around gap-16 px-8 font-bold">
+            <div class="bg-white m-auto h-12 rounded-full shadow w-fit flex items-center justify-around gap-16 px-8 font-bold">
                 <a href="#detail">Details</a>
                 <a href="#itinerary">Itinerary</a>
                 <a href="#available">Availability & Price</a>
                 <a href="#note">Notes</a>
+                <a href="#review">Reviews & Ratings</a>
             </div>
             <TourContent id="detail" title="Details">
                 <div class="flex gap-4 mb-8">
@@ -108,7 +109,12 @@ const customizeTour = () => {
                         </template>
                     </TourIconBox>
                 </div>
-                <TourTextBox label="Destination" />
+                <TourTextBox label="Destinations" :values="tour.destinations" />
+                <TourTextBox label="Activities" :values="tour.destinations" />
+                <div class="mt-8">
+                    <h2>Highlights</h2>
+                    
+                </div>
             </TourContent>
             <TourContent id="itinerary" title="Itinerary">
                 <div class="bg-neutral h-40 mb-4">
@@ -116,6 +122,12 @@ const customizeTour = () => {
                 <TourStepper 
                     :days="day"
                 />
+            </TourContent>
+            <TourContent id="available" title="Dates & Availability">
+            </TourContent>
+            <TourContent id="notes" title="Notes">  
+            </TourContent>
+            <TourContent id="review" title="Reviews & Ratings">  
             </TourContent>
         </div>
         <Footer />

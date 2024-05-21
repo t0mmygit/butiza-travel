@@ -3,7 +3,8 @@
 use App\Http\Controllers\ExploreController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\MainController;
-use App\Http\Controllers\SignUpController;
+use App\Http\Controllers\AuthController;
+use App\Http\Controllers\CommunityController;
 use App\Http\Controllers\TourController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -15,8 +16,9 @@ Route::get('/', function () {
    return Inertia::render('Main'); 
 })->name('main');
 
-Route::post('/send-email', [SignUpController::class, 'sendEmail'])->name('signup.email');
-Route::post('/send-detail', [SignUpController::class, 'sendUserDetail'])->name('signup.detail');
+Route::post('/send-email', [AuthController::class, 'sendEmail'])->name('auth.email');
+Route::post('/send-password', [AuthController::class, 'sendPassword'])->name('auth.password');
+Route::post('/send-detail', [AuthController::class, 'sendUserDetail'])->name('signup.detail');
 
 Route::get('/customize', function () {
     return Inertia::render('Customize');
@@ -29,6 +31,9 @@ Route::resource('/tour', TourController::class)
 
 Route::resource('/explore', ExploreController::class)
     ->only(['index', 'show']);
+
+Route::get('/community', [CommunityController::class, 'index'])->name('community.index');
+Route::get('/host', [CommunityController::class, 'host'])->name('host.index');
 
 Route::get('/dashboard', function () {
     return Inertia::render('Dashboard');

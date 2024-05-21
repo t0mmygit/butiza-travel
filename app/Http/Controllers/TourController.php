@@ -8,6 +8,7 @@ use Inertia\Inertia;
 use App\Models\Day;
 use App\Models\Tour;
 use App\Models\Itinerary;
+use App\Models\Reservation;
 
 class TourController extends Controller
 {
@@ -20,15 +21,13 @@ class TourController extends Controller
 
     public function show($tourId) 
     {
-        $tour = Tour::findOrFail($tourId);
+        $tour = Tour::with('destinations')->findOrFail($tourId);
 
         $itinerary = Itinerary::where('tour_id', $tourId)->firstOrFail();
 
         $days = Day::where('itinerary_id', $itinerary->id)
             ->orderBy('day_number')
             ->get();
-
-        // dd($tour, $itinerary, $days);
 
         return Inertia::render('Tour', [
             'tour' => $tour,
@@ -48,16 +47,24 @@ class TourController extends Controller
     public function submitReservation(Request $request)
     {
         $validated = $request->validate([
-            'date'              => 'required|date',
-            'people'            => 'required|numeric',
-            'notes'             => 'string|nullable',
-            'first_name'        => 'required|string',
-            'last_name'         => 'required|string',
-            'email'             => 'required|string|email:rfc,dns|lowercase',
-            'phone_number'      => 'required|numeric',
-            'contact_method' => 'required|numeric'
+            'tours_id'         => 'required|numeric',
+            'contact_methods' => 'required|numeric',
+            'preferred_date'   => 'required|date',
+            'passenger'       => 'required|numeric',
+            'note'            => 'string|nullable',
+            'first_name'      => 'required|string',
+            'last_name'       => 'required|string',
+            'email'           => 'required|string|email:rfc,dns|lowercase',
+            'phone_number'    => 'required|numeric'
         ]);
 
-        dd($validated);
+        $validated['contact_methods_id'] = $validated['contact_methods'];
+        unset($validated['contact_methods']);
+
+        $validated['preferred_date'] = date('Y-m-d', strtotime($validated['preferred_date']));
+
+        Reservation::create($validated);
+
+        return redirect(route('tour.show', $validated['tours_id']));
     }
 }

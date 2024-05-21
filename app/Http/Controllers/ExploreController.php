@@ -10,8 +10,10 @@ class ExploreController extends Controller
 {
     public function index()
     {
+        $tours = Tour::with('destinations')->get();
+
         return Inertia::render('Explore', [
-            'tours' => Tour::all()
+            'tours' => $tours
         ]);
     }
     

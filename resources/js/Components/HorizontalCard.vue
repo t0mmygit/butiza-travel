@@ -41,40 +41,37 @@ const formatPricePerDay = (price) => {
 const itemsListener = computed(() => {
     let index = props.items.findIndex(item => item.id === props.tour.id);
     return index != -1 ?  true : false;
-})
+});
+
+const formatDestination = destinations => destinations.map(destination => destination.destination_name).join(', ');
 
 </script>
 
 <template>
     <div v-if="tour" class="mb-4">
-        <div class="bg-white flex h-fit p-3 rounded-xl shadow">
+        <div class="bg-white rounded-lg shadow flex p-3 justify-between gap-4 items-start max-w-full">
 
             <!-- Card Image -->
-            <div id="image" class="aspect-square max-h-96">
+            <div id="image" class="aspect-square flex-initial min-w-60 max-w-60">
                 <img 
-                    class="object-contain rounded-md" 
+                    class="rounded" 
                     src="https://keycdn.borneoecotours.com/images/cache/tours/cover/bb07a-1000x1000.webp"
                 >
             </div>
 
             <!-- Card Details -->
-            <div id="text" class="ml-4">
-                <h3 class="text-2xl font-black mb-2">{{ tour.name }}</h3>
-                <div id="review" class="font-medium text-gray-500 mb-4">
+            <div class="mr-auto">
+                <h1 class="mb-2">{{ tour.name }}</h1>
+                <div class="font-medium text-gray-500 mb-4">
                     <span>No Reviews</span>
                 </div>
-                <div id="details" class="flex mb-4">
-                    <div class="flex flex-col font-bold pr-8">
-                        <span>Destinations</span>
-                        <span>Age Range</span>
-                    </div>
-                    <div>
-                        <div id="destination" class="flex gap-2">
-                            <span>{{ tour.destination }}</span>
-                        </div>
-                        <div>up to 95 years olds</div>
-                    </div>
+                <div class="grid grid-cols-3 mb-4">
+                    <strong class="col-span-1">Destinations</strong>
+                    <span class="truncate col-span-2">{{ formatDestination(tour.destinations) }}</span>
+                    <strong class="col-span-1">Age Range</strong>
+                    <span class="col-span-2">up to {{ tour.max_age }} years olds</span>
                 </div>
+
                 <div id="additional" class="flex gap-10 pr-4">
                     <div>
                         <h3 class="font-bold">Travel Intensity</h3>
@@ -92,19 +89,15 @@ const itemsListener = computed(() => {
             </div>
 
             <!-- Card Price -->
-            <div id="right-section" class="flex flex-col justify-between pr-2">
-                <div id="price">
-                    <div class="mb-3 flex flex-col">
-                        <span>From</span>
-                        <strong class="text-2xl">{{ formatPrice(tour.base_price) }}</strong>
-                    </div>
-                    <div id="person" class="flex flex-col">
-                        <span>Price Per Day</span>
-                        <strong>{{ formatPricePerDay(tour.base_price) }}</strong>
-                    </div>  
+            <div id="right-section" class="grid grid-rows-2 pr-2">
+                <div id="price" class="flex flex-col">
+                    <span>From</span>
+                    <strong class="text-2xl">{{ formatPrice(tour.base_price) }}</strong>
+                    <span>Price Per Day</span>
+                    <strong>{{ formatPricePerDay(tour.base_price) }}</strong>  
                 </div>
-                <div class="mb-2 mr-2">
-                    <Button @click="viewTour" class="mb-2 w-full">
+                <div class="flex flex-col place-self-end gap-2">
+                    <Button @click="viewTour">
                         View Tour
                     </Button>
                     <SecondaryButton @click="$emit('compare-tour', tour)" :active="itemsListener">

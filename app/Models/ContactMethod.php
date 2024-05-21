@@ -8,4 +8,9 @@ use Illuminate\Database\Eloquent\Model;
 class ContactMethod extends Model
 {
     use HasFactory;
+
+    public function reservations()
+    {
+        return $this->belongsTo(Reservation::class);
+    }
 }

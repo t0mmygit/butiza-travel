@@ -2,14 +2,16 @@
 import NavLink from '@/Components/NavLink.vue';
 import RoundedButton from './RoundedButton.vue';
 import Modal from './Modal.vue';
-import ModalEmailSection from '@/Components/SignUpModal/ModalEmailSection.vue';
-import ModalDetailSection from '@/Components/SignUpModal/ModalDetailSection.vue';
+import ModalEmailSection from '@/Components/Modal/ModalEmailSection.vue';
+import ModalPasswordSection from '@/Components/Modal/ModalPasswordSection.vue';
+import ModalDetailSection from '@/Components/Modal/ModalDetailSection.vue';
 
 import { ref } from 'vue';
 
 const emailModal = ref(false);
+const passwordModal = ref(false);
 const detailModal = ref(false);
-const email = ref();
+const email = ref(null);
 
 const confirm = (data) => {
     emailModal.value = false;
@@ -18,8 +20,15 @@ const confirm = (data) => {
 }
 
 const back = () => {
-    emailModal.value = true;
     detailModal.value = false;
+    emailModal.value = true;
+}
+
+const password = (data) => {
+    console.log(data);
+    emailModal.value = false;
+    passwordModal.value = true;
+    email.value = data;
 }
 
 </script>
@@ -45,7 +54,14 @@ const back = () => {
         :show="emailModal"
         @close="emailModal = false"
     >
-        <ModalEmailSection @confirm="confirm" />
+        <ModalEmailSection @confirm="confirm" @password="password" />
+    </Modal>
+
+    <Modal 
+        :show="passwordModal"
+        @close="passwordModal = false"
+    >
+        <ModalPasswordSection :email="email" />
     </Modal>
 
     <Modal 
