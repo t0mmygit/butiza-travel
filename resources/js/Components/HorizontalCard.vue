@@ -10,10 +10,13 @@ const props = defineProps({
     },
     items: {
         type: Array
+    },
+    mode: {
+        type: Boolean
     }
 });
 
-const emit = defineEmits(['compare-tour'])
+const emit = defineEmits(['compare-tour', 'host-tour'])
 
 const activeCompareButton = ref(false);
 
@@ -65,11 +68,12 @@ const formatDestination = destinations => destinations.map(destination => destin
                 <div class="font-medium text-gray-500 mb-4">
                     <span>No Reviews</span>
                 </div>
+
                 <div class="grid grid-cols-3 mb-4">
-                    <strong class="col-span-1">Destinations</strong>
-                    <span class="truncate col-span-2">{{ formatDestination(tour.destinations) }}</span>
-                    <strong class="col-span-1">Age Range</strong>
-                    <span class="col-span-2">up to {{ tour.max_age }} years olds</span>
+                    <strong>Destinations</strong>
+                    <span class="truncate col-start-2 col-span-3">{{ formatDestination(tour.destinations) }}</span>
+                    <strong>Age Range</strong>
+                    <span class="col-start-2 col-span-3">up to {{ tour.max_age }} years olds</span>
                 </div>
 
                 <div id="additional" class="flex gap-10 pr-4">
@@ -83,28 +87,33 @@ const formatDestination = destinations => destinations.map(destination => destin
                     </div>
                     <div>
                         <h3 class="font-bold">Durations</h3>
-                        <span>{{ tour.day }} Days</span>
+                        <span v-if="tour.day > 1">{{ tour.day }} Days</span>
+                        <span v-else-if="tour.day = 1">{{ tour.day }} Day</span>
                     </div>
                 </div>
             </div>
 
             <!-- Card Price -->
-            <div id="right-section" class="grid grid-rows-2 pr-2">
-                <div id="price" class="flex flex-col">
+            <div class="grid grid-rows-2 min-w-max">
+                <div class="flex flex-col">
                     <span>From</span>
                     <strong class="text-2xl">{{ formatPrice(tour.base_price) }}</strong>
-                    <span>Price Per Day</span>
-                    <strong>{{ formatPricePerDay(tour.base_price) }}</strong>  
+                    <span>Price per day</span>
+                    <strong>{{ formatPricePerDay(tour.base_price) }}</strong>
                 </div>
                 <div class="flex flex-col place-self-end gap-2">
                     <Button @click="viewTour">
                         View Tour
                     </Button>
-                    <SecondaryButton @click="$emit('compare-tour', tour)" :active="itemsListener">
+                    <SecondaryButton v-if="!mode" @click="$emit('compare-tour', tour)" :active="itemsListener">
                         <span>Compare</span>
+                    </SecondaryButton>
+                    <SecondaryButton v-else @click="$emit('host-tour', tour)">
+                        <span>Host Tour</span>
                     </SecondaryButton>
                 </div>
             </div>
+
         </div>
     </div>
 

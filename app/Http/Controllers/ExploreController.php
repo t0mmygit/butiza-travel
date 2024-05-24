@@ -8,13 +8,15 @@ use Inertia\Inertia;
 
 class ExploreController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         $tours = Tour::with('destinations')->get();
 
         return Inertia::render('Explore', [
-            'tours' => $tours
+            'tours' => $tours,
+            'mode' => $request->query('mode', "0")
         ]);
+
     }
     
     public function show($tours)

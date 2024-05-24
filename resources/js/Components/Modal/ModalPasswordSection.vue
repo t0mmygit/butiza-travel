@@ -7,7 +7,7 @@ import { onMounted } from 'vue';
 
 const props = defineProps({
     email: {
-        type: Object,
+        type: String,
         required: true
     }
 });

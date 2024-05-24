@@ -47,9 +47,9 @@ class TourController extends Controller
     public function submitReservation(Request $request)
     {
         $validated = $request->validate([
-            'tours_id'         => 'required|numeric',
+            'tours_id'        => 'required|numeric',
             'contact_methods' => 'required|numeric',
-            'preferred_date'   => 'required|date',
+            'preferred_date'  => 'required|date',
             'passenger'       => 'required|numeric',
             'note'            => 'string|nullable',
             'first_name'      => 'required|string',

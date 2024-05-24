@@ -5,10 +5,35 @@ import InputError from '@/Components/InputError.vue';
 import InputGroup from 'primevue/inputgroup';
 import InputGroupAddon from 'primevue/inputgroupaddon';
 import { useForm } from '@inertiajs/vue3';
+import axios from 'axios';
+import { computed, ref } from 'vue';
 
-const form = useForm({
+// const form = useForm({
+//     email: null,
+// });
+
+const emit = defineEmits(['confirm', 'password']);
+
+const errorMessage = ref(null);
+
+const form = ref({
     email: null,
 });
+
+const error = computed(() => errorMessage.value);
+
+const submitForm = () => {
+    axios.post(route('auth.email', form.value))
+        .then(response => {
+            if (!response.data) emit('confirm', form.value.email);
+            else emit('password', form.value.email);
+            form.value = null;
+        })
+        .catch(error => {
+            errorMessage.value = error.response.data.message;
+            console.error(error);
+        });
+}
 
 </script>
 
@@ -19,14 +44,16 @@ const form = useForm({
         </div>
         <h2 class="font-bold text-2xl mb-2">Sign in or create an account</h2>
         <p class="mb-6">Access member savings & community.</p>
-        <form @submit.prevent="form.post(route('auth.email', { email: form.email }), { 
-                onSuccess: (user) => { 
-                    if (!user) $emit('confirm', form.email ); 
-                    else $emit('password', form.email);
+        <!-- <form @submit.prevent="form.post(route('auth.email'), { 
+                onSuccess: (response) => { 
+                    console.log(response);
+                    $emit('confirm', form.email); 
+                    // else $emit('password', form.email);
                     form.reset();
                 }, 
                 onError: (error) => console.error('Error sending email:', error)})"
-        >
+        > -->
+        <form @submit.prevent="submitForm">
             <InputGroup class="group max-w-xs">
                 <InputGroupAddon class="group-hover:border-primary group-focus:border-primary group-active:border-primary">
                     <i class="pi pi-envelope"></i>
@@ -43,7 +70,7 @@ const form = useForm({
                     class="bg-primary border-primary"
                 />
             </InputGroup>
-            <InputError :message="form.errors.email" class="mt-2" />
+            <InputError :message="error" class="mt-2" />
         </form>
         <div class="my-6">or</div>
         <div class="flex flex-col gap-4">

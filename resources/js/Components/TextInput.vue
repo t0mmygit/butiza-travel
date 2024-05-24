@@ -15,6 +15,9 @@ const props = defineProps({
     },
     error: {
         type: String
+    },
+    placeholder: {
+        type: String
     }
 });
 
@@ -34,6 +37,7 @@ defineExpose({ focus: () => input.value.focus() });
         <label v-if="label" class="text-neutral-500 mb-2">{{ label }}</label>
         <input
             :type="type"
+            :placeholder="placeholder"
             class="border-neutral-300 border focus:border-primary-100 rounded-md shadow"
             v-model="model"
             ref="input"

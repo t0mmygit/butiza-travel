@@ -6,6 +6,7 @@ import Button from '@/Components/PrimaryButton.vue';
 import SecondaryButton from '@/Components/SecondaryButton.vue'
 
 import Breadcrumb from 'primevue/breadcrumb';
+import Avatar from 'primevue/avatar';
 
 import TourContent from '@/Components/Tour/TourContent.vue';
 import TourStepper from '@/Components/Tour/TourStepper.vue';
@@ -37,10 +38,6 @@ const reserveTour = () => {
         console.error('Error reserving tour:', error);
     }
 };
-
-const customizeTour = () => {
-
-}
 </script>
 
 <template>
@@ -113,7 +110,9 @@ const customizeTour = () => {
                 <TourTextBox label="Activities" :values="tour.destinations" />
                 <div class="mt-8">
                     <h2>Highlights</h2>
-                    
+                    <ul class="list-inside list-disc">
+                        <li></li>
+                    </ul>
                 </div>
             </TourContent>
             <TourContent id="itinerary" title="Itinerary">
@@ -128,6 +127,16 @@ const customizeTour = () => {
             <TourContent id="notes" title="Notes">  
             </TourContent>
             <TourContent id="review" title="Reviews & Ratings">  
+                <div class="mb-6">
+                    <div class="flex items-center">
+                        <Avatar icon="pi pi-user" class="mr-4" size="large" shape="circle" />
+                        <h4>Username</h4>
+                    </div>
+                    <div class="ml-16">
+                        <h3>Tour Title</h3>
+                        <p>Description</p>
+                    </div>
+                </div>
             </TourContent>
         </div>
         <Footer />

@@ -34,6 +34,7 @@ Route::resource('/explore', ExploreController::class)
 
 Route::get('/community', [CommunityController::class, 'index'])->name('community.index');
 Route::get('/host', [CommunityController::class, 'host'])->name('host.index');
+Route::post('/create-group-tour', [CommunityController::class, 'createGroupTour'])->name('host.create');
 
 Route::get('/dashboard', function () {
     return Inertia::render('Dashboard');

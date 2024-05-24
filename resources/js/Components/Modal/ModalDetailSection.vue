@@ -11,7 +11,7 @@ const props = defineProps({
 })
 
 const form = useForm({
-    email: props.email,
+    email: null,
     first_name: null,
     last_name: null,
     password: null,

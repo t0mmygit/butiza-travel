@@ -56,7 +56,6 @@ const form = useForm({
     phone_number: null
 });
 
-
 </script>
 
 <template>

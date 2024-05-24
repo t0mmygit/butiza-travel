@@ -13,10 +13,10 @@ const passwordModal = ref(false);
 const detailModal = ref(false);
 const email = ref(null);
 
-const confirm = (data) => {
+const confirm = (email) => {
     emailModal.value = false;
     detailModal.value = true;
-    email.value = data;
+    email.value = email;
 }
 
 const back = () => {
@@ -25,7 +25,6 @@ const back = () => {
 }
 
 const password = (data) => {
-    console.log(data);
     emailModal.value = false;
     passwordModal.value = true;
     email.value = data;

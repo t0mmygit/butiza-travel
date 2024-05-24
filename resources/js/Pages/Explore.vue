@@ -8,29 +8,52 @@ import InputTextFilter from '@/Components/InputTextFilter.vue';
 import CompareBox from '@/Components/CompareBox/CompareBox.vue';
 import AgeFilter from '@/Components/AgeFilter.vue';
 import MarginLayout from '@/Layouts/MarginLayout.vue';
+import Button from '@/Components/PrimaryButton.vue';
+import SecondaryButton from '@/Components/SecondaryButton.vue';
 
 // PrimeVue 
 import Slider from 'primevue/slider';
 import Toast from 'primevue/toast';
 import { useToast } from 'primevue/usetoast';
 
-
 import { computed, ref } from 'vue';
+import { router } from '@inertiajs/vue3';
 
 const props = defineProps({
     tours: {
         type: Array
+    },
+    mode: {
+        type: String
     }
-})
+});
 
 const items = ref([]);
 const currentFilter = ref([]);
 const range = ref([1, 20]);
 const toast = useToast();
+const hostMode = ref(false);
+const selectedHostTour = ref(null);
+
+if (props.mode == "1") hostMode.value = true;
+else hostMode.value = false; 
 
 const showToast = () => {
     toast.add({ severity: 'warn', summary: 'Limit Reached', detail: 'You have reached the limit of 3 tours.', life: 3000 })
 }
+
+const proceed = () => {
+    console.log(selectedHostTour.value.id)
+    try {
+        router.get(route('host.index', { id: selectedHostTour.value.id }))
+    } catch (error) {
+        console.error(error);
+    }
+};
+
+const back = () => {
+    router.get(route('host.index'))
+};
 
 // Emit event for HorizontalCard Component 
 const addCompareTour = (tour) => {
@@ -45,6 +68,12 @@ const removeCompareTour = (tour) => {
     const index = items.value.findIndex(item => item.id === tour.id);
     if (index != -1) items.value.splice(index, 1);
     else console.log("Tour ID not found!");
+}
+
+// Emit event for HorizontalCard Component
+const addHostTour = (tour) => {
+    if (selectedHostTour.value != tour) selectedHostTour.value = tour; 
+    else selectedHostTour.value = null;
 }
 
 // Handle filtering logic
@@ -122,7 +151,7 @@ const formatReadable = (text) => {
             @remove-compare-tour="removeCompareTour"
         />
         <div id="heading-container" class="bg-gradient-to-r from-primary-200 to-primary-400 font-sans py-4 shadow border">
-            <div id="heading" class="m-auto lg:w-5/6 xl:w-10/12 2xl:w-7/12">
+            <div id="heading" class="m-auto lg:w-5/6 xl:w-11/12 2xl:w-7/12">
                 <h1 class="text-2xl font-bold">Explore Malaysia</h1>
             </div>
         </div>
@@ -192,13 +221,37 @@ const formatReadable = (text) => {
                             :key="tour.id"
                             :tour="tour"
                             :items="items"
+                            :mode="hostMode"
                             @compare-tour="addCompareTour"
+                            @host-tour="addHostTour"
                         />
                     </div>
                 </div>
             </div>
         </section>
-
+        
         <Footer />
+        <div v-if="hostMode" class="sticky bottom-0">
+            <div class="bg-white h-20 outline outline-1 outline-neutral-300">
+                <div class="m-auto lg:w-5/6 xl:w-11/12 2xl:w-7/12 flex items-center h-full justify-between">
+                    <small>You are currently in host mode.</small>
+                    <div v-if="selectedHostTour" class="flex gap-2">
+                        <h3>Selected:</h3>
+                        <p>{{ selectedHostTour.name }}</p>
+                    </div>
+                    <h3 v-else>Please select a tour</h3>
+                    <div class="flex gap-2 pr-6">
+                        <SecondaryButton
+                            :icon="false"
+                            @click="back"
+                        >Back</SecondaryButton>
+                        <Button 
+                            :disabled="!selectedHostTour"
+                            @click="proceed"
+                        >Proceed</Button>
+                    </div>
+                </div>
+            </div>
+        </div>
     </MarginLayout>
 </template>

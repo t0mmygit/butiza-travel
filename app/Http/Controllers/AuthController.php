@@ -13,18 +13,18 @@ class AuthController extends Controller
         $request->validate([
             'email' => 'required|string|email:rfc,dns|lowercase',
         ]);
+        
+        $user = User::where('email', $request->email)->first();
 
-        User::where('email', $request->email)->firstOrFail();
+        return $user;
     }
 
     public function sendPassword(Request $request)
     {
         $validated = $request->validate([
-            'user' => 'required',
+            'user'     => 'required',
             'password' => 'required|password|string'
         ]);
-
-        dd($validated['user']);
     }
 
     public function sendUserDetail(Request $request)
