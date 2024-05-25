@@ -3,7 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Redirect;
 use Inertia\Inertia;
 
 class AuthController extends Controller
@@ -16,30 +20,59 @@ class AuthController extends Controller
         
         $user = User::where('email', $request->email)->first();
 
-        return $user;
+        return $user ? $user->email : '';
     }
 
-    public function sendPassword(Request $request)
+    public function sendPassword(Request $request): RedirectResponse
     {
-        $validated = $request->validate([
-            'user'     => 'required',
-            'password' => 'required|password|string'
+        $credentials = $request->validate([
+            'email'     => 'required',
+            'password' => 'required|string'
         ]);
+
+        if (Auth::attempt($credentials)) {
+            $request->session()->regenerate();
+            
+            return redirect()->intended('/');
+            // return redirect(route('explore.index'));
+        }
+
+        return back()->withErrors([
+            'password' => 'The provided credentials do not match our records.', 
+        ])->onlyInput('password');
     }
 
     public function sendUserDetail(Request $request)
     {
-        $validated = $request->validate([
-            'email'                 => 'required|string|email:rfc,dns|lowercase',
+        $request->validate([
+            'email'                 => 'required|string|email:rfc,dns|lowercase|unique'.User::class,
             'first_name'            => 'required|string',
             'last_name'             => 'required|string',
-            'password'              => 'required|confirmed|password|String',
-            'password_confirmation' => 'required|password',
+            'password'              => 'required|confirmed',
+            'password_confirmation' => 'required',
             'role'                  => 'required|string'
         ]);
 
-        User::create($validated);
+        $user = User::create([
+            'email'      => $request->email,
+            'first_name' => $request->first_name,
+            'last_name'  => $request->last_name,
+            'password'   => Hash::make($request->password)
+        ]);
+
+        Auth::login($user);
 
         return Inertia::render('Main');
+    }
+
+    public function logout(Request $request): RedirectResponse
+    {
+        Auth::guard('web')->logout();
+        // What is Auth::guard() anyway
+
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+
+        return redirect('/');   
     }
 }

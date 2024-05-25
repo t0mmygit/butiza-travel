@@ -8,7 +8,7 @@ const props = defineProps({
         type: String,
         required: true
     }
-})
+});
 
 const form = useForm({
     email: null,
@@ -18,6 +18,7 @@ const form = useForm({
     password_confirmation: null,
     role: 'traveller'
 });
+
 </script>
 
 <template>

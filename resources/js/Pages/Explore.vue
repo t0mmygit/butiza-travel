@@ -52,7 +52,7 @@ const proceed = () => {
 };
 
 const back = () => {
-    router.get(route('host.index'))
+    router.get(route('host.index'));
 };
 
 // Emit event for HorizontalCard Component 

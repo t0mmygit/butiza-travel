@@ -1,14 +1,16 @@
 <script setup>
 import { router } from '@inertiajs/vue3';
+import axios from 'axios';
 import Button from 'primevue/button';
 
 const hostTour = () => {
-    router.get(route('host.index'))
+    router.get(route('host.index'));
 };
 
 const searchTour = () => {
-    router.get(route('community.index'))
+    router.get(route('community.index'));
 };
+
 </script>
 
 <template>

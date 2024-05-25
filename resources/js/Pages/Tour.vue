@@ -5,7 +5,6 @@ import Footer from '@/Components/Footer.vue';
 import Button from '@/Components/PrimaryButton.vue';
 import SecondaryButton from '@/Components/SecondaryButton.vue'
 
-import Breadcrumb from 'primevue/breadcrumb';
 import Avatar from 'primevue/avatar';
 
 import TourContent from '@/Components/Tour/TourContent.vue';

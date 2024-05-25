@@ -12,13 +12,14 @@ const props = defineProps({
     }
 });
 
-onMounted(() => {
-    form.email = props.email;
-});
-
 const form = useForm({
     email: null,
     password: null,
+});
+
+onMounted(() => {
+    form.email = props.email;
+    console.log(form.email);
 });
 
 </script>
@@ -34,6 +35,7 @@ const form = useForm({
             <div class="mb-4">
                 <Password v-model="form.password" placeholder="Password" :feedback="false" toggleMask />
                 <InputError :message="form.errors.password" class="mt-2" />
+                <InputError :message="form.errors.email" class="mt-2" />
             </div>
             <Button
                 type="submit"

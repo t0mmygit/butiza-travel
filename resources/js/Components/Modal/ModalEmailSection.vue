@@ -8,10 +8,6 @@ import { useForm } from '@inertiajs/vue3';
 import axios from 'axios';
 import { computed, ref } from 'vue';
 
-// const form = useForm({
-//     email: null,
-// });
-
 const emit = defineEmits(['confirm', 'password']);
 
 const errorMessage = ref(null);
@@ -44,15 +40,6 @@ const submitForm = () => {
         </div>
         <h2 class="font-bold text-2xl mb-2">Sign in or create an account</h2>
         <p class="mb-6">Access member savings & community.</p>
-        <!-- <form @submit.prevent="form.post(route('auth.email'), { 
-                onSuccess: (response) => { 
-                    console.log(response);
-                    $emit('confirm', form.email); 
-                    // else $emit('password', form.email);
-                    form.reset();
-                }, 
-                onError: (error) => console.error('Error sending email:', error)})"
-        > -->
         <form @submit.prevent="submitForm">
             <InputGroup class="group max-w-xs">
                 <InputGroupAddon class="group-hover:border-primary group-focus:border-primary group-active:border-primary">

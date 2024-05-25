@@ -5,6 +5,8 @@ namespace App\Http\Middleware;
 use Closure;
 use Illuminate\Contracts\Session\Session;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Inertia\Inertia;
 use Symfony\Component\HttpFoundation\Response;
 
 class CommunityAuthenticate
@@ -14,12 +16,13 @@ class CommunityAuthenticate
      *
      * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
      */
-    public function handle(Request $request, Closure $next): Response
+    public function handle(Request $request, Closure $next)
     {
-        if (!auth()->check()) {
-            $request->session()->put('intended_url', $request->url());
-            $request->session()->put('open_signup', true);
-        }
+        if (!Auth::check()) {
+            return Inertia::render('Main', [
+                'auth' => true,
+            ]);
+        } 
 
         return $next($request);
     }
