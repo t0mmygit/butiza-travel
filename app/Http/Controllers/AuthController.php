@@ -48,7 +48,8 @@ class AuthController extends Controller
             'email'                 => 'required|string|email:rfc,dns|lowercase|unique:users',
             'first_name'            => 'required|string',
             'last_name'             => 'required|string',
-            'password'              => 'required|confirmed',
+            'password'              => 'required|confirmed', 
+            // Password Rule for password
             'password_confirmation' => 'required',
         ]);
 

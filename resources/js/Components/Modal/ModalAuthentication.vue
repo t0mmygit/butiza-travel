@@ -16,7 +16,6 @@ const props = defineProps({
 });
 
 watch(() => props.show, (newValue) => {
-    console.log(newValue);
     emailModal.value = props.show;
 });
 

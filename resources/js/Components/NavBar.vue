@@ -50,7 +50,7 @@ const items = [
             <div class="flex gap-4 ml-auto">
                 <RoundedButton>Bookmark</RoundedButton>
                 <RoundedButton v-if="!user" @click="modal = true">Sign In</RoundedButton>
-                <SplitButton v-else label="Profile" severity="secondary" rounded @click="profile" :model="items" />
+                <SplitButton v-else :label="user.name" severity="secondary" rounded @click="profile" :model="items" />
             </div>
         </div>
     </div>

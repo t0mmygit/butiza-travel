@@ -1,27 +1,8 @@
 <script setup>
-import { router, usePage } from '@inertiajs/vue3';
 import Button from 'primevue/button';
-import ModalAuthentication from '@/Components/Modal/ModalAuthentication.vue';
-import { computed, ref } from 'vue';
-
-const page = usePage();
-const modal = ref(false);
-
-const hostTour = () => {
-    router.get(route('host.index'));
-    // if (page.props.auth.user) 
-    // else modal.value = true;
-};
-
-const searchTour = () => {
-    if (page.props.auth.user) router.get(route('community.index'));
-    else modal.value = true;
-};
 </script>
 
 <template>
-    <ModalAuthentication :show="modal" />
-
     <div class="flex flex-col justify-center items-center p-6 mb-6">
         <div class="flex lg:justify-center lg:col-start-2 mb-4">
             <SvgLogo />
@@ -34,14 +15,14 @@ const searchTour = () => {
                 icon="pi pi-user-plus"
                 plain text raised 
                 class="shadow-none text-base outline outline-1 outline-gray-300 rounded hover:outline-primary hover:bg-white"
-                @click="hostTour"
+                @click="$inertia.get(route('host.index'))"
             />
             <Button
                 label="Join a group tour"
                 icon="pi pi-search"
                 plain text raised
                 class="shadow-none text-base outline outline-1 outline-gray-300 rounded hover:outline-primary hover:bg-white"
-                @click="searchTour"
+                @click="$inertia.get(route('community.index'))"
             />
         </div>
         <small class="text-gray-500 text-center mt-12">

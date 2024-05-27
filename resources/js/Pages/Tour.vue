@@ -6,6 +6,10 @@ import Button from '@/Components/PrimaryButton.vue';
 import SecondaryButton from '@/Components/SecondaryButton.vue'
 
 import Avatar from 'primevue/avatar';
+import Accordion from 'primevue/accordion';
+import AccordionTab from 'primevue/accordiontab';
+import DataTable from 'primevue/datatable';
+import Column from 'primevue/column';
 
 import TourContent from '@/Components/Tour/TourContent.vue';
 import TourStepper from '@/Components/Tour/TourStepper.vue';
@@ -17,14 +21,6 @@ import { defineProps } from 'vue';
 
 const props = defineProps({
     tour: {
-        type: Object,
-        required: true
-    },
-    itinerary: {
-        type: Object,
-        required: true
-    },
-    day: {
         type: Object,
         required: true
     }
@@ -57,7 +53,7 @@ const reserveTour = () => {
                     <p class="text-neutral-600">{{ tour.description }}</p>
                     <div class="flex flex-col gap-2 mt-4">
                         <Button @click="reserveTour">Reserve</Button>
-                        <SecondaryButton :icon="false" @click="customizeTour">Customize Tour</SecondaryButton>
+                        <SecondaryButton :icon="false">Customize Tour</SecondaryButton>
                     </div>
                 </div>
             </div>
@@ -105,11 +101,11 @@ const reserveTour = () => {
                         </template>
                     </TourIconBox>
                 </div>
-                <TourTextBox label="Destinations" :values="tour.destinations" />
-                <TourTextBox label="Activities" :values="tour.destinations" />
+                <TourTextBox label="Destinations" :value="tour.destinations" />
+                <TourTextBox label="Activities" :value="tour.activities" />
                 <div class="mt-8">
                     <h2>Highlights</h2>
-                    <ul class="list-inside list-disc">
+                    <ul>
                         <li></li>
                     </ul>
                 </div>
@@ -118,12 +114,25 @@ const reserveTour = () => {
                 <div class="bg-neutral h-40 mb-4">
                 </div>
                 <TourStepper 
-                    :days="day"
+                    :days="tour.itineraries.days"
                 />
             </TourContent>
             <TourContent id="available" title="Dates & Availability">
+                <DataTable :value="availability" stripedRows tableStyle="min-width: 50rem">
+                    <Column field="" header="Departure Date"></Column>
+                    <Column field="" header="Finished Date"></Column>
+                    <Column field="" header="Availability"></Column>
+                    <Column></Column>
+                </DataTable>
             </TourContent>
             <TourContent id="notes" title="Notes">  
+                <Accordion :multiple="true">
+                    <AccordionTab v-for="subject in tour.note.subjects" :header="subject.name">
+                        <ul v-for="bulletPoint in subject.bullet_points">
+                            <li>{{ bulletPoint.content }}</li>
+                        </ul>
+                    </AccordionTab>
+                </Accordion>
             </TourContent>
             <TourContent id="review" title="Reviews & Ratings">  
                 <div class="mb-6">

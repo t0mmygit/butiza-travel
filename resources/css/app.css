@@ -31,6 +31,9 @@
         a {
             @apply cursor-pointer
         }
+        ul {
+            @apply list-inside list-disc
+        }
     }
 }
 

@@ -2,12 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\BulletPoint;
 use App\Models\ContactMethod;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use App\Models\Day;
 use App\Models\Tour;
 use App\Models\Itinerary;
+use App\Models\Subject;
 use App\Models\Reservation;
 
 class TourController extends Controller
@@ -21,25 +23,22 @@ class TourController extends Controller
 
     public function show($tourId) 
     {
-        $tour = Tour::with('destinations')->findOrFail($tourId);
-
-        $itinerary = Itinerary::where('tour_id', $tourId)->firstOrFail();
-
-        $days = Day::where('itinerary_id', $itinerary->id)
-            ->orderBy('day_number')
-            ->get();
+        $tour = Tour::with([
+            'activities',
+            'destinations', 
+            'itineraries.days', 
+            'note.subjects.bulletPoints'
+        ])->findOrFail($tourId);
 
         return Inertia::render('Tour', [
             'tour' => $tour,
-            'itinerary' => $itinerary,
-            'day' => $days,
         ]);
     }
 
     public function reserve($tourId)
     {
         return Inertia::render('Reserve', [
-            'tour' => Tour::where('id', $tourId)->firstOrFail(),
+            'tour'            => Tour::where('id', $tourId)->firstOrFail(),
             'contact_methods' => ContactMethod::all()
         ]);
     }
