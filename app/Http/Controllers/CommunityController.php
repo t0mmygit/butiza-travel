@@ -7,12 +7,13 @@ use App\Models\Tour;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Carbon\Carbon;
+use Illuminate\Http\RedirectResponse;
 
 class CommunityController extends Controller
 {
     public function index()
     {
-        $groupTours = GroupTour::with('tour')->get();
+        $groupTours = GroupTour::with('tour', 'user')->get();
 
         return Inertia::render('Community', [
             'group_tours' => $groupTours
@@ -28,31 +29,34 @@ class CommunityController extends Controller
         ]);
     }
 
-    public function createGroupTour(Request $request)
+    public function createGroupTour(Request $request): RedirectResponse
     {
         $oneMonth = Carbon::now()->addMonth()->toDateString();
 
         $validated = $request->validate([
-            'tours_id'    => 'required|numeric',
+            'tour_id'    => 'required|numeric',
             'date'        => 'required|date|after:' . $oneMonth,
             'passenger'   => 'required|numeric',
             'description' => 'required|string'
         ]);
 
-        dd($request->user()->id);
-
         $groupTour = GroupTour::create([
-            'tours_id' => $validated['tours_id'],
-            'users_id' => $request->user()->id,
+            'tour_id' => $validated['tour_id'],
+            'user_id' => $request->user()->id,
             'date' => date('Y-m-d', strtotime($validated['date'])),
             'passenger' => $validated['passenger'],
             'description' => $validated['description']
         ]);
 
-        $groupTour->tour()->associate($validated['tours_id']);
-        $groupTour->user()->associate($validated['users_id']);
+        $groupTour->tour()->associate($groupTour['tour_id']);
+        $groupTour->user()->associate($groupTour['user_id']);
         $groupTour->save();
 
         return redirect(route('community.index'));
+    }
+
+    public function login()
+    {
+        return Inertia::render('CommunityLogin');
     }
 }

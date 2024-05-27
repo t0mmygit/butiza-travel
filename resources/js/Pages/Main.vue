@@ -6,23 +6,16 @@ import IconField from 'primevue/iconfield';
 import InputText from 'primevue/inputtext';
 import InputIcon from 'primevue/inputicon';
 import InputGroup from 'primevue/inputgroup';
-import InputGroupAddon from 'primevue/inputgroupaddon';
 import Modal from '@/Components/Modal.vue';
 import ModalGroupTour from '@/Components/Modal/ModalGroupTour.vue';
 import { router } from '@inertiajs/vue3';
 import { ref } from 'vue';
 
 const props = defineProps({
-    userAuth: {
+    isAuthenticated: {
         type: Boolean,
-        default: false,
     }
 });
-
-const isAuthenticated = ref(false);
-const authenticateStatus = () => {
-    isAuthenticated.value = props.userAuth;
-}
 
 const tourModal = ref(false);
 
@@ -41,7 +34,7 @@ const customize = () => {
     </Modal>
 
     <div class="flex flex-col min-h-screen">
-        <NavBar :person="isAuthenticated" />
+        <NavBar :isAuthenticated="isAuthenticated" />
         <main class="flex-1">
             <div id="main-container" class="bg-local bg-cover bg-center" style="background-image: url('https://keycdn.borneoecotours.com/images/cache/tours/cover/bb07a-1000x1000.webp');">
                 <div id="content-container" class="py-10">

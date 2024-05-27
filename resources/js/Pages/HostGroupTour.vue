@@ -27,7 +27,7 @@ const preset = () => {
 };
 
 const form = useForm({
-    tours_id: tourId,
+    tour_id: tourId,
     date: null,
     passenger: null,
     description: null,

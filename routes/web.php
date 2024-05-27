@@ -17,7 +17,6 @@ Route::get('/', function () {
    return Inertia::render('Main'); 
 })->name('main');
 
-Route::get('/login', [AuthController::class, 'isAuthorized'])->name('auth');
 Route::post('/send-email', [AuthController::class, 'sendEmail'])->name('auth.email');
 Route::post('/send-password', [AuthController::class, 'sendPassword'])->name('auth.password');
 Route::post('/send-detail', [AuthController::class, 'sendUserDetail'])->name('signup.detail');
@@ -36,15 +35,11 @@ Route::resource('/tour', TourController::class)
 Route::resource('/explore', ExploreController::class)
     ->only(['index', 'show']);
 
-Route::middleware([CommunityAuthenticate::class])->group(function () {
+Route::middleware('auth')->group(function () {
     Route::get('/community', [CommunityController::class, 'index'])->name('community.index');
     Route::get('/host', [CommunityController::class, 'host'])->name('host.index');
     Route::post('/create-group-tour', [CommunityController::class, 'createGroupTour'])->name('host.create');
 });
-
-// Route::get('/community', [CommunityController::class, 'index'])->name('community.index');
-// Route::get('/host', [CommunityController::class, 'host'])->name('host.index');
-// Route::post('/create-group-tour', [CommunityController::class, 'createGroupTour'])->name('host.create');
 
 Route::get('/dashboard', function () {
     return Inertia::render('Dashboard');

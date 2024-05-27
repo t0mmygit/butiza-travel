@@ -1,19 +1,27 @@
 <script setup>
-import { router } from '@inertiajs/vue3';
-import axios from 'axios';
+import { router, usePage } from '@inertiajs/vue3';
 import Button from 'primevue/button';
+import ModalAuthentication from '@/Components/Modal/ModalAuthentication.vue';
+import { computed, ref } from 'vue';
+
+const page = usePage();
+const modal = ref(false);
 
 const hostTour = () => {
     router.get(route('host.index'));
+    // if (page.props.auth.user) 
+    // else modal.value = true;
 };
 
 const searchTour = () => {
-    router.get(route('community.index'));
+    if (page.props.auth.user) router.get(route('community.index'));
+    else modal.value = true;
 };
-
 </script>
 
 <template>
+    <ModalAuthentication :show="modal" />
+
     <div class="flex flex-col justify-center items-center p-6 mb-6">
         <div class="flex lg:justify-center lg:col-start-2 mb-4">
             <SvgLogo />

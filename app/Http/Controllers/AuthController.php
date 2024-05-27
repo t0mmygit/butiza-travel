@@ -45,24 +45,22 @@ class AuthController extends Controller
     public function sendUserDetail(Request $request)
     {
         $request->validate([
-            'email'                 => 'required|string|email:rfc,dns|lowercase|unique'.User::class,
+            'email'                 => 'required|string|email:rfc,dns|lowercase|unique:users',
             'first_name'            => 'required|string',
             'last_name'             => 'required|string',
             'password'              => 'required|confirmed',
             'password_confirmation' => 'required',
-            'role'                  => 'required|string'
         ]);
 
         $user = User::create([
-            'email'      => $request->email,
-            'first_name' => $request->first_name,
-            'last_name'  => $request->last_name,
-            'password'   => Hash::make($request->password)
+            'name'     => $request->first_name. ' ' .$request->last_name,
+            'email'    => $request->email,
+            'password' => Hash::make($request->password)
         ]);
 
         Auth::login($user);
 
-        return Inertia::render('Main');
+        return redirect()->intended('/');
     }
 
     public function logout(Request $request): RedirectResponse

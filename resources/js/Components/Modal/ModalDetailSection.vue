@@ -1,6 +1,6 @@
 <script setup>
 import FloatInput from '@/Components/FloatInput.vue';
-import { useForm } from '@inertiajs/vue3';
+import { router, useForm } from '@inertiajs/vue3';
 import Button from 'primevue/button';
 
 const props = defineProps({
@@ -11,13 +11,16 @@ const props = defineProps({
 });
 
 const form = useForm({
-    email: null,
+    email: props.email,
     first_name: null,
     last_name: null,
     password: null,
-    password_confirmation: null,
-    role: 'traveller'
+    password_confirmation: null
 });
+
+const reset = () => {
+    router.get(route('main'));
+}
 
 </script>
 
@@ -39,7 +42,7 @@ const form = useForm({
         <h2 class="font-bold text-2xl mb-2">Join us. It's free.</h2>
         <p class="mb-12">Access member savings & community.</p>
         <form @submit.prevent="form.post(route('signup.detail'), { 
-            onSuccess: () => form.reset(),
+            onSuccess: () => { reset; form.reset(); },
             onError: (error) => console.error(error)})"
         >
             <div class="flex flex-col gap-4 mb-4">

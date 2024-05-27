@@ -7,21 +7,18 @@ import { computed, ref, watch } from 'vue';
 import { router, usePage } from '@inertiajs/vue3';
 
 const props = defineProps({
-    person: {
+    isAuthenticated: {
         type: Boolean,
     }
 });
 
 const modal = ref(false);
 
-watch(() => props.person, () => {
-    console.log(props.person)
-    modal.value = props.person;
+watch(() => props.isAuthenticated, (newValue) => {
+    modal.value = !newValue;
 });
 
-const reactiveModal = computed(() => {
-    return modal.value;
-});
+const reactiveModal = computed(() => modal.value);
 
 const user = computed(() => usePage().props.auth.user);
 
