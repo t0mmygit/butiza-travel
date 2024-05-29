@@ -1,11 +1,12 @@
 <script setup>
-import MarginLayout from '@/Layouts/MarginLayout.vue';
 import ChirpBox from '@/Components/ChirpBox.vue';
-import TextInput from '@/Components/TextInput.vue';
 import RoundedButton from '@/Components/RoundedButton.vue';
 import Dropdown from '@/Components/Dropdown.vue';
 import DropdownLink from '@/Components/DropdownLink.vue';
+
 import Button from 'primevue/button';
+import Badge from 'primevue/badge';
+import Avatar from 'primevue/avatar';
 
 const props = defineProps({
     group_tours: {
@@ -16,44 +17,127 @@ const props = defineProps({
 const navButton = [
     {
         label: "Home",
-        icon: "pi pi-home"
+        icon: 'pi pi-home'
     },
     {
-        label: "Bookmark",
-        icon: "pi pi-bookmark"
+        label: 'Bookmarks',
+        icon: 'pi pi-bookmark'
+    },
+    {
+        label: 'Notifications',
+        icon: 'pi pi-bell'
+    },
+    {
+        label: 'Group Tour',
+        icon: 'pi pi-users'
+    },
+    {
+        label: 'Settings',
+        icon: 'pi pi-cog'
+    },
+];
+
+const selections = [
+    {
+        label: 'All',
+    }, 
+    {
+        label: 'Post'
+    },
+    {
+        label: 'Group Tour'
     }
-]
+];
+
+const communityGuidelines = [
+  { 
+    header: "Respect and Courtesy",
+    paragraph: "Treat all members with respect and kindness."
+  },
+  { 
+    header: "Relevance",
+    paragraph: "Keep your posts and comments relevant to travel and tourism."
+  },
+  { 
+    header: "Original Content",
+    paragraph: "Share your own photos, stories, and experiences whenever possible."
+  },
+  { 
+    header: "Safety First",
+    paragraph: "Prioritize safety in all your travel recommendations and advice."
+  },
+  { 
+    header: "No Spam or Self-Promotion",
+    paragraph: "Avoid spamming the community with advertisements or irrelevant links."
+  },
+  { 
+    header: "Be Mindful of Language and Tone",
+    paragraph: "Use respectful language and maintain a positive tone."
+  },
+  { 
+    header: "Respect Privacy",
+    paragraph: "Protect the privacy of others and refrain from sharing personal information without consent."
+  },
+  { 
+    header: "Report Inappropriate Content",
+    paragraph: "If you come across any content that violates these guidelines, please report it to the moderators."
+  }
+];
 
 </script>
 
 <template>
-    <MarginLayout>
-
-        <div class="bg-white h-fit shadow py-6">
-            <div class="max-w-sm lg:max-w-full lg:mx-16 flex items-center relative">
-                <SvgLogo />
-            </div>
+    <!-- <div class="bg-white h-fit shadow py-6">
+        <div class="max-w-sm lg:max-w-full lg:mx-16 flex items-center relative">
+            <SvgLogo />
         </div>
+    </div> -->
 
-        <!-- <section class="mx-auto my-8 lg:flex xl:flex max-w-2xl xl:max-w-7xl"> -->
-        <div class="flex lg:w-11/12 mx-auto">
-            <section class="flex flex-row w-full min-h-dvh justify-center">
-                <header class="bg-neutral-300 w-fit ml-auto">
-                    <div>
-                        <nav class="flex flex-col items-start">
-                            <Button v-for="nav in navButton" :label="nav.label" :icon="nav.icon" plain text />
-                        </nav>
+    <!-- <section class="mx-auto my-8 lg:flex xl:flex max-w-2xl xl:max-w-7xl"> -->
+    <div class="flex lg:max-w-6xl mx-auto">
+        <section class="flex flex-row w-full min-h-dvh justify-center">
+            <header class="sticky flex-none items-end">
+                <div class="flex m-2 justify-center" @click="$inertia.get(route('main'))">
+                    <small class="flex cursor-pointer py-2 items-center gap-2">
+                        <i class="pi pi-angle-left"></i>
+                        Exit Community
+                    </small>
+                </div>
+                <div v-if="$page.props.auth.user">
+                    <div class="flex items-center mb-2 pl-2 py-2 rounded w-full">
+                        <Avatar icon="pi pi-user" class="mr-2" shape="circle" />
+                        <h2>{{ $page.props.auth.user.name }}</h2>
                     </div>
-                </header>
+                    <nav class="flex flex-col gap-1">
+                        <Button
+                            v-for="nav in navButton"
+                            :label="nav.label"
+                            :icon="nav.icon"
+                            class="hover:bg-neutral-300 w-full text-left"
+                            plain text
+                        />
+                    </nav>
+                </div>
+            </header>
     
-                <main class="flex items-start flex-grow min-h-full w-full border border-primary border-y-0 p-4">
-                    <div class="w-full">
-                        <div class="grid grid-cols-2 w-full justify-between gap-4">
-                            <ChirpBox v-for="group_tour in group_tours" class="rounded-md mb-4">
+            <main class="flex items-start flex-grow min-h-full w-full">
+                <div class="flex w-full h-full justify-between gap-4">
+                    <section class="flex-1 border border-primary border-y-0 bg-white">
+                        <div class="bg-white h-12 flex justify-between">
+                            <div v-for="selection in selections" class="flex flex-1 text-center justify-center items-center cursor-pointer border-b border-primary hover:bg-neutral-300">
+                                <a>{{ selection.label }}</a>
+                            </div>
+                        </div>
+                        <div class="p-2">
+                            <div class="flex gap-2 mb-4">
+                                <Button label="Create Post" outlined class="flex-1" />
+                                <Button label="Create Group Tour" outlined class="flex-1" @click="$inertia.get(route('host.index'))" />
+                            </div>
+                            <ChirpBox v-if="group_tours.length" v-for="group_tour in group_tours" class="rounded-md mb-4 border border-neutral-300">
                                 <div class="flex items-center mb-2 justify-between">
                                     <div class="flex items-center">
-                                        <div class="bg-neutral-500 rounded size-10 mr-3"></div>
-                                        <h3 class="mr-3">{{ group_tour.user.name }}</h3>
+                                        <Avatar class="mr-2" />
+                                        <h3>{{ group_tour.user.name }}</h3>
                                     </div>
                                     <Dropdown v-if="group_tour.user.id === $page.props.auth.user.id" class="mr-2">
                                         <template #trigger>
@@ -86,31 +170,26 @@ const navButton = [
                                     </div>
                                 </div>
                             </ChirpBox>
-                        </div>
-                        <!-- <div class="bg-neutral-300"></div> -->
-                    </div>
-    
-                    <!-- <ChirpBox>
-                        <div class="flex">
-                            <div>
-                                <div class="bg-neutral-500 rounded size-10 mr-3"></div>
-                            </div>
-                            <div class="flex flex-col w-full">
-                                <TextInput placeholder="What's happening" />
-                                <div class="h-10 flex flex-1 items-center justify-between">
-                                    <div class="flex gap-2 items-center">
-                                        <div class="bg-neutral-500 size-6 rounded"></div>
-                                        <div class="bg-neutral-500 size-6 rounded"></div>
-                                        <div class="bg-neutral-500 size-6 rounded"></div>
-                                        <div class="bg-neutral-500 size-6 rounded"></div>
-                                    </div>
-                                    <RoundedButton>CHIRP</RoundedButton>
-                                </div>
+                            <div v-else class="text-center p-4">
+                                <p>Nothing here? Well that's embarassing...</p>
                             </div>
                         </div>
-                    </ChirpBox> -->
-                </main>
-            </section>
-        </div>
-    </MarginLayout>
+                    </section>
+                    <section class="flex-none max-w-xs px-4 py-3">
+                        <div class="p-2 mb-4">
+                            <SvgLogo />
+                        </div>
+                        <h1 class="mb-4">Community Guideline</h1>
+                        <div v-for="guideline in communityGuidelines" :key="guideline.id" class="mb-4">
+                            <div class="flex items-center gap-2">
+                                <Badge />
+                                <h3>{{ guideline.header }}</h3>
+                            </div>
+                            <p>{{ guideline.paragraph }}</p>
+                        </div>
+                    </section>
+                </div>
+            </main>
+        </section>
+    </div>
 </template>

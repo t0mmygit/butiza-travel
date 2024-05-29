@@ -16,7 +16,7 @@ import TourStepper from '@/Components/Tour/TourStepper.vue';
 import TourIconBox from '@/Components/Tour/TourIconBox.vue';
 import TourTextBox from '@/Components/Tour/TourTextBox.vue';
 
-import { router } from '@inertiajs/vue3';
+import { useForm } from '@inertiajs/vue3';
 import { defineProps } from 'vue';
 
 const props = defineProps({
@@ -28,11 +28,24 @@ const props = defineProps({
 
 const reserveTour = () => {
     try {
-        router.get(route('tour.reserve', { id: props.tour.id }))
+        form.get(route('tour.reserve'));
     } catch (error) {
         console.error('Error reserving tour:', error);
     }
 };
+
+const bookDate = (availability_id) => {
+    try {
+        form.get(route('tour.book', { availabilityId: availability_id }));
+    } catch (error) {
+        console.error('Error reserving tour:', error);
+    }
+};
+
+const form = useForm({
+    tour_id: props.tour.id
+});
+
 </script>
 
 <template>
@@ -48,19 +61,24 @@ const reserveTour = () => {
                         class="rounded-xl"
                     >
                 </div>
-                <div class="bg-white flex flex-col shadow w-full rounded-xl px-4 py-6">         
+                <div id="reserve" class="bg-white flex flex-col shadow w-full rounded-xl px-4 py-6">         
                     <h1 class="text-2xl uppercase font-black pb-4">{{ tour.name }}</h1>
                     <p class="text-neutral-600">{{ tour.description }}</p>
-                    <div class="flex flex-col gap-2 mt-4">
-                        <Button @click="reserveTour">Reserve</Button>
-                        <SecondaryButton :icon="false">Customize Tour</SecondaryButton>
+                    <div class="flex gap-2 mt-4">
+                        <a v-if="tour.availabilities.length > 1" href="#available" class="flex-1">
+                            <Button class="w-full">
+                                Check Availability
+                            </Button>
+                        </a>
+                        <Button v-else @click="reserveTour" class="flex-1">Reserve</Button>
+                        <SecondaryButton :icon="false" class="flex-1">Customize This Tour</SecondaryButton>
                     </div>
                 </div>
             </div>
             <div class="bg-white m-auto h-12 rounded-full shadow w-fit flex items-center justify-around gap-16 px-8 font-bold">
                 <a href="#detail">Details</a>
                 <a href="#itinerary">Itinerary</a>
-                <a href="#available">Availability & Price</a>
+                <a href="#available">Date & Availability</a>
                 <a href="#note">Notes</a>
                 <a href="#review">Reviews & Ratings</a>
             </div>
@@ -103,10 +121,12 @@ const reserveTour = () => {
                 </div>
                 <TourTextBox label="Destinations" :value="tour.destinations" />
                 <TourTextBox label="Activities" :value="tour.activities" />
-                <div class="mt-8">
+                <div class="mt-8" v-if="tour.highlights.length != 0">
                     <h2>Highlights</h2>
                     <ul>
-                        <li></li>
+                        <li v-for="highlight in tour.highlights">
+                            {{ highlight.description }}
+                        </li>
                     </ul>
                 </div>
             </TourContent>
@@ -118,12 +138,27 @@ const reserveTour = () => {
                 />
             </TourContent>
             <TourContent id="available" title="Dates & Availability">
-                <DataTable :value="availability" stripedRows tableStyle="min-width: 50rem">
-                    <Column field="" header="Departure Date"></Column>
-                    <Column field="" header="Finished Date"></Column>
-                    <Column field="" header="Availability"></Column>
-                    <Column></Column>
+                <DataTable v-if="tour.availabilities.length != 0" :value="tour.availabilities" stripedRows tableStyle="min-width: 50rem">
+                    <Column field="departure_date" header="Departure Date"></Column>
+                    <Column field="finished_date" header="Finished Date"></Column>
+                    <Column header="Availability">
+                        <template #body="{ data }">
+                            <span v-if="data.maximum_slot > data.occupied_slot">{{ data.maximum_slot - data.occupied_slot }} slots left</span>
+                            <h4 v-else class="text-red-500">Occupied</h4>
+                        </template>
+                    </Column>
+                    <Column>
+                        <template #body="{ data }">
+                            <Button 
+                                :disabled="data.maximum_slot <= data.occupied_slot"
+                                @click="bookDate(data.pivot.availability_id)"
+                            >Reserve</Button>
+                        </template>
+                    </Column>
                 </DataTable>
+                <div v-else>
+                    <p>No available dates currently. Click <a href="#reserve" class="underline">'Reserve'</a> to reserve a slot for this tour.</p>
+                </div>
             </TourContent>
             <TourContent id="notes" title="Notes">  
                 <Accordion :multiple="true">

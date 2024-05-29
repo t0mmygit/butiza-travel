@@ -52,7 +52,7 @@ class CommunityController extends Controller
         $groupTour->user()->associate($groupTour['user_id']);
         $groupTour->save();
 
-        return redirect(route('community.index'));
+        return redirect(route('community'));
     }
 
     public function login()

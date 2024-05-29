@@ -19,9 +19,34 @@ const props = defineProps({
 
 const tourModal = ref(false);
 
-const customize = () => {
-    router.get(route('customize'));
-};
+function routeTo(routePath) {
+    if (routePath === 'groupTour') tourModal.value = true;
+    else router.get(route(routePath));
+}
+
+const heroBoxes = [
+    {
+        img: 'https://static.travelstride.com/store/ef/c8a39facc946ed960e425e6e27569d/4f8b67971e48794c9d63975391f5eb02.jpg',
+        header: 'Customize Your Adventure',
+        paragraph: 'Create your dream vacation with our easy planner. Craft your perfect adventure.',
+        button: 'Customize',
+        route: 'customize'
+    },
+    {
+        img: 'https://static.travelstride.com/store/ef/c8a39facc946ed960e425e6e27569d/4f8b67971e48794c9d63975391f5eb02.jpg',
+        header: 'Share the Adventure, Split the Cost',
+        paragraph: 'Traveling with friends made easy! Split bills hassle-free on group tours.',
+        button: 'Group Tour',
+        route: 'groupTour'
+    },
+    {
+        img: 'https://static.travelstride.com/store/ef/c8a39facc946ed960e425e6e27569d/4f8b67971e48794c9d63975391f5eb02.jpg',
+        header: 'Explore the Community',
+        paragraph: 'Traveling with friends made easy! Split bills hassle-free on group tours.',
+        button: 'Community',
+        route: 'community'
+    },
+]
 
 </script>
 
@@ -35,9 +60,10 @@ const customize = () => {
 
     <div class="flex flex-col min-h-screen">
         <NavBar :isAuthenticated="isAuthenticated" />
-        <main class="flex-1">
+        <main class="flex-1 bg-gray-200">
             <div id="main-container" class="bg-local bg-cover bg-center" style="background-image: url('https://keycdn.borneoecotours.com/images/cache/tours/cover/bb07a-1000x1000.webp');">
-                <div id="content-container" class="py-10">
+            <!-- <div id="main-container" class="bg-neutral-500 bg-local bg-cover bg-center"> -->
+                <div id="content-container" class="py-10 mb-8">
                     <h1 class="text-2xl text-center">Start Your Adventure Around Malaysia</h1>
                     <InputGroup class="py-8">
                         <IconField iconPosition="left" class="flex mx-auto">
@@ -45,7 +71,8 @@ const customize = () => {
                             <InputText placeholder="Search" class="rounded-full" />
                         </IconField>
                     </InputGroup>
-                    <div class="flex justify-center gap-16 py-10 text-center">
+
+                    <!-- <div class="flex justify-center gap-16 py-10 text-center">
                         <div id="group-tour" class="relative">
                             <div class="bg-white h-fit w-96 rounded-lg shadow-md p-6 items-center">
                                 <div class="mb-4">
@@ -64,9 +91,32 @@ const customize = () => {
                                 <Button @click="tourModal = true" label="Group Tour" text raised class="rounded-full bg-white text-sm" />
                             </div>
                         </div>
-                    </div>
+                    </div> -->  
                 </div>
             </div>
+
+            <section class="my-8 mx-auto max-w-2xl xl:max-w-7xl">
+                <h1 class="mb-4">More Features</h1>
+                <div class="grid grid-cols-3 gap-8 min-h-min">
+                    <div v-for="heroBox in heroBoxes" class="bg-white min-h-40 rounded-lg p-3 cursor-pointer shadow-lg">
+                        <img 
+                            :src="heroBox.img"
+                            class="rounded-md"
+                        >
+                        <div class="my-4">
+                            <h3 class="font-bold">{{ heroBox.header }}</h3>
+                            <p>{{ heroBox.paragraph }}</p>
+                        </div>
+                        <Button 
+                            :label="heroBox.button" 
+                            severity="contrast" outline  
+                            class="w-full"
+                            @click="routeTo(heroBox.route)"
+                        />
+                    </div>
+                </div>
+
+            </section>
         </main>
         <Footer />
     </div>

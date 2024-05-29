@@ -5,6 +5,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\MainController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CommunityController;
+use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\TourController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -27,19 +28,24 @@ Route::get('/customize', function () {
     return Inertia::render('Customize');
 })->name('customize');
 
-Route::get('/reserve/{tour}', [TourController::class, 'reserve'])->name('tour.reserve');
-Route::post('/reserve-submit', [TourController::class, 'submitReservation'])->name('tour.reserve-submit');
+Route::get('/reserve', [TourController::class, 'showReserveForm'])->name('tour.reserve');
+Route::get('/book/{availabilityId}', [TourController::class, 'showBookingForm'])->name('tour.book');
+Route::post('/submit-reservation', [TourController::class, 'submitReservation'])->name('tour.submit-reservation');
+Route::post('/validate-booking', [TourController::class, 'validateBooking'])->name('tour.validate-booking');
 Route::resource('/tour', TourController::class)
     ->only(['index', 'show']);
 
 Route::resource('/explore', ExploreController::class)
     ->only(['index', 'show']);
+    
+Route::get('/community', [CommunityController::class, 'index'])->name('community');
 
 Route::middleware('auth')->group(function () {
-    Route::get('/community', [CommunityController::class, 'index'])->name('community.index');
     Route::get('/host', [CommunityController::class, 'host'])->name('host.index');
     Route::post('/create-group-tour', [CommunityController::class, 'createGroupTour'])->name('host.create');
 });
+
+Route::post('/validate-payment', [PaymentController::class, 'validation'])->name('validate-payment');
 
 Route::get('/dashboard', function () {
     return Inertia::render('Dashboard');

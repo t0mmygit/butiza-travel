@@ -6,7 +6,7 @@ import Calendar from 'primevue/calendar';
 import TextInput from '@/Components/TextInput.vue';
 import InputError from '@/Components/InputError.vue';
 import { router, useForm } from '@inertiajs/vue3';  
-import { computed, ref } from 'vue';
+import { computed } from 'vue';
 
 const props = defineProps({
     tour: {
@@ -69,7 +69,7 @@ const form = useForm({
                     <div v-else>
                         <div class="flex items-center mb-6">
                             <div class="bg-white rotate-45 size-4 absolute xl:left-[-6px]"></div>
-                            <h1>Hey there, please fill in these forms to create your group tour.</h1>
+                            <h1>Next, please fill in these forms to create your group tour.</h1>
                         </div>
                         <form @submit.prevent="form.post(route('host.create'))">
                             <div class="mb-8 flex flex-col gap-2">

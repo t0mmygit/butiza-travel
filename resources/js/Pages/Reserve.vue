@@ -3,6 +3,7 @@ import MarginLayout from '@/Layouts/MarginLayout.vue';
 import Avatar from 'primevue/avatar';
 import Calendar from 'primevue/calendar';
 import Button from 'primevue/button';
+
 import TextInput from '@/Components/TextInput.vue';
 import InputError from '@/Components/InputError.vue';
 
@@ -30,22 +31,18 @@ const contactIcons = [
 ];
 
 const getContactMethodIcon = (iconName) => {
-    const icon = contactIcons.find(icon => {  return iconName.toLowerCase() in icon });
+    const icon = contactIcons.find(icon => iconName.toLowerCase() in icon );
     return icon ? icon[iconName.toLowerCase()] : '';
-}
+};
 
-const selectContactMethod = (contactMethodId) => {
-    selectedContactMethod.value = contactMethodId;
-}
+const selectContactMethod = (contactMethodId) => selectedContactMethod.value = contactMethodId;
 
-const reactiveTour = computed(() => {
-    selectedTour.value = props.tour.id;
-    return selectedTour.value;
-});
+const reactiveTour = computed(() => props.tour.id);
+
 const reactiveContactMethod = computed(() => selectedContactMethod.value);
 
 const form = useForm({
-    tours_id: reactiveTour,
+    tour_id: reactiveTour,
     contact_methods: reactiveContactMethod,
     preferred_date: null,
     passenger: null,
@@ -76,78 +73,77 @@ const form = useForm({
                     bg-white shadow rounded py-6 px-5 relative"
                 >
                     <!-- Title -->
-                    <div class="flex items-center mb-6">
-                        <div class="bg-white rotate-45 size-4 absolute xl:left-[-6px]"></div>
-                        <h1>Hey there, We just need a few details to reserve this tour.</h1>
-                    </div>
-                    <!-- User Detail -->
-                    <form @submit.prevent="form.post(route('tour.reserve-submit'))">
-                        <div class="mb-8 flex flex-col gap-2">
-                            <h4>When do you want your tour to start? *</h4>
-                            <Calendar v-model="form.preferred_date" dateFormat="dd MM yy" />
-                            <InputError :message="form.errors.preferred_date" />
+                    <section>
+                        <div class="flex items-center mb-6">
+                            <div class="bg-white rotate-45 size-4 absolute xl:left-[-6px]"></div>
+                            <h1>Hey there, We just need a few details to reserve this tour.</h1>
                         </div>
-                        <div class="mb-8 flex flex-col gap-2">
-                            <h4>How many people are traveling? *</h4>
-                            <TextInput v-model="form.passenger" placeholder="How many?" type="number" :error="form.errors.passenger" />
-                        </div>
-                        <div class="mb-8 flex flex-col gap-2">
-                            <h2>Special Request & Questions</h2>
-                            <textarea 
-                                v-model="form.note"
-                                placeholder="Feel free to tell us anything you'd like or how you want to make the trip perfect for you. (optional)"
-                                class="rounded-md border-neutral-300 shadow"
-                            ></textarea>
-                            <InputError :message="form.errors.note" />
-                        </div>
-                        <div class="mb-8 flex flex-col gap-2">
-                            <h2>Contact Info</h2>
-                            <div class="flex gap-6 mt-4">
-                                <TextInput v-model="form.first_name" label="First Name *" :error="form.errors.first_name" />
-                                <TextInput v-model="form.last_name" label="Last Name *" :error="form.errors.last_name" />
+                        <!-- Reservation Detail -->
+                        <form @submit.prevent="form.post(route('tour.submit-reservation'))">
+                            <div class="mb-8 flex flex-col gap-2">
+                                <h4>When do you want your tour to start? *</h4>
+                                <Calendar v-model="form.preferred_date" dateFormat="dd MM yy" />
+                                <InputError :message="form.errors.preferred_date" />
                             </div>
-                            <div class="flex gap-6 mt-4">
-                                <TextInput v-model="form.email" label="Email *" :error="form.errors.email" />
-                                <TextInput v-model="form.phone_number" label="Phone Number *" type="number" :error="form.errors.phone_number" />
+                            <div class="mb-8 flex flex-col gap-2">
+                                <h4>How many people are traveling? *</h4>
+                                <TextInput v-model="form.passenger" type="number" :error="form.errors.passenger" />
                             </div>
-                        </div>
-                        <div class="mb-8 flex flex-col gap-2">
-                            <h2>How should we contact you?</h2>
-                            <div class="flex gap-4">
-                                <Button 
-                                    v-for="method in contact_methods"
-                                    :key="method.id"
-                                    :label="method.method_name"
-                                    :icon="getContactMethodIcon(method.method_name)"
-                                    plain text raised
-                                    class="flex-1 shadow-none text-base outline outline-1 outline-gray-300 rounded hover:outline-indigo-500 hover:bg-white"
-                                    :class="[{'border-primary bg-primary-100 text-black': selectedContactMethod === method.id}]"
-                                    @click="selectContactMethod(method.id)"
-                                />
+                            <div class="mb-8 flex flex-col gap-2">
+                                <h2>Special Request & Questions</h2>
+                                <textarea
+                                    v-model="form.note"
+                                    placeholder="Feel free to tell us anything you'd like or how you want to make the trip perfect for you. (optional)"
+                                    class="rounded-md border-neutral-300 shadow"
+                                ></textarea>
+                                <InputError :message="form.errors.note" />
                             </div>
-                            <InputError :message="form.errors.contact_methods" />
-                        </div>
-                        <div class="flex place-content-end">
-                            <Button
-                                type="submit"
-                                label="Reserve Now"
-                            />
-                        </div>
-                    </form>
+                            <div class="mb-8 flex flex-col gap-2">
+                                <h2>Contact Info</h2>
+                                <div class="flex gap-6 mt-4">
+                                    <TextInput v-model="form.first_name" label="First Name *" :error="form.errors.first_name" />
+                                    <TextInput v-model="form.last_name" label="Last Name *" :error="form.errors.last_name" />
+                                </div>
+                                <div class="flex gap-6 mt-4">
+                                    <TextInput v-model="form.email" label="Email *" :error="form.errors.email" />
+                                    <TextInput v-model="form.phone_number" label="Phone Number *" type="number" :error="form.errors.phone_number" />
+                                </div>
+                            </div>
+                            <div class="mb-8 flex flex-col gap-2">
+                                <h2>How should we contact you?</h2>
+                                <div class="flex gap-4">
+                                    <Button
+                                        v-for="method in contact_methods"
+                                        :key="method.id"
+                                        :label="method.method_name"
+                                        :icon="getContactMethodIcon(method.method_name)"
+                                        plain text raised
+                                        class="flex-1 shadow-none text-base outline outline-1 outline-gray-300 rounded hover:outline-indigo-500 hover:bg-white"
+                                        :class="[{'border-primary bg-primary-100 text-black': selectedContactMethod === method.id}]"
+                                        @click="selectContactMethod(method.id)"
+                                    />
+                                </div>
+                                <InputError :message="form.errors.contact_methods" />
+                            </div>
+                            <div class="flex place-content-end">
+                                <Button type="submit" label="Reserve Now" />
+                            </div>
+                        </form>
+                    </section>
                 </div>
             </div>
-            <div class="bg-white rounded-md shadow-md min-w-72 max-w-72 h-fit hidden xl:block">
-                <div>
+            <div class="min-w-72 max-w-72 h-fit hidden xl:block">
+                <div class="bg-white rounded-md shadow-md mb-8">
                     <img 
                         src="https://static.travelstride.com/store/51/ad4f08f81843578f3ea235b037593e/b669206bb8425f9409b22d1a87c8d181.jpg"
                         class="rounded-t-md"
                     >
-                </div>
-                <div class="p-3">
-                    <h2>{{ tour.name }}</h2>
-                    <div class="flex items-center justify-between">
-                        <span class="text-xl font-medium">{{ tour.day }} Days</span>
-                        <span class="text-xl font-medium"><small class="text-black">From</small> RM{{ tour.base_price }}</span>
+                    <div class="p-3">
+                        <h2>{{ tour.name }}</h2>
+                        <div class="flex items-center justify-between">
+                            <span class="text-xl font-medium">{{ tour.day }} Days</span>
+                            <span class="text-xl font-medium"><small class="text-black">From</small> RM{{ tour.base_price }}</span>
+                        </div>
                     </div>
                 </div>
             </div>

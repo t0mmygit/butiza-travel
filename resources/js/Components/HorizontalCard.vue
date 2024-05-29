@@ -2,7 +2,7 @@
 import Button from '@/Components/PrimaryButton.vue'
 import SecondaryButton from '@/Components/SecondaryButton.vue'
 import { router } from '@inertiajs/vue3';
-import { computed, ref } from 'vue';
+import { computed } from 'vue';
 
 const props = defineProps({
     tour: {
@@ -17,8 +17,6 @@ const props = defineProps({
 });
 
 const emit = defineEmits(['compare-tour', 'host-tour'])
-
-const activeCompareButton = ref(false);
 
 const viewTour = () => {
     try {
@@ -46,7 +44,7 @@ const itemsListener = computed(() => {
     return index != -1 ?  true : false;
 });
 
-const formatDestination = destinations => destinations.map(destination => destination.destination_name).join(', ');
+const formatDestination = destinations => destinations.map(destination => destination.name).join(', ');
 
 </script>
 

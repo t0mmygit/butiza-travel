@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Tour extends Model
@@ -25,6 +26,16 @@ class Tour extends Model
     public function activities(): BelongsToMany
     {
         return $this->belongsToMany(Activity::class, 'tour_activities');
+    }
+
+    public function availabilities(): BelongsToMany
+    {
+        return $this->belongsToMany(Availability::class, 'tour_availabilities');
+    }
+
+    public function highlights(): HasMany
+    {
+        return $this->hasMany(Highlight::class);
     }
 
     public function note(): HasOne

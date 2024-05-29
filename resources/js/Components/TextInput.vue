@@ -18,6 +18,10 @@ const props = defineProps({
     },
     placeholder: {
         type: String
+    },
+    disabled: {
+        type: Boolean,
+        default: false
     }
 });
 
@@ -34,13 +38,14 @@ defineExpose({ focus: () => input.value.focus() });
 
 <template>
     <div class="flex flex-col flex-1">    
-        <label v-if="label" class="text-neutral-500 mb-2">{{ label }}</label>
+        <label v-if="label" class="text-neutral-500 text-sm mb-1 ml-2">{{ label }}</label>
         <input
             :type="type"
             :placeholder="placeholder"
-            class="border-neutral-300 border focus:border-primary-100 rounded-md shadow"
+            class="border-neutral-300 border focus:border-primary-100, rounded-md shadow disabled:bg-neutral"
             v-model="model"
             ref="input"
+            :disabled="disabled"
         />
         <p class="text-error text-sm mt-2">{{ error }}</p>
     </div>

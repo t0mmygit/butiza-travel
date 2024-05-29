@@ -4,8 +4,8 @@ import Button from 'primevue/button';
 
 <template>
     <footer class="h-fit py-8 bg-white">
-        <div id="section-container" class="m-auto lg:w-5/6 xl:w-11/12 2xl:w-7/12">
-            <div class="flex flex-row gap-x-24">
+        <div id="section-container" class="m-auto lg:max-w-7xl">
+            <div class="flex flex-row justify-around">
                 <div id="section-1">
                     <SvgLogo />
                     <h3 class="text-lg font-bold">Travel Malaysia With Us!</h3>

@@ -44,13 +44,33 @@ const items = [
                 <SvgLogo />
             </div>
             <div class="flex gap-4">
-                <NavLink label="Package" :href="route('tour.index')" :active="route().current('package.index')"></NavLink>
                 <NavLink label="Explore" :href="route('explore.index')" :active="route().current('explore.index')"></NavLink>
+                <NavLink label="Community" :href="route('community')" :active="route().current('community')"></NavLink>
+                <NavLink label="Contact" :href="route('community')" :active="route().current('community')"></NavLink>
             </div>
             <div class="flex gap-4 ml-auto">
-                <RoundedButton>Bookmark</RoundedButton>
-                <RoundedButton v-if="!user" @click="modal = true">Sign In</RoundedButton>
-                <SplitButton v-else :label="user.name" severity="secondary" rounded @click="profile" :model="items" />
+                <RoundedButton
+                    class="flex gap-2"
+                >
+                    <i class="pi pi-bookmark"></i>
+                    Bookmark
+                </RoundedButton>
+                <RoundedButton 
+                    v-if="!user" 
+                    class="flex gap-2"
+                    @click="modal = true"
+                >
+                    <i class="pi pi-sign-in"></i>
+                    Sign In
+                </RoundedButton>
+                <SplitButton 
+                    v-else 
+                    :model="items" 
+                    :label="user.name" 
+                    severity="secondary" 
+                    rounded 
+                    @click="profile" 
+                />
             </div>
         </div>
     </div>
