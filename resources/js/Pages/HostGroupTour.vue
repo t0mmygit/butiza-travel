@@ -29,7 +29,7 @@ const preset = () => {
 const form = useForm({
     tour_id: tourId,
     date: null,
-    passenger: null,
+    max_passenger: null,
     description: null,
 });
 
@@ -80,7 +80,7 @@ const form = useForm({
                             </div>
                             <div class="mb-8 flex flex-col gap-2">
                                 <h4>What is the maximum people for this tour? *</h4>
-                                <TextInput v-model="form.passenger" placeholder="How many?" type="number" :error="form.errors.passenger" />
+                                <TextInput v-model="form.max_passenger" placeholder="How many?" type="number" :error="form.errors.max_passenger" />
                             </div>
                             <div class="mb-8 flex flex-col gap-2">
                                 <h2>Description</h2>

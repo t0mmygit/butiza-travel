@@ -1,18 +1,38 @@
 <script setup>
-import ChirpBox from '@/Components/ChirpBox.vue';
+import Chirp from '@/Components/Community/Chirp.vue';
+import GroupTourChirp from '@/Components/Community/GroupTourChirp.vue';
 import RoundedButton from '@/Components/RoundedButton.vue';
 import Dropdown from '@/Components/Dropdown.vue';
 import DropdownLink from '@/Components/DropdownLink.vue';
+import PrimaryButton from '@/Components/PrimaryButton.vue';
 
 import Button from 'primevue/button';
 import Badge from 'primevue/badge';
 import Avatar from 'primevue/avatar';
+import Textarea from 'primevue/textarea';
+import Tag from 'primevue/tag';
+
+import dayjs from 'dayjs';
+import relativeTime from 'dayjs/plugin/relativeTime';
+import { useForm, usePage } from '@inertiajs/vue3';
+import { computed, ref } from 'vue';
+
+dayjs.extend(relativeTime);
 
 const props = defineProps({
-    group_tours: {
+    posts: {
         type: [Array, Object]
     }
 });
+
+console.log(props.posts);
+
+const posts = computed(() => props.posts.data);
+const filterType = ref(null);
+
+const page = usePage();
+
+const visiblePost = ref(false);
 
 const navButton = [
     {
@@ -37,7 +57,7 @@ const navButton = [
     },
 ];
 
-const selections = [
+const filterSelections = [
     {
         label: 'All',
     }, 
@@ -84,6 +104,20 @@ const communityGuidelines = [
   }
 ];
 
+function tags(type) {
+    switch(type) {
+        case 'post':
+            return 'Post';
+        case 'group_tour':
+            return 'Group Tour';
+    }
+}
+
+const form = useForm({
+    user_id: page.props.auth.user?.id,
+    content: null,
+});
+
 </script>
 
 <template>
@@ -92,6 +126,13 @@ const communityGuidelines = [
             <SvgLogo />
         </div>
     </div> -->
+
+    <div v-if="!$page.props.auth.user" class="fixed w-full h-20 bg-primary left-0 bottom-0">
+        <div class="flex justify-center items-center h-full">
+            <h2 class="text-white mr-4">Join the community and find your travel partners!</h2>
+            <PrimaryButton class="bg-neutral-800">Sign Up</PrimaryButton>
+        </div>
+    </div>
 
     <!-- <section class="mx-auto my-8 lg:flex xl:flex max-w-2xl xl:max-w-7xl"> -->
     <div class="flex lg:max-w-6xl mx-auto">
@@ -124,22 +165,38 @@ const communityGuidelines = [
                 <div class="flex w-full h-full justify-between gap-4">
                     <section class="flex-1 border border-primary border-y-0 bg-white">
                         <div class="bg-white h-12 flex justify-between">
-                            <div v-for="selection in selections" class="flex flex-1 text-center justify-center items-center cursor-pointer border-b border-primary hover:bg-neutral-300">
+                            <div v-for="selection in filterSelections" class="flex flex-1 text-center justify-center items-center cursor-pointer border-b border-primary hover:bg-neutral-300">
                                 <a>{{ selection.label }}</a>
                             </div>
                         </div>
-                        <div class="p-2">
+                        <div class="p-3">
                             <div class="flex gap-2 mb-4">
-                                <Button label="Create Post" outlined class="flex-1" />
+                                <Button label="Create Post" outlined class="flex-1" @click="visiblePost = !visiblePost" />
                                 <Button label="Create Group Tour" outlined class="flex-1" @click="$inertia.get(route('host.index'))" />
                             </div>
-                            <ChirpBox v-if="group_tours.length" v-for="group_tour in group_tours" class="rounded-md mb-4 border border-neutral-300">
+                            <Chirp v-if="visiblePost" class="flex">
+                                <Avatar icon="pi pi-user" class="mr-2 mt-1 flex-none" shape="circle" />
+                                <div class="flex flex-col w-full">
+                                    <Textarea placeholder="Share your experience..." rows="1" autoResize class="mb-2 border-none shadow-none" />
+                                    <div class="flex justify-between">
+                                        <div class="flex">
+                                            <Button icon="pi pi-image" text rounded aria-label="Image" />
+                                            <Button icon="pi pi-face-smile" text rounded aria-label="Emoji" />
+                                        </div>
+                                        <Button label="Post" rounded class="px-6" @click="form.post(route('post-store'))" />
+                                    </div>
+                                </div>
+                            </Chirp> 
+                            <Chirp v-if="posts != null" v-for="post in posts">
                                 <div class="flex items-center mb-2 justify-between">
                                     <div class="flex items-center">
-                                        <Avatar class="mr-2" />
-                                        <h3>{{ group_tour.user.name }}</h3>
+                                        <Avatar icon="pi pi-user" class="mr-2" shape="circle" />
+                                        <h3>{{ post.user.name }}</h3>
+                                        <small class="ml-2">{{ dayjs(post.created_at).fromNow() }}</small>
+                                        <small v-if="post.created_at !== post.updated_at"> &middot; edited</small>
+                                        <Tag v-if="post.type" :value="tags(post.type)" class="ml-2" />
                                     </div>
-                                    <Dropdown v-if="group_tour.user.id === $page.props.auth.user.id" class="mr-2">
+                                    <Dropdown v-if="post.user.id === $page.props.auth.user?.id" class="mr-2">
                                         <template #trigger>
                                             <button>
                                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
@@ -148,7 +205,12 @@ const communityGuidelines = [
                                             </button>
                                         </template>
                                         <template #content>
-                                            <button class="block w-full px-4 py-2 text-left text-sm leading-5 text-gray-700 hover:bg-gray-100 focus:bg-gray-100 transition duration-150 ease-in-out">
+                                            <button 
+                                                class="block w-full px-4 py-2 
+                                                text-left text-sm leading-5 text-gray-700 
+                                                hover:bg-gray-100 focus:bg-gray-100 
+                                                transition duration-150 ease-in-out"
+                                            >
                                                 Edit
                                             </button>
                                             <DropdownLink href="#" as="button">
@@ -157,19 +219,19 @@ const communityGuidelines = [
                                         </template>
                                     </Dropdown>
                                 </div>
-                                <h2>{{ group_tour.tour.name }}</h2>
-                                <p class="mb-2">{{ group_tour.description }}</p>
+                                <GroupTourChirp
+                                    :post="post"
+                                    image="https://static.travelstride.com/store/map_image/5061423/attachment/2a1bc8851483009a6ce5dce769eb39dd.jpg" 
+                                />
+                                <p class="mb-2">{{ post.description }}</p>
                                 <div class="flex justify-between">
                                     <div class="flex gap-2 items-center">
                                         <Button icon="pi pi-heart" severity="secondary" text rounded aria-label="Like" />
                                         <Button icon="pi pi-bookmark" severity="secondary" text rounded aria-label="Bookmark" />
                                         <Button icon="pi pi-share-alt" severity="secondary" text rounded aria-label="Share" />
                                     </div>
-                                    <div class="flex gap-2">
-                                        <RoundedButton>View Group Tour</RoundedButton>
-                                    </div>
                                 </div>
-                            </ChirpBox>
+                            </Chirp>
                             <div v-else class="text-center p-4">
                                 <p>Nothing here? Well that's embarassing...</p>
                             </div>

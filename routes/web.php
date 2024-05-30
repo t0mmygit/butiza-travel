@@ -6,6 +6,7 @@ use App\Http\Controllers\MainController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CommunityController;
 use App\Http\Controllers\PaymentController;
+use App\Http\Controllers\PostController;
 use App\Http\Controllers\TourController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -43,6 +44,7 @@ Route::get('/community', [CommunityController::class, 'index'])->name('community
 Route::middleware('auth')->group(function () {
     Route::get('/host', [CommunityController::class, 'host'])->name('host.index');
     Route::post('/create-group-tour', [CommunityController::class, 'createGroupTour'])->name('host.create');
+    Route::post('/create_post', [PostController::class, 'store'])->name('post.store');
 });
 
 Route::post('/validate-payment', [PaymentController::class, 'validation'])->name('validate-payment');
