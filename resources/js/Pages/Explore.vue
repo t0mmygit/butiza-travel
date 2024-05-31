@@ -42,15 +42,6 @@ const showToast = () => {
     toast.add({ severity: 'warn', summary: 'Limit Reached', detail: 'You have reached the limit of 3 tours.', life: 3000 })
 }
 
-const proceed = () => {
-    console.log(selectedHostTour.value.id)
-    try {
-        router.get(route('host.index', { id: selectedHostTour.value.id }))
-    } catch (error) {
-        console.error(error);
-    }
-};
-
 const back = () => {
     router.get(route('host.index'));
 };
@@ -247,7 +238,7 @@ const formatReadable = (text) => {
                         >Back</SecondaryButton>
                         <Button 
                             :disabled="!selectedHostTour"
-                            @click="proceed"
+                            @click="router.get(route('group-tour.index', { id: selectedHostTour.id }))"
                         >Proceed</Button>
                     </div>
                 </div>

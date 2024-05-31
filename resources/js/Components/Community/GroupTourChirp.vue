@@ -30,7 +30,7 @@ const props = defineProps({
             <div>
                 <div class="flex items-center gap-1">
                     <i class="pi pi-users"></i>
-                    <h3>3/{{ post.max_passenger }}</h3>
+                    <h3>{{ post.current_passenger }}/{{ post.max_passenger }}</h3>
                 </div>
             </div>
             <RoundedButton>View Group Tour</RoundedButton>

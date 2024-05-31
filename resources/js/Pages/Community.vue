@@ -1,21 +1,20 @@
 <script setup>
 import Chirp from '@/Components/Community/Chirp.vue';
+import ChirpTopSection from '@/Components/Community/ChirpTopSection.vue';
 import GroupTourChirp from '@/Components/Community/GroupTourChirp.vue';
-import RoundedButton from '@/Components/RoundedButton.vue';
-import Dropdown from '@/Components/Dropdown.vue';
-import DropdownLink from '@/Components/DropdownLink.vue';
 import PrimaryButton from '@/Components/PrimaryButton.vue';
+import InputError from '@/Components/InputError.vue';
 
 import Button from 'primevue/button';
 import Badge from 'primevue/badge';
 import Avatar from 'primevue/avatar';
 import Textarea from 'primevue/textarea';
-import Tag from 'primevue/tag';
 
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import { useForm, usePage } from '@inertiajs/vue3';
 import { computed, ref } from 'vue';
+import axios from 'axios';
 
 dayjs.extend(relativeTime);
 
@@ -25,13 +24,11 @@ const props = defineProps({
     }
 });
 
-console.log(props.posts);
-
 const posts = computed(() => props.posts.data);
+console.log(posts.value);
+const nextCursor = ref(props.posts.next_cursor);
 const filterType = ref(null);
-
-const page = usePage();
-
+const isLoading = ref(false);
 const visiblePost = ref(false);
 
 const navButton = [
@@ -104,29 +101,48 @@ const communityGuidelines = [
   }
 ];
 
-function tags(type) {
-    switch(type) {
-        case 'post':
-            return 'Post';
-        case 'group_tour':
-            return 'Group Tour';
+const loadPost = async () => {
+    if (isLoading.value || !nextCursor.value) return;
+    isLoading.value = true;
+
+    try {
+        const response = await axios.get('/community', {
+            params: {
+                type: filterType.value,
+                cursor: nextCursor.value
+            },
+            headers: {
+                'Accept': 'application/json'
+            }
+        });
+        posts.value.push(...response.data.data);
+        nextCursor.value = response.data.next_cursor;
+    } catch (error) {
+        console.error(error);
+    } finally {
+        isLoading.value = false;
     }
-}
+};
 
 const form = useForm({
-    user_id: page.props.auth.user?.id,
+    user_id: usePage().props.auth.user?.id,
     content: null,
 });
+
+const onScroll = () => {
+    if (
+        window.innerHeight + window.scrollY >= 
+        document.body.offsetHeight - 500 && !isLoading.value
+    ) {
+        loadPost();
+    }
+};
+
+window.addEventListener('scroll', onScroll);
 
 </script>
 
 <template>
-    <!-- <div class="bg-white h-fit shadow py-6">
-        <div class="max-w-sm lg:max-w-full lg:mx-16 flex items-center relative">
-            <SvgLogo />
-        </div>
-    </div> -->
-
     <div v-if="!$page.props.auth.user" class="fixed w-full h-20 bg-primary left-0 bottom-0">
         <div class="flex justify-center items-center h-full">
             <h2 class="text-white mr-4">Join the community and find your travel partners!</h2>
@@ -134,11 +150,10 @@ const form = useForm({
         </div>
     </div>
 
-    <!-- <section class="mx-auto my-8 lg:flex xl:flex max-w-2xl xl:max-w-7xl"> -->
     <div class="flex lg:max-w-6xl mx-auto">
         <section class="flex flex-row w-full min-h-dvh justify-center">
             <header class="sticky flex-none items-end">
-                <div class="flex m-2 justify-center" @click="$inertia.get(route('main'))">
+                <div class="flex m-2 justify-center" @click="route('main')">
                     <small class="flex cursor-pointer py-2 items-center gap-2">
                         <i class="pi pi-angle-left"></i>
                         Exit Community
@@ -172,58 +187,50 @@ const form = useForm({
                         <div class="p-3">
                             <div class="flex gap-2 mb-4">
                                 <Button label="Create Post" outlined class="flex-1" @click="visiblePost = !visiblePost" />
-                                <Button label="Create Group Tour" outlined class="flex-1" @click="$inertia.get(route('host.index'))" />
+                                <Button label="Create Group Tour" outlined class="flex-1" @click="$inertia.get(route('group-tour.index'))" />
                             </div>
                             <Chirp v-if="visiblePost" class="flex">
                                 <Avatar icon="pi pi-user" class="mr-2 mt-1 flex-none" shape="circle" />
-                                <div class="flex flex-col w-full">
-                                    <Textarea placeholder="Share your experience..." rows="1" autoResize class="mb-2 border-none shadow-none" />
-                                    <div class="flex justify-between">
-                                        <div class="flex">
-                                            <Button icon="pi pi-image" text rounded aria-label="Image" />
-                                            <Button icon="pi pi-face-smile" text rounded aria-label="Emoji" />
+                                <form @submit.prevent="form.post(route('post.store'), { onSuccess: () => form.reset() })" class="w-full">
+                                    <div class="flex flex-col w-full">
+                                        <Textarea
+                                            v-model="form.content"
+                                            rows="1" autoResize
+                                            placeholder="Share your experience..."
+                                            class="mb-2 shadow-none"
+                                            :invalid="form.errors.content ? true : false"
+                                        />
+                                        <InputError :message="form.errors.content" />
+                                        <div class="flex justify-between">
+                                            <div class="flex">
+                                                <Button icon="pi pi-image" text rounded aria-label="Image" />
+                                                <Button icon="pi pi-face-smile" text rounded aria-label="Emoji" />
+                                            </div>
+                                            <Button
+                                                type="submit"
+                                                label="Post"
+                                                rounded class="px-6"
+                                            />
                                         </div>
-                                        <Button label="Post" rounded class="px-6" @click="form.post(route('post-store'))" />
                                     </div>
-                                </div>
+                                </form>
                             </Chirp> 
-                            <Chirp v-if="posts != null" v-for="post in posts">
-                                <div class="flex items-center mb-2 justify-between">
-                                    <div class="flex items-center">
-                                        <Avatar icon="pi pi-user" class="mr-2" shape="circle" />
-                                        <h3>{{ post.user.name }}</h3>
-                                        <small class="ml-2">{{ dayjs(post.created_at).fromNow() }}</small>
-                                        <small v-if="post.created_at !== post.updated_at"> &middot; edited</small>
-                                        <Tag v-if="post.type" :value="tags(post.type)" class="ml-2" />
-                                    </div>
-                                    <Dropdown v-if="post.user.id === $page.props.auth.user?.id" class="mr-2">
-                                        <template #trigger>
-                                            <button>
-                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
-                                                    <path d="M6 10a2 2 0 11-4 0 2 2 0 014 0zM12 10a2 2 0 11-4 0 2 2 0 014 0zM16 12a2 2 0 100-4 2 2 0 000 4z" />
-                                                </svg>
-                                            </button>
-                                        </template>
-                                        <template #content>
-                                            <button 
-                                                class="block w-full px-4 py-2 
-                                                text-left text-sm leading-5 text-gray-700 
-                                                hover:bg-gray-100 focus:bg-gray-100 
-                                                transition duration-150 ease-in-out"
-                                            >
-                                                Edit
-                                            </button>
-                                            <DropdownLink href="#" as="button">
-                                                Delete
-                                            </DropdownLink>
-                                        </template>
-                                    </Dropdown>
-                                </div>
-                                <GroupTourChirp
-                                    :post="post"
-                                    image="https://static.travelstride.com/store/map_image/5061423/attachment/2a1bc8851483009a6ce5dce769eb39dd.jpg" 
-                                />
-                                <p class="mb-2">{{ post.description }}</p>
+                            <!-- Chirp Main Section -->
+                            <Chirp v-if="posts.length" v-for="post in posts">
+                                <!-- Group Tour Post -->
+                                <section v-if="post.type === 'group_tour'">
+                                    <ChirpTopSection :post="post" />
+                                    <GroupTourChirp
+                                        :post="post"
+                                        image="https://static.travelstride.com/store/map_image/5061423/attachment/2a1bc8851483009a6ce5dce769eb39dd.jpg"
+                                    />
+                                    <p class="mb-2">{{ post.description }}</p>
+                                </section>
+                                <!-- Normal Post -->
+                                <section v-if="post.type === 'normal_post'">
+                                    <ChirpTopSection :post="post" />
+                                    <p>{{ post.content }}</p>
+                                </section>
                                 <div class="flex justify-between">
                                     <div class="flex gap-2 items-center">
                                         <Button icon="pi pi-heart" severity="secondary" text rounded aria-label="Like" />
@@ -233,7 +240,7 @@ const form = useForm({
                                 </div>
                             </Chirp>
                             <div v-else class="text-center p-4">
-                                <p>Nothing here? Well that's embarassing...</p>
+                                <p>Nothing here? Be the first to share your adventure!</p>
                             </div>
                         </div>
                     </section>

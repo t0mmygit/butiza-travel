@@ -5,6 +5,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\MainController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CommunityController;
+use App\Http\Controllers\GroupTourController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\TourController;
@@ -13,7 +14,7 @@ use Inertia\Inertia;
 use App\Http\Middleware\CommunityAuthenticate;
 
 Route::resource('/', MainController::class)
-    ->only(['index']);
+->only(['index']);
 
 Route::get('/', function () {
    return Inertia::render('Main'); 
@@ -33,6 +34,7 @@ Route::get('/reserve', [TourController::class, 'showReserveForm'])->name('tour.r
 Route::get('/book/{availabilityId}', [TourController::class, 'showBookingForm'])->name('tour.book');
 Route::post('/submit-reservation', [TourController::class, 'submitReservation'])->name('tour.submit-reservation');
 Route::post('/validate-booking', [TourController::class, 'validateBooking'])->name('tour.validate-booking');
+
 Route::resource('/tour', TourController::class)
     ->only(['index', 'show']);
 
@@ -42,16 +44,16 @@ Route::resource('/explore', ExploreController::class)
 Route::get('/community', [CommunityController::class, 'index'])->name('community');
 
 Route::middleware('auth')->group(function () {
-    Route::get('/host', [CommunityController::class, 'host'])->name('host.index');
-    Route::post('/create-group-tour', [CommunityController::class, 'createGroupTour'])->name('host.create');
-    Route::post('/create_post', [PostController::class, 'store'])->name('post.store');
+    Route::get('/group-tour', [GroupTourController::class, 'index'])->name('group-tour.index');
+    Route::post('/create-group-tour', [GroupTourController::class, 'store'])->name('group-tour.store');
+});
+
+Route::middleware('auth')->group(function () {
+    Route::post('/create-post', [PostController::class, 'store'])->name('post.store');
+    Route::delete('/delete-post/{post}', [PostController::class, 'destroy'])->name('post.destroy');
 });
 
 Route::post('/validate-payment', [PaymentController::class, 'validation'])->name('validate-payment');
-
-Route::get('/dashboard', function () {
-    return Inertia::render('Dashboard');
-})->middleware(['verified'])->name('dashboard');
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');

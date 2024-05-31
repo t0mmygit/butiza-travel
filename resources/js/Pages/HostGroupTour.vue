@@ -1,12 +1,17 @@
 s<script setup>
 import MarginLayout from '@/Layouts/MarginLayout.vue';
+
 import Avatar from 'primevue/avatar';
 import Button from 'primevue/button';
 import Calendar from 'primevue/calendar';
+import SelectButton from 'primevue/selectbutton';
+import ToggleButton from 'primevue/togglebutton';
+import Textarea from 'primevue/textarea';
+
 import TextInput from '@/Components/TextInput.vue';
 import InputError from '@/Components/InputError.vue';
 import { router, useForm } from '@inertiajs/vue3';  
-import { computed } from 'vue';
+import { computed, ref } from 'vue';
 
 const props = defineProps({
     tour: {
@@ -26,11 +31,19 @@ const preset = () => {
     }
 };
 
+const selectedPrivacy = ref('Public');
+const options = ref(['Public', 'Private']);
+const isPrivate = computed(() => selectedPrivacy.value === 'Private' ? true : false);
+
+const selectedLock = ref(false);
+
 const form = useForm({
     tour_id: tourId,
     date: null,
     max_passenger: null,
     description: null,
+    is_private: isPrivate,
+    is_locked: selectedLock
 });
 
 </script>
@@ -71,7 +84,7 @@ const form = useForm({
                             <div class="bg-white rotate-45 size-4 absolute xl:left-[-6px]"></div>
                             <h1>Next, please fill in these forms to create your group tour.</h1>
                         </div>
-                        <form @submit.prevent="form.post(route('host.create'))">
+                        <form @submit.prevent="form.post(route('group-tour.store'))">
                             <div class="mb-8 flex flex-col gap-2">
                                 <h4>When should this group tour to start? *</h4>
                                 <Calendar v-model="form.date" dateFormat="dd MM yy" />
@@ -80,18 +93,28 @@ const form = useForm({
                             </div>
                             <div class="mb-8 flex flex-col gap-2">
                                 <h4>What is the maximum people for this tour? *</h4>
-                                <TextInput v-model="form.max_passenger" placeholder="How many?" type="number" :error="form.errors.max_passenger" />
+                                <TextInput v-model="form.max_passenger" type="number" :error="form.errors.max_passenger" />
                             </div>
                             <div class="mb-8 flex flex-col gap-2">
                                 <h2>Description</h2>
-                                <textarea 
+                                <Textarea 
                                     v-model="form.description"
-                                    placeholder="Provide a brief overview of the group tour."
-                                    class="rounded-md border-neutral-300 shadow"
-                                ></textarea>
+                                    rows="5" autoResize
+                                    class="rounded-md shadow"
+                                />
                                 <InputError :message="form.errors.description" />
                             </div>
-                            <div class="flex place-content-end">
+
+                            <div class="flex w-full justify-between">
+                                <div class="flex gap-4">
+                                    <SelectButton
+                                        v-model="selectedPrivacy"
+                                        :options="options"
+                                    />
+                                    <ToggleButton v-model="selectedLock" onLabel="Locked" offLabel="Unlocked" onIcon="pi pi-lock"
+                                        offIcon="pi pi-lock-open"
+                                    />
+                                </div>
                                 <Button
                                     type="submit"
                                     label="Create Group Tour"

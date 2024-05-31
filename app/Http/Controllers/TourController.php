@@ -3,14 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\Availability;
-use App\Models\BulletPoint;
 use App\Models\ContactMethod;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
-use App\Models\Day;
 use App\Models\Tour;
-use App\Models\Itinerary;
-use App\Models\Subject;
 use App\Models\Reservation;
 
 class TourController extends Controller
