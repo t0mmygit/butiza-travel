@@ -1,7 +1,7 @@
 <script setup>
 import Chirp from '@/Components/Community/Chirp.vue';
 import ChirpTopSection from '@/Components/Community/ChirpTopSection.vue';
-import GroupTourChirp from '@/Components/Community/GroupTourChirp.vue';
+import ChirpGroupTour from '@/Components/Community/ChirpGroupTour.vue';
 import PrimaryButton from '@/Components/PrimaryButton.vue';
 import InputError from '@/Components/InputError.vue';
 
@@ -12,9 +12,10 @@ import Textarea from 'primevue/textarea';
 
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
+import axios from 'axios';
+
 import { useForm, usePage } from '@inertiajs/vue3';
 import { computed, ref } from 'vue';
-import axios from 'axios';
 
 dayjs.extend(relativeTime);
 
@@ -25,11 +26,12 @@ const props = defineProps({
 });
 
 const posts = computed(() => props.posts.data);
-console.log(posts.value);
+
 const nextCursor = ref(props.posts.next_cursor);
 const filterType = ref(null);
 const isLoading = ref(false);
 const visiblePost = ref(false);
+const authModal = ref(false);
 
 const navButton = [
     {
@@ -124,6 +126,11 @@ const loadPost = async () => {
     }
 };
 
+const createPost = () => {
+    if (!usePage().props.auth.user?.id) authModal.value = true;
+    else visiblePost.value = !visiblePost.value;
+}
+
 const form = useForm({
     user_id: usePage().props.auth.user?.id,
     content: null,
@@ -143,17 +150,19 @@ window.addEventListener('scroll', onScroll);
 </script>
 
 <template>
+    <ModalAuthenticate :show="authModal" @reset="authModal = false" />
+
     <div v-if="!$page.props.auth.user" class="fixed w-full h-20 bg-primary left-0 bottom-0">
         <div class="flex justify-center items-center h-full">
             <h2 class="text-white mr-4">Join the community and find your travel partners!</h2>
-            <PrimaryButton class="bg-neutral-800">Sign Up</PrimaryButton>
+            <PrimaryButton class="bg-neutral-800" @click="authModal = true">Sign Up</PrimaryButton>
         </div>
     </div>
 
     <div class="flex lg:max-w-6xl mx-auto">
         <section class="flex flex-row w-full min-h-dvh justify-center">
             <header class="sticky flex-none items-end">
-                <div class="flex m-2 justify-center" @click="route('main')">
+                <div class="flex m-2 justify-center" @click="$inertia.get(route('main'))">
                     <small class="flex cursor-pointer py-2 items-center gap-2">
                         <i class="pi pi-angle-left"></i>
                         Exit Community
@@ -186,7 +195,7 @@ window.addEventListener('scroll', onScroll);
                         </div>
                         <div class="p-3">
                             <div class="flex gap-2 mb-4">
-                                <Button label="Create Post" outlined class="flex-1" @click="visiblePost = !visiblePost" />
+                                <Button label="Create Post" outlined class="flex-1" @click="createPost" />
                                 <Button label="Create Group Tour" outlined class="flex-1" @click="$inertia.get(route('group-tour.index'))" />
                             </div>
                             <Chirp v-if="visiblePost" class="flex">
@@ -220,7 +229,7 @@ window.addEventListener('scroll', onScroll);
                                 <!-- Group Tour Post -->
                                 <section v-if="post.type === 'group_tour'">
                                     <ChirpTopSection :post="post" />
-                                    <GroupTourChirp
+                                    <ChirpGroupTour
                                         :post="post"
                                         image="https://static.travelstride.com/store/map_image/5061423/attachment/2a1bc8851483009a6ce5dce769eb39dd.jpg"
                                     />

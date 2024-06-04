@@ -21,9 +21,9 @@ const props = defineProps({
                 :src="image"
                 class="rounded-ss-md h-full aspect-video"
             >
-            <div class="px-3 py-2 mb-2">
+            <div class="px-3 py-2 mb-2 h-full">
                 <h2>{{ post.tour.name }}</h2>
-                <p class="text-justify text-clip">{{ post.tour.description }}</p>
+                <p class="text-justify text-ellipsis overflow-hidden">{{ post.tour.description }}</p>
             </div>
         </div>
         <div class="flex items-center px-3 py-2 justify-between">
@@ -33,7 +33,7 @@ const props = defineProps({
                     <h3>{{ post.current_passenger }}/{{ post.max_passenger }}</h3>
                 </div>
             </div>
-            <RoundedButton>View Group Tour</RoundedButton>
+            <RoundedButton @click="$inertia.get(route('group-tour.lobby'))">View Group Tour</RoundedButton>
         </div>
     </div>
 </template>

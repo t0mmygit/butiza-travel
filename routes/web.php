@@ -45,8 +45,9 @@ Route::get('/community', [CommunityController::class, 'index'])->name('community
 
 Route::middleware('auth')->group(function () {
     Route::get('/group-tour', [GroupTourController::class, 'index'])->name('group-tour.index');
-    Route::post('/create-group-tour', [GroupTourController::class, 'store'])->name('group-tour.store');
-});
+    Route::get('/group-tour/lobby', [GroupTourController::class, 'lobby'])->name('group-tour.lobby');
+    Route::post('/group-tour/create', [GroupTourController::class, 'store'])->name('group-tour.store');
+}); 
 
 Route::middleware('auth')->group(function () {
     Route::post('/create-post', [PostController::class, 'store'])->name('post.store');

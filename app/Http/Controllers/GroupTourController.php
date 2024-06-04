@@ -8,14 +8,15 @@ use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
 use Carbon\Carbon;
 use Inertia\Inertia;
+use Inertia\Response;
 
 class GroupTourController extends Controller
 {
-    public function index(Request $request)
+    public function index(Request $request): Response
     {
         $query = $request->query('id');
 
-        return Inertia::render('HostGroupTour', [
+        return Inertia::render('GroupTour/Host', [
             'tour' => Tour::where('id', $query)->get()
         ]);
     }
@@ -48,5 +49,12 @@ class GroupTourController extends Controller
         $groupTour->save();
 
         return redirect(route('community'));
+    }
+
+    public function lobby(): Response
+    {
+        return Inertia::render('GroupTour/Lobby', [
+            //
+        ]);
     }
 }

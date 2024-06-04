@@ -18,12 +18,8 @@ const props = defineProps({
 });
 
 function tags(type) {
-    switch(type) {
-        case 'normal_post':
-            return 'Post';
-        case 'group_tour':
-            return 'Group Tour';
-    }
+    if (type === 'normal_post') return 'Post';
+    else return 'Group Tour';
 }
 
 </script>
@@ -36,6 +32,7 @@ function tags(type) {
             <small class="ml-2">{{ dayjs(post.created_at).fromNow() }}</small>
             <small v-if="post.created_at !== post.updated_at"> &middot; edited</small>
             <Tag v-if="post.type" :value="tags(post.type)" class="ml-2" />
+            <Tag v-if="post.is_private" severity="danger" value="Private" class="ml-2" />
         </div>
         <Dropdown v-if="post.user.id === $page.props.auth.user?.id" class="mr-2">
             <template #trigger>

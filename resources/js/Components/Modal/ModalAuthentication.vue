@@ -15,7 +15,7 @@ const props = defineProps({
     }
 });
 
-watch(() => props.show, (newValue) => {
+watch(() => props.show, () => {
     emailModal.value = props.show;
 });
 
@@ -44,11 +44,17 @@ const password = (data) => {
 </script>
 
 <template>
-    <Modal :show="emailModal" @close="$emit('reset'); emailModal = false">
+    <Modal 
+        :show="emailModal" 
+        @close="$emit('reset'); emailModal = false"
+    >
         <ModalEmailSection @confirm="confirm" @password="password" />
     </Modal>
 
-    <Modal :show="passwordModal" @close="passwordModal = false; $emit('reset')">
+    <Modal 
+        :show="passwordModal" 
+        @close="passwordModal = false; $emit('reset')"
+    >
         <ModalPasswordSection :email="email" />
     </Modal>
 

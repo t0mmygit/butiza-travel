@@ -20,8 +20,6 @@ import Button from 'primevue/button';
                     <h3 class="text-lg font-bold mb-2">Butiza Travel</h3>
                     <ul class="list-none font-medium text-gray-800 cursor-pointer">
                         <li>About Us</li>
-                        <li>Careers</li>
-                        <li>Sign Up as a Guide</li>
                         <li>Member Benefits</li>
                         <li>Why Group Tour</li>
                     </ul>
@@ -30,7 +28,6 @@ import Button from 'primevue/button';
                     <h3 class="text-lg font-bold mb-2">Connect</h3>
                     <ul class="list-none font-medium text-gray-800 cursor-pointer">
                         <li>Contact Us</li>
-                        <li>Write a Review</li>
                         <li>Blog</li>
                     </ul>
                 </div>
