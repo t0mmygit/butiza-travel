@@ -5,6 +5,8 @@ import Password from 'primevue/password';
 import { useForm } from '@inertiajs/vue3';
 import { onMounted } from 'vue';
 
+const emit = defineEmits(['close']);
+
 const props = defineProps({
     email: {
         type: String,
@@ -19,8 +21,15 @@ const form = useForm({
 
 onMounted(() => {
     form.email = props.email;
-    console.log(form.email);
 });
+
+const submitPassword = () => {
+    form.post(route('auth.password'), {
+        onSuccess: () => emit('close'),
+        onError: (error) => console.error(error),
+        onFinish: () => form.reset('password'),
+    })
+}
 
 </script>
 
@@ -31,11 +40,15 @@ onMounted(() => {
         </div>
         <h2 class="font-bold text-2xl mb-2">Welcome Back</h2>
         <p class="mb-6">Enter your password</p>
-        <form @submit.prevent="form.post(route('auth.password'))">
+        <form @submit.prevent="submitPassword">
             <div class="mb-4">
-                <Password v-model="form.password" placeholder="Password" :feedback="false" toggleMask />
+                <Password 
+                    v-model="form.password" 
+                    placeholder="Password" 
+                    :feedback="false" toggleMask 
+                    :invalid="form.errors.password != null ? true : false"
+                />
                 <InputError :message="form.errors.password" class="mt-2" />
-                <InputError :message="form.errors.email" class="mt-2" />
             </div>
             <Button
                 type="submit"

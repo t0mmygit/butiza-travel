@@ -7,6 +7,7 @@ import TabPanel from 'primevue/tabpanel';
 import InputNumber from 'primevue/inputnumber';
 import InputGroup from 'primevue/inputgroup';
 import InputGroupAddon from 'primevue/inputgroupaddon';
+import InputMask from 'primevue/inputmask';
 import Checkbox from 'primevue/checkbox';
 import Divider from 'primevue/divider';
 
@@ -15,13 +16,11 @@ import InputError from '@/Components/InputError.vue';
 
 import { ref, computed } from 'vue';
 import { useForm } from '@inertiajs/vue3';
+
 import dayjs from 'dayjs';
+import { useFormatPrice } from '@/Composables/formatPrice.js'; 
 
-const continuePayment = ref(false);
-const terms = ref(false); 
-const bookingData = ref(null);
-
-const selectedTour = ref(null);
+const paymentSection = ref(false);
 const selectedContactMethod = ref(null);
 
 const props = defineProps({
@@ -58,9 +57,10 @@ const reactiveCheckbox = computed(() => paymentForm.errors.terms ? true : false)
 
 const bookingForm = useForm({
     tour_id: reactiveTour,
-    contact_methods: reactiveContactMethod,
+    contact_method: reactiveContactMethod,
     departure_date: props.availability.departure_date,
     passenger: null,
+    note: null,
     first_name: null,
     last_name: null,
     email: null,
@@ -79,33 +79,18 @@ const paymentForm = useForm({
 });
 
 const bookingValidation = () => {
-    try {
-        bookingForm.post(route('tour.validate-booking'), {
-            onSuccess: () => {
-                bookingForm.reset();
-                continuePayment.value = true;
-            },
-            onFinish: () => {
-                // For Prototyping, delete later
-                continuePayment.value = true;
-            }
-        });
-    } catch (error) {
-        console.error(error);
-    }
+    bookingForm.post(route('tour.validate-booking'), {
+        onSuccess: () => paymentSection.value = true,
+        onError: (error) => console.error(error),
+    });
 };
 
 const paymentValidation = () => {
-    try {
-        paymentForm.post(route('validate-payment'), {
-            onSuccess: () => {
-                paymentForm.reset();
-                // Success message / Direct user to ...
-            }
-        });
-    } catch (error) {
-        console.error(error);
-    }
+    paymentForm.post(route('validate-payment'), {
+        onSuccess: () => bookingForm.post(route('tour.store-booking', { id: props.availability.id })),
+        onError: (error) => console.error(error),
+        onFinish: () => bookingForm.post(route('tour.store-booking', { id: props.availability.id })),
+    });
 };
 
 const datePlaceholder = () => {
@@ -132,10 +117,10 @@ const datePlaceholder = () => {
                     bg-white shadow rounded py-6 px-5 relative"
                 >
                     <!-- Title -->
-                    <section v-if="!continuePayment">
+                    <section v-if="!paymentSection">
                         <div class="flex items-center mb-6">
                             <div class="bg-white rotate-45 size-4 absolute xl:left-[-6px]"></div>
-                            <h1>Hey there, We just need a few details to reserve this tour.</h1>
+                            <h1>Hey there, We just need a few details to book this tour.</h1>
                         </div>
                         <!-- Booking Details -->
                         <form>
@@ -181,7 +166,7 @@ const datePlaceholder = () => {
                                         @click="selectContactMethod(method.id)"
                                     />
                                 </div>
-                                <InputError :message="bookingForm.errors.contact_methods" />
+                                <InputError :message="bookingForm.errors.contact_method" />
                             </div>
                         </form>
                     </section>
@@ -197,16 +182,33 @@ const datePlaceholder = () => {
                                 <!-- Payment Form -->
                                 <form>
                                     <div class="flex gap-4 mb-2">
-                                        <TextInput v-model="paymentForm.cardholder_name" label="Cardholder Name" placeholder="e.g. John Smith" :error="paymentForm.errors.cardholder_name" />
-                                        <TextInput v-model="paymentForm.card_number" type="number" label="Card Number" placeholder="**** **** **** ****" :error="paymentForm.errors.card_number" />
+                                        <TextInput v-model="paymentForm.cardholder_name" label="Cardholder Name" placeholder="e.g. JOHN SMITH" :error="paymentForm.errors.cardholder_name" />
+                                        <!-- <TextInput v-model="paymentForm.card_number" type="number" label="Card Number" placeholder="**** **** **** ****" :error="paymentForm.errors.card_number" /> -->
+                                        <div class="flex flex-col">
+                                            <label class="text-neutral-500 text-sm mb-1 ml-2">Card Number</label>
+                                            <InputMask
+                                                v-model="paymentForm.card_number"
+                                                mask="9999 9999 9999 9999"
+                                                placeholder="**** **** **** ****"
+                                            />
+                                        </div>
                                     </div>
                                     <div class="flex gap-4 mb-4">
                                         <div class="flex flex-col w-1/2">
                                             <label class="text-neutral-500 text-sm mb-1 ml-2">Expiry Date</label>
                                             <InputGroup>
-                                                <InputNumber v-model="paymentForm.card_month" placeholder="MM" />
+                                                <InputNumber 
+                                                    v-model="paymentForm.card_month" 
+                                                    placeholder="MM"
+                                                    :min="1"
+                                                    :max="12"
+                                                 />
                                                 <InputGroupAddon>/</InputGroupAddon>
-                                                <InputNumber v-model="paymentForm.card_year" placeholder="YY" />
+                                                <InputNumber 
+                                                    v-model="paymentForm.card_year" 
+                                                    placeholder="YY" 
+                                                    :useGrouping="false"
+                                                />
                                             </InputGroup>
                                             <InputError 
                                                 v-if="paymentForm.errors.card_month || paymentForm.errors.card_year" 
@@ -224,7 +226,7 @@ const datePlaceholder = () => {
                             </TabPanel>
                         </TabView>
                         <div class="flex items-start mt-8 ml-2">
-                            <Checkbox v-model="terms" name="terms" binary :invalid="reactiveCheckbox" />
+                            <Checkbox v-model="paymentForm.terms" name="terms" binary :invalid="reactiveCheckbox" />
                             <p class="ml-2">
                                 I accept and agree to Butiza Travel & Tour's
                                 <a class="underline text-primary">Terms & Condition</a>,  
@@ -234,7 +236,7 @@ const datePlaceholder = () => {
                         </div>
                     </section>
                 </div>
-                <small class="flex items-center ml-6 mt-2 cursor-pointer" @click="continuePayment = false">
+                <small v-if="paymentSection" class="flex items-center ml-6 mt-2 cursor-pointer" @click="paymentSection = false">
                     <i class="pi pi-angle-left"></i> 
                     Change Booking Details
                 </small>
@@ -249,29 +251,32 @@ const datePlaceholder = () => {
                         <h2>{{ tour.name }}</h2>
                         <div class="flex items-center justify-between">
                             <span class="text-xl font-medium">{{ tour.day }} Days</span>
-                            <span class="text-xl font-medium"><small class="text-black">From</small> RM{{ tour.base_price }}</span>
+                            <span class="text-xl font-medium"><small class="text-black">From</small> {{ useFormatPrice(tour.base_price) }}</span>
                         </div>
                     </div>
                 </div>
-                <div v-if="continuePayment" class="bg-white rounded-md shadow-md mb-8 p-3">
+                <div v-if="paymentSection" class="bg-white rounded-md shadow-md mb-8 p-3">
                     <h2 class="mb-4">Price Breakdown</h2>
                     <div class="flex justify-between">
-                        <small>XX Traveller x RM{{ tour.base_price }}</small>
-                        <small>RM{{ tour.base_price }}</small>
+                        <small>{{ bookingForm.passenger }} 
+                            Traveller<span v-if="bookingForm.passenger > 1">s</span> 
+                            x {{ useFormatPrice(tour.base_price) }}
+                        </small>
+                        <small>{{ useFormatPrice(tour.base_price * bookingForm.passenger) }}</small>
                     </div>
                     <Divider />
                     <div class="flex justify-between mb-4">
                         <h3>Total Due</h3>
-                        <h3>RM{{ tour.base_price }}</h3>
+                        <h3>{{ useFormatPrice(tour.base_price * bookingForm.passenger) }}</h3>
                     </div>
                     <Button 
-                        v-if="continuePayment"
+                        v-if="paymentSection"
                         class="w-full justify-center"
                         @click="paymentValidation"
                     >Proceed Payment</Button>
                 </div>
                 <Button 
-                    v-if="!continuePayment"
+                    v-if="!paymentSection"
                     class="w-full justify-center"
                     @click="bookingValidation"
                 >Continue</Button>

@@ -4,6 +4,9 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Reservation extends Model
 {
@@ -11,13 +14,18 @@ class Reservation extends Model
 
     protected $guarded = [];
 
-    public function tour()
+    public function tour(): BelongsTo
     {
-        return $this->hasOne(Tour::class, 'id', 'tours_id');
+        return $this->belongsTo(Tour::class);
     }
 
-    public function contactMethod()
+    public function contactMethod(): BelongsTo
     {
-        return $this->hasOne(ContactMethod::class, 'id', 'contact_methods_id');
+        return $this->belongsTo(ContactMethod::class);
+    }
+
+    public function user(): BelongsToMany
+    {
+        return $this->belongsToMany(User::class, 'user_reservations');
     }
 }

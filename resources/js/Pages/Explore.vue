@@ -38,19 +38,21 @@ const selectedHostTour = ref(null);
 if (props.mode == "1") hostMode.value = true;
 else hostMode.value = false; 
 
-const showToast = () => {
-    toast.add({ severity: 'warn', summary: 'Limit Reached', detail: 'You have reached the limit of 3 tours.', life: 3000 })
+const showToast = (action) => {
+    console.log(action);
+    switch(action) {
+        case 'compare':
+            toast.add({ severity: 'warn', summary: 'Limit Reached', detail: 'You have reached the limit of 3 tours.', life: 3000 })
+        case 'bookmark':
+            toast.add({ severity: 'success', summary: 'Bookmark Added', detail: 'You have successfully added a bookmark.', life: 3000 })
+    }
 }
-
-const back = () => {
-    router.get(route('host.index'));
-};
 
 // Emit event for HorizontalCard Component 
 const addCompareTour = (tour) => {
     const index = items.value.findIndex(item => item.id === tour.id);
     if (index != -1) items.value.splice(index, 1);
-    else if (items.value.length >= 3) showToast(); 
+    else if (items.value.length >= 3) showToast('compare'); 
     else items.value.push(tour);
 }
 
@@ -122,7 +124,7 @@ const handleFilter = (value, column) => {
 
 const travelIntensity = {
     column: 'travel_intensity',
-    value: ['Easy', 'Medium', 'Hard']   
+    value: ['Relaxed', 'Moderate', 'Adventurous']   
 };
 
 const formatReadable = (text) => {
@@ -215,6 +217,7 @@ const formatReadable = (text) => {
                             :mode="hostMode"
                             @compare-tour="addCompareTour"
                             @host-tour="addHostTour"
+                            @add-bookmark="showToast('bookmark')"
                         />
                     </div>
                 </div>
@@ -234,7 +237,7 @@ const formatReadable = (text) => {
                     <div class="flex gap-2 pr-6">
                         <SecondaryButton
                             :icon="false"
-                            @click="back"
+                            @click="$inertia.get(route('host.index'))"
                         >Back</SecondaryButton>
                         <Button 
                             :disabled="!selectedHostTour"

@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
@@ -41,5 +42,20 @@ class Tour extends Model
     public function note(): HasOne
     {
         return $this->hasOne(Note::class);
+    }
+
+    // public function userBookmarks(): HasMany
+    // {
+    //     return $this->hasMany(UserBookmark::class);
+    // }
+
+    // public function guestBookmarks(): HasMany
+    // {
+    //     return $this->hasMany(GuestBookmark::class);
+    // }
+
+    public function bookmarks(): HasMany
+    {
+        return $this->hasMany(Bookmark::class);
     }
 }

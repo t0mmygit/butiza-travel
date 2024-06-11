@@ -18,6 +18,7 @@ import TourTextBox from '@/Components/Tour/TourTextBox.vue';
 
 import { useForm } from '@inertiajs/vue3';
 import { defineProps } from 'vue';
+import dayjs from 'dayjs';
 
 const props = defineProps({
     tour: {
@@ -139,8 +140,16 @@ const form = useForm({
             </TourContent>
             <TourContent id="available" title="Dates & Availability">
                 <DataTable v-if="tour.availabilities.length != 0" :value="tour.availabilities" stripedRows tableStyle="min-width: 50rem">
-                    <Column field="departure_date" header="Departure Date"></Column>
-                    <Column field="finished_date" header="Finished Date"></Column>
+                    <Column header="Departure Date">
+                        <template #body="{ data }">
+                            <span>{{ dayjs(data.departure_date).format('DD MMM YYYY') }}</span>
+                        </template>
+                    </Column>
+                    <Column header="Finished Date">
+                        <template #body="{ data }">
+                            <span>{{ dayjs(data.finished_date).format('DD MMM YYYY') }}</span>
+                        </template>
+                    </Column>
                     <Column header="Availability">
                         <template #body="{ data }">
                             <span v-if="data.maximum_slot > data.occupied_slot">{{ data.maximum_slot - data.occupied_slot }} slots left</span>
@@ -152,7 +161,7 @@ const form = useForm({
                             <Button 
                                 :disabled="data.maximum_slot <= data.occupied_slot"
                                 @click="bookDate(data.pivot.availability_id)"
-                            >Reserve</Button>
+                            >Book</Button>
                         </template>
                     </Column>
                 </DataTable>
@@ -160,7 +169,7 @@ const form = useForm({
                     <p>No available dates currently. Click <a href="#reserve" class="underline">'Reserve'</a> to reserve a slot for this tour.</p>
                 </div>
             </TourContent>
-            <TourContent id="notes" title="Notes">  
+            <TourContent id="notes" title="Notes">
                 <Accordion :multiple="true">
                     <AccordionTab v-for="subject in tour.note.subjects" :header="subject.name">
                         <ul v-for="bulletPoint in subject.bullet_points">

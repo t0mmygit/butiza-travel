@@ -3,6 +3,8 @@ import FloatInput from '@/Components/FloatInput.vue';
 import { router, useForm } from '@inertiajs/vue3';
 import Button from 'primevue/button';
 
+const emit = defineEmits(['close']);
+
 const props = defineProps({
     email: {
         type: String,
@@ -18,8 +20,12 @@ const form = useForm({
     password_confirmation: null
 });
 
-const reset = () => {
-    router.get(route('main'));
+const submitDetail = () => {
+    form.post(route('signup.detail'), {
+        onSuccess: () => emit('close'),
+        onError: (error) => console.error(error),
+        onFinish: () => form.reset(),
+    })
 }
 
 </script>
@@ -41,10 +47,7 @@ const reset = () => {
         </div>
         <h2 class="font-bold text-2xl mb-2">Join us. It's free.</h2>
         <p class="mb-12">Access member savings & community.</p>
-        <form @submit.prevent="form.post(route('signup.detail'), { 
-            onSuccess: () => { reset; form.reset(); },
-            onError: (error) => console.error(error)})"
-        >
+        <form @submit.prevent="submitDetail">
             <div class="flex flex-col gap-4 mb-4">
                 <FloatInput v-model="form.first_name" label="First Name" value="firstName" :error="form.errors.first_name" />
                 <FloatInput v-model="form.last_name" label="Last Name" value="lastName" :error="form.errors.last_name" />

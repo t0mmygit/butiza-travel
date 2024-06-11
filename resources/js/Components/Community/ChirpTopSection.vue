@@ -8,7 +8,6 @@ import DropdownLink from '@/Components/DropdownLink.vue';
 
 import Tag from 'primevue/tag';
 import Avatar from 'primevue/avatar';
-import { router } from '@inertiajs/vue3';
 
 const props = defineProps({
     post: {

@@ -39,6 +39,9 @@ class HandleInertiaRequests extends Middleware
                 ...(new Ziggy)->toArray(),
                 'location' => $request->url(),
             ],
+            'cookie' => [
+                'guest_id' => $request->cookie('guest_id'),
+            ],
         ];
     }
 }

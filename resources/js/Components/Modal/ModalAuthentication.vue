@@ -24,18 +24,23 @@ const passwordModal = ref(false);
 const detailModal = ref(false);
 const email = ref(null);
 
-const confirm = (data) => {
+const openDetailModal = (data) => {
     emailModal.value = false;
     detailModal.value = true;
     email.value = data;
 }
 
-const back = () => {
+const detailBackToEmail = () => {
     detailModal.value = false;
     emailModal.value = true;
 }
 
-const password = (data) => {
+const passwordBackToEmail = () => {
+    passwordModal.value = false;
+    emailModal.value = true;
+}
+
+const openPasswordModal = (data) => {
     emailModal.value = false;
     passwordModal.value = true;
     email.value = data;
@@ -46,24 +51,30 @@ const password = (data) => {
 <template>
     <Modal 
         :show="emailModal" 
-        @close="$emit('reset'); emailModal = false"
+        @close="emailModal= false; $emit('reset')"
     >
-        <ModalEmailSection @confirm="confirm" @password="password" />
+        <ModalEmailSection @confirm="openDetailModal" @password="openPasswordModal" />
     </Modal>
 
     <Modal 
         :show="passwordModal" 
+        @previous="passwordBackToEmail" allowPrevious
         @close="passwordModal = false; $emit('reset')"
     >
-        <ModalPasswordSection :email="email" />
+        <ModalPasswordSection 
+            :email="email" 
+            @close="passwordModal = false; $emit('reset')"
+        />
     </Modal>
 
     <Modal 
         :show="detailModal"
-        allowPrevious
-        @previous="back"
+        @previous="detailBackToEmail" allowPrevious
         @close="detailModal = false; $emit('reset')"
     >
-        <ModalDetailSection :email="email" @previous="back" />
+        <ModalDetailSection 
+            :email="email"
+            @close="passwordModal = false; $emit('reset')"
+        />
     </Modal>
 </template>

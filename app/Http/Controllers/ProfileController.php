@@ -3,16 +3,31 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\ProfileUpdateRequest;
+use App\Models\Booking;
+use App\Models\Bookmark;
+use App\Models\Reservation;
+use App\Models\User;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cookie;
 use Illuminate\Support\Facades\Redirect;
 use Inertia\Inertia;
 use Inertia\Response;
 
 class ProfileController extends Controller
 {
+    public function index(): Response
+    {
+        $userId = Auth::user()->id;
+        $user = User::with('posts', 'reviews', 'bookings')->findOrFail($userId);
+
+        return Inertia::render('Profile/Account', [
+            'user' => $user,
+        ]);
+    }
+
     /**
      * Display the user's profile form.
      */
@@ -59,5 +74,34 @@ class ProfileController extends Controller
         $request->session()->regenerateToken();
 
         return Redirect::to('/');
+    }
+
+    public function history(Request $request): Response
+    {
+        $user = $request->user();
+
+        return Inertia::render('Profile/History', [
+            'bookings' => Booking::where('email', $user->email)->with('tour')->get(),
+            'reservations' => Reservation::where('email', $user->email)->with('tour')->get(),
+            'payments' => null,
+        ]);
+    } 
+
+    public function bookmark(Request $request): Response
+    {
+        if (Auth::check()) {
+            $user = $request->user()->id;
+        } else {
+            if (Cookie::has('guest_id')) {
+                $user = Cookie::get('guest_id');
+            }
+        }
+
+        $bookmarks = Bookmark::where('user_id', $user)
+                    ->with('tour')->get();
+        
+        return Inertia::render('Profile/Bookmark', [
+            'bookmarks' => $bookmarks,
+        ]);
     }
 }

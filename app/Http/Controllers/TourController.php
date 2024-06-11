@@ -2,12 +2,15 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Availability;
-use App\Models\ContactMethod;
-use Illuminate\Http\Request;
-use Inertia\Inertia;
 use App\Models\Tour;
 use App\Models\Reservation;
+use App\Models\Availability;
+use App\Models\Booking;
+use App\Models\ContactMethod;
+use App\Models\User;
+use Illuminate\Http\Request;
+use Inertia\Inertia;
+use Illuminate\Support\Facades\Auth;
 
 class TourController extends Controller
 {
@@ -22,7 +25,9 @@ class TourController extends Controller
     {
         $tour = Tour::with([
             'activities',
-            'availabilities',
+            'availabilities' => function ($query) {
+                $query->orderBy('departure_date', 'asc');
+            },
             'destinations', 
             'highlights',
             'itineraries.days', 
@@ -55,7 +60,7 @@ class TourController extends Controller
     {
         $validated = $request->validate([
             'tour_id'        => 'required|numeric',
-            'contact_methods' => 'required|numeric',
+            'contact_method' => 'required|numeric',
             'preferred_date'  => 'required|date',
             'passenger'       => 'required|numeric',
             'note'            => 'string|nullable',
@@ -65,28 +70,84 @@ class TourController extends Controller
             'phone_number'    => 'required|numeric'
         ]);
 
-        $validated['contact_methods_id'] = $validated['contact_methods'];
-        unset($validated['contact_methods']);
+        // contact_methods is used as error message
+        $validated['contact_method_id'] = $validated['contact_method'];
+        unset($validated['contact_method']);
 
         $validated['preferred_date'] = date('Y-m-d', strtotime($validated['preferred_date']));
 
-        Reservation::create($validated);
+        $reservation = Reservation::create($validated);
+        if (Auth::check()) {
+            $user = User::find(Auth::user()->id);
+            $user->reservations()->attach($reservation->id);
 
-        return redirect(route('tour.show', $validated['tours_id']));
+            return redirect(route('profile.history'));
+        }
+        // Redirection need to be changed/Add confirmation message
+        return redirect(route('tour.show', $validated['tour_id']));
     }
 
     public function validateBooking(Request $request)
     {
         $validated = $request->validate([
-            'tour_id'        => 'required|numeric',
-            'contact_methods' => 'required|numeric',
+            'tour_id'         => 'required|numeric',
+            'contact_method' => 'required|numeric',
             'departure_date'  => 'required|date',
-            'passenger'       => 'required|numeric',
+            'passenger'       => 'required|numeric|max:20',
             'note'            => 'string|nullable',
             'first_name'      => 'required|string',
             'last_name'       => 'required|string',
             'email'           => 'required|string|email:rfc,dns|lowercase',
             'phone_number'    => 'required|numeric'
         ]);
+    }
+
+    public function storeBooking(Request $request, $availabilityId)
+    {
+        $validated = $request->validate([
+            'tour_id'         => 'required|numeric',
+            'contact_method' => 'required|numeric',
+            'departure_date'  => 'required|date',
+            'passenger'       => 'required|numeric|max:20',
+            'note'            => 'string|nullable',
+            'first_name'      => 'required|string',
+            'last_name'       => 'required|string',
+            'email'           => 'required|string|email:rfc,dns|lowercase',
+            'phone_number'    => 'required|numeric',
+        ]);
+
+        // contact_methods is used as error message
+        $validated['contact_method_id'] = $validated['contact_method'];
+        unset($validated['contact_method']);
+
+        $validated['departure_date'] = date('Y-m-d', strtotime($validated['departure_date']));
+
+        $booking = Booking::create($validated);
+        $availability = Availability::find($availabilityId);
+        $availability->increment('occupied_slot');
+
+        
+        if (Auth::check()) {
+            $authenticatedUser = Auth::user();
+            
+            $user = User::find($authenticatedUser->id);
+            $user->bookings()->attach($booking->id);
+            
+            return redirect(route('profile.history'));
+        } 
+            
+        // NOTE: IF USER HAS AN ACCOUNT BUT IS NOT LOGGED IN DURING BOOKING
+        // Associates bookings with the current user based on similar email addresses.
+        // If bookings exist, find the current user and attach bookings to their profile
+        // by matching the emails of the current user with the emails associated with the bookings.
+        $currentUser = User::where('email', $validated['email'])->firstOrFail();
+        $bookings = Booking::where('email', $validated['email'])->firstOrFail();
+        if ($bookings) {
+            $user = User::find($currentUser->id);
+            $user->bookings()->attach($bookings->pluck('id'));
+        }
+        
+        // Redirection need to be changed/Add confirmation message
+        return redirect(route('tour.show', $validated['tour_id']));
     }
 }

@@ -43,7 +43,7 @@ const reactiveContactMethod = computed(() => selectedContactMethod.value);
 
 const form = useForm({
     tour_id: reactiveTour,
-    contact_methods: reactiveContactMethod,
+    contact_method: reactiveContactMethod,
     preferred_date: null,
     passenger: null,
     note: null,
@@ -123,7 +123,7 @@ const form = useForm({
                                         @click="selectContactMethod(method.id)"
                                     />
                                 </div>
-                                <InputError :message="form.errors.contact_methods" />
+                                <InputError :message="form.errors.contact_method" />
                             </div>
                             <div class="flex place-content-end">
                                 <Button type="submit" label="Reserve Now" />

@@ -15,7 +15,7 @@ class CommunityController extends Controller
     {
         $type = $request->query('type', null);
         $cursor = $request->query('cursor', null);
-        $perPage = 8;
+        $perPage = 6;
 
         switch($type) 
         {

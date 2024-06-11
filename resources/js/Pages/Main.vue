@@ -11,12 +11,6 @@ import ModalGroupTour from '@/Components/Modal/ModalGroupTour.vue';
 import { router } from '@inertiajs/vue3';
 import { ref } from 'vue';
 
-const props = defineProps({
-    isAuthenticated: {
-        type: Boolean,
-    }
-});
-
 const tourModal = ref(false);
 
 function routeTo(routePath) {
@@ -59,7 +53,7 @@ const heroBoxes = [
     </Modal>
 
     <div class="flex flex-col min-h-screen">
-        <NavBar :isAuthenticated="isAuthenticated" />
+        <NavBar />
         <main class="flex-1 bg-gray-200">
             <div id="main-container" class="bg-local bg-cover bg-center" style="background-image: url('https://keycdn.borneoecotours.com/images/cache/tours/cover/bb07a-1000x1000.webp');">
             <!-- <div id="main-container" class="bg-neutral-500 bg-local bg-cover bg-center"> -->
@@ -99,10 +93,10 @@ const heroBoxes = [
                 <h1 class="mb-4">More Features</h1>
                 <div class="grid grid-cols-3 gap-8 min-h-min">
                     <div v-for="heroBox in heroBoxes" class="bg-white min-h-40 rounded-lg p-3 cursor-pointer shadow-lg">
-                        <img 
+                        <!-- <img 
                             :src="heroBox.img"
                             class="rounded-md"
-                        >
+                        > -->
                         <div class="my-4">
                             <h3 class="font-bold">{{ heroBox.header }}</h3>
                             <p>{{ heroBox.paragraph }}</p>
