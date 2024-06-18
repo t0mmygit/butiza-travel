@@ -23,7 +23,6 @@ class ExploreController extends Controller
         $ids = explode(',', $tours);
 
         return Inertia::render('Compare/Tour', [
-            // 'tours' => Tour::whereIn('id', $ids)->get(),
             'tours' => Tour::with('destinations')->whereIn('id', $ids)->get(),
         ]);
     }

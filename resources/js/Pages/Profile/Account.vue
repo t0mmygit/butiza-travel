@@ -22,7 +22,7 @@ const stats = [
     },
     {
         label: props.user.bookings.length > 1 ? 'Adventures' : 'Adventure',
-        value: props.user.bookings.length,
+        value: props.user.bookings.status === 'completed' ? props.user.bookings.length : 0,
     }
 ];
 

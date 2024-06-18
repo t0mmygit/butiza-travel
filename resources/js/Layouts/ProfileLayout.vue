@@ -27,13 +27,14 @@ const items = [
         command: () => router.get(route('profile.history'))
     },
     {
-        label: 'Bookmark',
+        label: 'Bookmarks',
         icon: 'pi pi-bookmark',
         command: () => router.get(route('profile.bookmark'))
     },
     {
-        label: 'Review',
-        icon: 'pi pi-star'
+        label: 'Reviews',
+        icon: 'pi pi-star',
+        command: () => router.get(route('profile.review'))
     }
 ];
 

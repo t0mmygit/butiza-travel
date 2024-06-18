@@ -149,7 +149,7 @@ const datePlaceholder = () => {
                                 </div>
                                 <div class="flex gap-6 mt-4">
                                     <TextInput v-model="bookingForm.email" label="Email *" :error="bookingForm.errors.email" />
-                                    <TextInput v-model="bookingForm.phone_number" label="Phone Number *" type="number" :error="bookingForm.errors.phone_number" />
+                                    <TextInput v-model="bookingForm.phone_number" label="Phone Number *" type="tel" inputmode="numeric" pattern="[0-9]*" :error="bookingForm.errors.phone_number" />
                                 </div>
                             </div>
                             <div class="mb-8 flex flex-col gap-2">

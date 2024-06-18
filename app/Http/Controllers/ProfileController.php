@@ -2,10 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\BookingStatus;
 use App\Http\Requests\ProfileUpdateRequest;
 use App\Models\Booking;
 use App\Models\Bookmark;
 use App\Models\Reservation;
+use App\Models\Review;
 use App\Models\User;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Http\RedirectResponse;
@@ -76,12 +78,28 @@ class ProfileController extends Controller
         return Redirect::to('/');
     }
 
+    // NOTE: NEED MODIFICATION
     public function history(Request $request): Response
     {
         $user = $request->user();
 
+        $bookings = Booking::where('email', $user->email)->with([
+            'tour.destinations',
+            'tour.itineraries.days'
+        ])->get();
+
+        $statuses = array_map(function($status) {
+            return [
+                'name' => $status,
+                'value' => $status->getValue(),
+                'severity' => $status->getSeverity(),
+            ];
+        }, BookingStatus::cases());
+
         return Inertia::render('Profile/History', [
-            'bookings' => Booking::where('email', $user->email)->with('tour')->get(),
+            'bookings' => $bookings,
+            'reviews' => Review::all(), // THIS IS TERRIBLE FOR SCALING (will cause lag)
+            'bookingStatuses' => $statuses,
             'reservations' => Reservation::where('email', $user->email)->with('tour')->get(),
             'payments' => null,
         ]);
@@ -102,6 +120,17 @@ class ProfileController extends Controller
         
         return Inertia::render('Profile/Bookmark', [
             'bookmarks' => $bookmarks,
+        ]);
+    }
+
+    public function review(Request $request): Response
+    {
+        $user = $request->user();
+
+        $reviews = Review::with('tour', 'booking')->where('user_id', $user->id)->get();
+
+        return Inertia::render('Profile/Review', [
+            'reviews' => $reviews,
         ]);
     }
 }

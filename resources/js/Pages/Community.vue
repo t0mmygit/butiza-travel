@@ -14,7 +14,7 @@ import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import axios from 'axios';
 
-import { useForm, usePage } from '@inertiajs/vue3';
+import { router, useForm, usePage } from '@inertiajs/vue3';
 import { computed, ref } from 'vue';
 
 dayjs.extend(relativeTime);
@@ -129,6 +129,11 @@ const loadPost = async () => {
 const createPost = () => {
     if (!usePage().props.auth.user?.id) authModal.value = true;
     else visiblePost.value = !visiblePost.value;
+};
+
+const createGroupTour = () => {
+    if (!usePage().props.auth.user?.id) authModal.value = true;
+    else router.get(route('group-tour.index'));
 }
 
 const form = useForm({
@@ -162,14 +167,14 @@ window.addEventListener('scroll', onScroll);
     <div class="flex lg:max-w-6xl mx-auto">
         <section class="flex flex-row w-full min-h-dvh justify-center">
             <header class="sticky flex-none items-end">
-                <div class="flex m-2 justify-center" @click="$inertia.get(route('main'))">
+                <div class="flex m-2 justify-center shadow rounded px-2" @click="route('home')">
                     <small class="flex cursor-pointer py-2 items-center gap-2">
                         <i class="pi pi-angle-left"></i>
                         Exit Community
                     </small>
                 </div>
                 <div v-if="$page.props.auth.user">
-                    <div class="flex items-center mb-2 pl-2 py-2 rounded w-full">
+                    <div class="flex justify-center items-center mb-4 pl-2 py-3 cursor-pointer" @click="route('profile.account')">
                         <Avatar icon="pi pi-user" class="mr-2" shape="circle" />
                         <h2>{{ $page.props.auth.user.name }}</h2>
                     </div>
@@ -178,7 +183,7 @@ window.addEventListener('scroll', onScroll);
                             v-for="nav in navButton"
                             :label="nav.label"
                             :icon="nav.icon"
-                            class="hover:bg-neutral-300 w-full text-left"
+                            class="hover:bg-neutral w-full text-left"
                             plain text
                         />
                     </nav>
@@ -196,7 +201,7 @@ window.addEventListener('scroll', onScroll);
                         <div class="p-3">
                             <div class="flex gap-2 mb-4">
                                 <Button label="Create Post" outlined class="flex-1" @click="createPost" />
-                                <Button label="Create Group Tour" outlined class="flex-1" @click="$inertia.get(route('group-tour.index'))" />
+                                <Button label="Create Group Tour" outlined class="flex-1" @click="createGroupTour" />
                             </div>
                             <Chirp v-if="visiblePost" class="flex">
                                 <Avatar icon="pi pi-user" class="mr-2 mt-1 flex-none" shape="circle" />

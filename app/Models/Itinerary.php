@@ -4,17 +4,19 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Itinerary extends Model
 {
     use HasFactory;
 
-    public function itineraries() 
+    public function tour(): BelongsTo
     {
         return $this->belongsTo(Tour::class);
     }
 
-    public function days() 
+    public function days(): HasMany
     {
         return $this->hasMany(Day::class);
     }

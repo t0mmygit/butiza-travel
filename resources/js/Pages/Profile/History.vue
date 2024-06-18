@@ -1,18 +1,26 @@
 <script setup>
 import ProfileLayout from '@/Layouts/ProfileLayout.vue';
+import ReviewForm from '@/Components/Dialog/ReviewForm.vue';
+import { useFormatPrice } from '@/Composables/formatPrice';
 
 import DataTable from 'primevue/datatable';
 import Column from 'primevue/column';
 import Button from 'primevue/button';
 import Tag from 'primevue/tag';
-import Dropdown from '@/Components/Dropdown.vue';
-import DropdownLink from '@/Components/DropdownLink.vue';
+import Divider from 'primevue/divider';
+import Dialog from 'primevue/dialog';
 
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
 import dayjs from 'dayjs';
 
 const props = defineProps({
     bookings: {
+        type: [Array, Object],
+    },
+    reviews: {
+        type: [Array, Object],
+    },
+    bookingStatuses: {
         type: [Array, Object],
     },
     reservations: {
@@ -23,10 +31,70 @@ const props = defineProps({
     }
 });
 
+const reviewDialog = ref(false);
+const booking = ref(null);
 const expandedRows = ref({});
+
+const bookingDetails = [
+    {
+        title: 'Tour ID',
+        value: (booking) => booking.tour.id,
+    },
+    {
+        title: 'Departure Date',
+        value: (booking) => dayjs(booking.departure_date).format('DD MMMM YYYY'),
+    },
+    {
+        title: 'Guide Type',
+        value: (booking) => 'No Guide Type Yet'
+    },
+    {
+        title: 'Duration',
+        value: (booking) => `${booking.tour.day} Days`,
+    },
+    {
+        title: 'Number of Passengers',
+        value: (booking) => booking.passenger,
+    },
+    {
+        title: 'Destinations',
+        value: (booking) => formatDestination(booking.tour.destinations),
+    },
+];
+
+const formatDestination = destinations => destinations.map(destination => destination.name).join(', ');
+
+function triggerReviewDialog(bookingData) {
+    booking.value = bookingData;
+    reviewDialog.value = true;
+}
+
+function actionOption(booking) {
+    const index = props.reviews.findIndex(review => review.id === booking.id);
+    if (index != -1) return false;
+    else return true;  
+}
+
+const getBookingSeverity = (statusName) => {
+    const bookingStatus = props.bookingStatuses.find(status => status.name === statusName);
+    return bookingStatus.severity;
+};
+
+const getBookingValue = (statusName) => {
+    const bookingStatus = props.bookingStatuses.find(status => status.name === statusName);
+    return bookingStatus.value;
+};
+
 </script>
 
 <template>
+    <Dialog v-model:visible="reviewDialog" modal header="Write a review" style="min-width: 30rem">
+        <ReviewForm
+            :booking="booking" 
+            @close-review-dialog="reviewDialog = false"
+        />
+    </Dialog>
+
     <ProfileLayout section="History">
         <div class="py-6">
             <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
@@ -40,38 +108,64 @@ const expandedRows = ref({});
                                     <span>{{ dayjs(data.created_at).format('DD MMM YYYY') }}</span>
                                 </template>
                             </Column>
-                            <Column field="tour.name" header="Tour Name" />
-                            <Column field="payment.price" header="Price" />
-                            <Column field="status" header="Status" />
+                            <Column header="Tour Name">
+                                <template #body="{ data }">
+                                    <span class="hover:underline cursor-pointer" @click="$inertia.get(route('tour.show', { tour: data.tour.id }))">
+                                        {{ data.tour.name }}
+                                    </span>
+                                </template>
+                            </Column>
+                            <Column header="Total Price">
+                                <template #body="{ data }">
+                                    <span>{{ useFormatPrice(data.passenger * data.tour.base_price) }}</span>
+                                </template>
+                            </Column>
+                            <Column header="Status">
+                                <template #body="{ data }"> 
+                                    <Tag 
+                                        :severity="getBookingSeverity(data.status)" 
+                                        :value="getBookingValue(data.status)" 
+                                    />
+                                </template>
+                            </Column>
                             <Column>
-                                <template #body="{ data, index }">
-                                    <!-- <Dropdown>
-                                        <template #trigger>
-                                            <button>
-                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
-                                                    <path d="M6 10a2 2 0 11-4 0 2 2 0 014 0zM12 10a2 2 0 11-4 0 2 2 0 014 0zM16 12a2 2 0 100-4 2 2 0 000 4z" />
-                                                </svg>
-                                            </button>
-                                        </template>
-                                        <template #content>
-                                            <button
-                                                class="block w-full px-4 py-2
-                                                text-left text-sm leading-5 text-gray-700
-                                                hover:bg-gray-100 focus:bg-gray-100
-                                                transition duration-150 ease-in-out"
-                                            >
-                                                Edit
-                                            </button>
-                                            <DropdownLink as="button" method="delete">
-                                                Delete
-                                            </DropdownLink>
-                                        </template>
-                                    </Dropdown> -->
+                                <template #body="{ data }">
+                                    <div v-if="actionOption(data)">
+                                        <a v-if="data.status === 'confirmed'" class="group text-sm font-bold text-red-500 flex justify-center items-center gap-2">
+                                            <i class="pi pi-times-circle"></i>
+                                            <span class="group-hover:underline">Cancel</span>
+                                        </a>
+                                        <a v-else-if="data.status !== 'cancelled' && data.status !== 'confirmed'" class="group text-sm font-bold text-orange-500 flex justify-center items-center gap-2" @click="triggerReviewDialog(data)">
+                                            <i class="pi pi-pen-to-square"></i>
+                                            <span class="group-hover:underline">Review</span>
+                                        </a>
+                                    </div>
                                 </template>
                             </Column>
                             <template #expansion="slotProps">
                                 <div class="p-3">
-                                    <h3>Booking Details</h3>
+                                    <h3 class="mb-4">Booking Details</h3>   
+
+                                    <div class="shadow py-3 px-6 outline outline-1 outline-neutral-300 rounded text-sm">
+                                        <div class="flex space-x-8 justify-between">
+                                            <div v-for="(detail, index) in bookingDetails" :key="index" class="flex flex-col text-sm">
+                                                <strong>{{ detail.title }}</strong>
+                                                <span v-html="detail.value(slotProps.data)"></span>
+                                            </div>
+                                        </div>
+                                        <Divider />
+                                        <div class="flex flex-col">
+                                            <strong class="mb-4">Itinerary</strong>
+                                            <div v-for="day in slotProps.data.tour.itineraries.days" class="flex flex-col">
+                                                <span><strong>Day {{ day.day_number }}</strong> {{ day.day_title }}</span>
+                                            </div>
+                                        </div>
+                                        <Divider />
+                                        <div class="flex flex-col">
+                                            <strong class="mb-4">Payment Details</strong>
+                                            <span>No Payment Info</span>
+                                        </div>
+                                    </div>
                                 </div>
                             </template>
                         </DataTable>
@@ -91,7 +185,6 @@ const expandedRows = ref({});
                                 </template>
                             </Column>
                             <Column field="tour.name" header="Tour Name" />
-                            <!-- <Column field="payment.price" header="Price" /> -->
                             <Column header="Status">
                                 <template #body="{ data }">
                                     <Tag severity="danger" value="Pending" />

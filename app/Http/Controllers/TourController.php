@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\BookingStatus;
 use App\Models\Tour;
 use App\Models\Reservation;
 use App\Models\Availability;
@@ -34,14 +35,14 @@ class TourController extends Controller
             'note.subjects.bulletPoints'
         ])->findOrFail($tourId);
 
-        return Inertia::render('Tour', [
+        return Inertia::render('Tour/Index', [
             'tour' => $tour,
         ]);
     }
 
     public function showReserveForm(Request $request)
     {
-        return Inertia::render('Reserve', [
+        return Inertia::render('Tour/Reserve', [
             'tour'            => Tour::findOrFail($request->tour_id),
             'contact_methods' => ContactMethod::all()
         ]);
@@ -49,7 +50,7 @@ class TourController extends Controller
 
     public function showBookingForm(Request $request, $availabilityId)
     {   
-        return Inertia::render('Book', [
+        return Inertia::render('Tour/Book', [
             'tour'            => Tour::findOrFail($request->tour_id),
             'availability'    => Availability::findOrFail($availabilityId),
             'contact_methods' => ContactMethod::all()
@@ -61,13 +62,13 @@ class TourController extends Controller
         $validated = $request->validate([
             'tour_id'        => 'required|numeric',
             'contact_method' => 'required|numeric',
-            'preferred_date'  => 'required|date',
-            'passenger'       => 'required|numeric',
-            'note'            => 'string|nullable',
-            'first_name'      => 'required|string',
-            'last_name'       => 'required|string',
-            'email'           => 'required|string|email:rfc,dns|lowercase',
-            'phone_number'    => 'required|numeric'
+            'preferred_date' => 'required|date',
+            'passenger'      => 'required|numeric',
+            'note'           => 'string|nullable',
+            'first_name'     => 'required|string',
+            'last_name'      => 'required|string',
+            'email'          => 'required|string|email:rfc,dns|lowercase',
+            'phone_number'   => 'required|numeric',
         ]);
 
         // contact_methods is used as error message
@@ -89,31 +90,31 @@ class TourController extends Controller
 
     public function validateBooking(Request $request)
     {
-        $validated = $request->validate([
-            'tour_id'         => 'required|numeric',
+        $request->validate([
+            'tour_id'        => 'required|numeric',
             'contact_method' => 'required|numeric',
-            'departure_date'  => 'required|date',
-            'passenger'       => 'required|numeric|max:20',
-            'note'            => 'string|nullable',
-            'first_name'      => 'required|string',
-            'last_name'       => 'required|string',
-            'email'           => 'required|string|email:rfc,dns|lowercase',
-            'phone_number'    => 'required|numeric'
+            'departure_date' => 'required|date',
+            'passenger'      => 'required|numeric|max:20',
+            'note'           => 'string|nullable',
+            'first_name'     => 'required|string',
+            'last_name'      => 'required|string',
+            'email'          => 'required|string|email:rfc,dns|lowercase',
+            'phone_number'   => 'required|numeric',
         ]);
     }
 
     public function storeBooking(Request $request, $availabilityId)
     {
         $validated = $request->validate([
-            'tour_id'         => 'required|numeric',
+            'tour_id'        => 'required|numeric',
             'contact_method' => 'required|numeric',
-            'departure_date'  => 'required|date',
-            'passenger'       => 'required|numeric|max:20',
-            'note'            => 'string|nullable',
-            'first_name'      => 'required|string',
-            'last_name'       => 'required|string',
-            'email'           => 'required|string|email:rfc,dns|lowercase',
-            'phone_number'    => 'required|numeric',
+            'departure_date' => 'required|date',
+            'passenger'      => 'required|numeric|max:20',
+            'note'           => 'string|nullable',
+            'first_name'     => 'required|string',
+            'last_name'      => 'required|string',
+            'email'          => 'required|string|email:rfc,dns|lowercase',
+            'phone_number'   => 'required|numeric',
         ]);
 
         // contact_methods is used as error message

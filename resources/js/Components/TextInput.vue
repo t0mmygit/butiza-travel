@@ -1,5 +1,5 @@
 <script setup>
-import { onMounted, ref } from 'vue';
+import { onMounted, ref, computed } from 'vue';
 
 const model = defineModel({
     type: [String, Number],
@@ -26,14 +26,19 @@ const props = defineProps({
 });
 
 const input = ref(null);
+const classes = computed(() => 
+    props.error
+    ? 'border-red-400 focus:border-none rounded-md disabled:bg-neutral'
+    : 'border-neutral-300 border focus:border-primary-100 rounded-md disabled:bg-neutral'
+);
 
-onMounted(() => {
-    if (input.value.hasAttribute('autofocus')) {
-        input.value.focus();
-    }
-});
+// onMounted(() => {
+//     if (input.value.hasAttribute('autofocus')) {
+//         input.value.focus();
+//     }
+// });
 
-defineExpose({ focus: () => input.value.focus() });
+// defineExpose({ focus: () => input.value.focus() });
 </script>
 
 <template>
@@ -42,9 +47,8 @@ defineExpose({ focus: () => input.value.focus() });
         <input
             :type="type"
             :placeholder="placeholder"
-            class="border-neutral-300 border focus:border-primary-100, rounded-md shadow disabled:bg-neutral"
+            :class="classes"
             v-model="model"
-            ref="input"
             :disabled="disabled"
         />
         <p class="text-error text-sm mt-2">{{ error }}</p>

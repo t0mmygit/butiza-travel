@@ -15,14 +15,14 @@ import Button from 'primevue/button';
                 icon="pi pi-user-plus"
                 plain text raised 
                 class="shadow-none text-base outline outline-1 outline-gray-300 rounded hover:outline-primary hover:bg-white"
-                @click="$inertia.get(route('host.index'))"
+                @click="$inertia.get(route('group-tour.index'))"
             />
             <Button
                 label="Join a group tour"
                 icon="pi pi-search"
                 plain text raised
                 class="shadow-none text-base outline outline-1 outline-gray-300 rounded hover:outline-primary hover:bg-white"
-                @click="$inertia.get(route('community.index'))"
+                @click="$inertia.get(route('community'))"
             />
         </div>
         <small class="text-gray-500 text-center mt-12">

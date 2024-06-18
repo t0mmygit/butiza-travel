@@ -4,43 +4,44 @@ import RoundedButton from '@/Components/RoundedButton.vue';
 import ContactForm from '@/Components/Dialog/ContactForm.vue';
 
 import SplitButton from 'primevue/splitbutton';
-import Button from 'primevue/button';
 import Dialog from 'primevue/dialog';
 import IconField from 'primevue/iconfield';
 import InputIcon from 'primevue/inputicon';
 import InputText from 'primevue/inputtext';
+import Toast from 'primevue/toast';
+import { useToast } from 'primevue/usetoast';
 
 import { ref } from 'vue';
-import { router, usePage } from '@inertiajs/vue3';
+import { router } from '@inertiajs/vue3';
 
-const modal = ref(false);
-const contactDialog = ref(false);
 const mask = ref(false);
+const modal = ref(false);
+const toast = useToast();
+const contactDialog = ref(false);
 
 const items = [
     {
         label: 'User Profile',
-        command: () => router.get(route('profile.index'))
+        command: () => router.get(route('profile.account'))
     },
     {
         label: 'Log Out',
         command: () => router.delete(route('auth.destroy')),
     }
-]
+];
 
-const directToBookmark = () => {
-    router.get(route('profile.bookmark'));
-}
+const closeContactDialog = () => {
+    contactDialog.value = false;
+    toast.add({ severity: 'success', summary: 'Message Successfully Submitted', detail: 'Thank you for reaching out! We will get back to you as soon as possible.', life: 3000 });
+};
 
 </script>
 
 <template>
+    <Toast />
     <ModalAuthenticate :show="modal" @reset="modal = false" />
     <Dialog v-model:visible="contactDialog" modal header="Ask a Question" >
-        <ContactForm />
-        <template #footer>
-            <Button label="Submit" outlined severity="secondary" @click="visible = false" autofocus />
-        </template>
+        <ContactForm @close-contact-dialog="closeContactDialog" />
     </Dialog>
 
     <div class="bg-white h-20 shadow z-50">
@@ -48,7 +49,7 @@ const directToBookmark = () => {
             <div id="left" class="mr-auto">
                 <SvgLogo />
             </div>
-            <IconField v-if="!route().current('main')" iconPosition="left">
+            <IconField v-if="!route().current('home')" iconPosition="left">
                 <InputIcon class="pi pi-search" />
                 <InputText 
                     placeholder="Search" 
@@ -57,6 +58,7 @@ const directToBookmark = () => {
                 />
             </IconField>
             <div class="flex gap-4 mx-auto">
+                <NavLink label="Home" :href="route('home')" :active="route().current('home')" />
                 <NavLink label="Explore" :href="route('explore.index')" :active="route().current('explore.index')" />
                 <NavLink label="Community" :href="route('community')" :active="route().current('community')" />
             </div>
@@ -64,20 +66,17 @@ const directToBookmark = () => {
                 <RoundedButton class="flex gap-2" @click="contactDialog = true">
                     <i class="pi pi-info-circle"></i>Contact Us
                 </RoundedButton>
-                <RoundedButton class="flex gap-2" @click="directToBookmark">
+                <RoundedButton class="flex gap-2" @click="route('profile.bookmark')">
                     <i class="pi pi-bookmark"></i>Bookmark
                 </RoundedButton>
-                <!-- <i v-badge="2" class="pi pi-bookmark" style="font-size: 2rem" /> -->
                 <RoundedButton v-if="!$page.props.auth.user" class="flex gap-2" @click="modal = true">
                     <i class="pi pi-sign-in"></i>Sign In
                 </RoundedButton>
-                <SplitButton 
-                    v-else 
+                <SplitButton v-else 
                     :model="items" 
                     :label="$page.props.auth.user.name" 
-                    severity="secondary" 
-                    rounded 
-                    @click="$inertia.get(route('profile.account'))" 
+                    severity="secondary" rounded 
+                    @click="route('profile.account')" 
                 />
             </div>
         </div>

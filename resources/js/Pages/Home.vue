@@ -8,7 +8,7 @@ import InputIcon from 'primevue/inputicon';
 import InputGroup from 'primevue/inputgroup';
 import Modal from '@/Components/Modal.vue';
 import ModalGroupTour from '@/Components/Modal/ModalGroupTour.vue';
-import { router } from '@inertiajs/vue3';
+import { router, Head } from '@inertiajs/vue3';
 import { ref } from 'vue';
 
 const tourModal = ref(false);
@@ -45,6 +45,8 @@ const heroBoxes = [
 </script>
 
 <template>
+    <Head title="Home" />
+
     <Modal
         :show="tourModal"
         @close="tourModal = false"

@@ -14,7 +14,7 @@ defineProps({
 </script>
 
 <template>
-    <a class="flex cursor-pointer gap-4 items-center no-underline" :href="route('main')">
+    <a class="flex cursor-pointer gap-4 items-center no-underline" :href="route('home')">
         <svg
             class="w-auto"
             :class="size, color"
