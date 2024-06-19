@@ -76,7 +76,7 @@ const closeContactDialog = () => {
                     :model="items" 
                     :label="$page.props.auth.user.name" 
                     severity="secondary" rounded 
-                    @click="route('profile.account')" 
+                    @click="$inertia.get(route('profile.account'))" 
                 />
             </div>
         </div>

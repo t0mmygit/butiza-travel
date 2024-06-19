@@ -31,4 +31,9 @@ class ReviewController extends Controller
 
         $user->reviews()->save($review);
     }
+
+    public function update(Request $request, Review $review)
+    {
+        
+    }
 }

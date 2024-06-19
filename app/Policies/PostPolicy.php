@@ -20,6 +20,6 @@ class PostPolicy
     {
         return $user->id === $post->user_id
                     ? Response::allow()
-                    : Response::deny('DENIED: Require Delete Policy.');
+                    : Response::deny('DENIED: Require Delete Post Policy.');
     }
 }

@@ -83,6 +83,7 @@ class ProfileController extends Controller
     {
         $user = $request->user();
 
+        // Might Need Pagination
         $bookings = Booking::where('email', $user->email)->with([
             'tour.destinations',
             'tour.itineraries.days'
@@ -96,11 +97,15 @@ class ProfileController extends Controller
             ];
         }, BookingStatus::cases());
 
+        // Might Need Pagination
+        $reviews = Review::where('user_id', $user->id)->get();
+        $reservations = Reservation::where('email', $user->email)->with('tour')->get();
+
         return Inertia::render('Profile/History', [
             'bookings' => $bookings,
-            'reviews' => Review::all(), // THIS IS TERRIBLE FOR SCALING (will cause lag)
             'bookingStatuses' => $statuses,
-            'reservations' => Reservation::where('email', $user->email)->with('tour')->get(),
+            'reviews' => $reviews, 
+            'reservations' => $reservations,
             'payments' => null,
         ]);
     } 

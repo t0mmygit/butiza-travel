@@ -2,9 +2,9 @@
 
 use App\Http\Controllers\ExploreController;
 use App\Http\Controllers\ProfileController;
-use App\Http\Controllers\MainController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BookmarkController;
+use App\Http\Controllers\BookingController;
 use App\Http\Controllers\CommunityController;
 use App\Http\Controllers\CustomerSupportController;
 use App\Http\Controllers\GroupTourController;
@@ -23,7 +23,7 @@ Route::get('/customize', function () {
     return Inertia::render('Customize');
 })->name('customize');
 
-Route::get('community', [CommunityController::class, 'index'])->name('community');
+Route::get('/community', [CommunityController::class, 'index'])->name('community');
 Route::resource('tour', TourController::class)->only(['index', 'show']);
 Route::resource('explore', ExploreController::class)->only(['index', 'show']);
 
@@ -42,32 +42,40 @@ Route::controller(TourController::class)->group(function () {
     Route::post('/submit-booking/{id}', 'storeBooking')->name('tour.store-booking');
 });
 
-Route::get('profile/bookmark', [ProfileController::class, 'bookmark'])->name('profile.bookmark');
-Route::post('bookmark/{tour}', [BookmarkController::class, 'store'])->name('bookmark.store');
-Route::post('validate-payment', [PaymentController::class, 'validation'])->name('validate-payment');
-Route::post('customer-query', [CustomerSupportController::class, 'store'])->name('support.store');
-Route::post('profile/review/{tour}', [ReviewController::class, 'store'])->name('review.store');
-Route::delete('bookmark/{bookmark}', [BookmarkController::class, 'destroy'])->name('bookmark.destroy');
+Route::get('/profile/bookmark', [ProfileController::class, 'bookmark'])->name('profile.bookmark');
+Route::post('/bookmark/{tour}', [BookmarkController::class, 'store'])->name('bookmark.store');
+Route::post('/validate-payment', [PaymentController::class, 'validation'])->name('validate-payment');
+Route::post('/customer-query', [CustomerSupportController::class, 'store'])->name('support.store');
+Route::delete('/bookmark/{bookmark}', [BookmarkController::class, 'destroy'])->name('bookmark.destroy');
+
+Route::controller(BookingController::class)->group(function () {
+    Route::patch('/profile/booking/{booking}', 'update')->name('booking.update');
+});
+
+Route::controller(ReviewController::class)->group(function () {
+    Route::post('/profile/review/{tour}')->name('review.store');
+    // Route::patch('/profile/review/{review}')->name('review.update');
+});
 
 Route::middleware('auth')->group(function () {
     Route::controller(GroupTourController::class)->group(function () {
-        Route::get('group-tour', 'index')->name('group-tour.index');
-        Route::get('group-tour/lobby', 'lobby')->name('group-tour.lobby');
-        Route::post('group-tour/create', 'store')->name('group-tour.store');
+        Route::get('/group-tour', 'index')->name('group-tour.index');
+        Route::get('/group-tour/lobby', 'lobby')->name('group-tour.lobby');
+        Route::post('/group-tour/create', 'store')->name('group-tour.store');
     });
-
+    
     Route::controller(PostController::class)->group(function () {
-        Route::post('post/create', 'store')->name('post.store');
-        Route::delete('post/delete/{post}', 'destroy')->name('post.destroy');
+        Route::post('/post/create', 'store')->name('post.store');
+        Route::delete('/post/delete/{post}', 'destroy')->name('post.destroy');
     });
-
+    
     Route::controller(ProfileController::class)->group(function () {
-        Route::get('profile', 'index')->name('profile.account');
-        Route::get('profile/edit', 'edit')->name('profile.edit');
-        Route::get('profile/history', 'history')->name('profile.history');
-        Route::get('profile/review', 'review')->name('profile.review');
-        Route::patch('profile', 'update')->name('profile.update');
-        Route::delete('profile', 'destroy')->name('profile.destroy');
+        Route::get('/profile', 'index')->name('profile.account');
+        Route::get('/profile/edit', 'edit')->name('profile.edit');
+        Route::get('/profile/history', 'history')->name('profile.history');
+        Route::get('/profile/review', 'review')->name('profile.review');
+        Route::patch('/profile', 'update')->name('profile.update');
+        Route::delete('/profile', 'destroy')->name('profile.destroy');
     });
 }); 
     
