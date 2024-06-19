@@ -12,9 +12,10 @@ class BookingController extends Controller
     {
         $this->authorize('update', $booking);
 
-        // Need to modify to checks for genera; status update (not just cancelled)
+        // Currently status only update to 'cancelled'
         $booking->status = 'cancelled';
+        $booking->save();
 
-        return redirect(route('profile.history'));
+        return redirect()->route('profile.history');
     }
 }

@@ -17,7 +17,12 @@ const props = defineProps({
         <div class="py-6">
             <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
                 <h1>My Bookmarks</h1>
-                <Message v-if="!$page.props.auth.user" :closable="false">Your bookmarks are saved temporarily and will disappear if you do not save them to your account. Login or create a new account now!</Message>
+                <Message 
+                    v-if="!$page.props.auth.user" 
+                    :closable="false"
+                >
+                    Your bookmarks are saved temporarily and will disappear if you do not save them to your account. Login or create a new account now!
+                </Message>
                 <div v-if="bookmarks.length != 0" class="grid gird-cols-2 lg:grid-cols-3 gap-8">
                     <Card 
                         v-for="bookmark in bookmarks" 

@@ -8,7 +8,6 @@ import DataTable from 'primevue/datatable';
 import Column from 'primevue/column';
 import Button from 'primevue/button';
 import Tag from 'primevue/tag';
-import Divider from 'primevue/divider';
 import Dialog from 'primevue/dialog';
 
 import { ref } from 'vue';
@@ -32,7 +31,12 @@ const props = defineProps({
     }
 });
 
-const reviewDialog = ref(true);
+function openReviewDialog(bookingData) {
+    booking.value = bookingData;
+    reviewDialog.value = true;
+}
+
+const reviewDialog = ref(false);
 const booking = ref(null);
 
 </script>
@@ -55,7 +59,7 @@ const booking = ref(null);
                             :bookings="bookings" 
                             :bookingStatuses="bookingStatuses" 
                             :reviews="reviews"
-                            @open-review-dialog="reviewDialog = true"
+                            @open-review-dialog="openReviewDialog"
                         />
                     </div>
                     <div v-else class="sm:p-4 bg-white shadow sm:rounded-lg">

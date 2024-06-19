@@ -1,5 +1,6 @@
     <script setup>
 import { useFormatPrice } from '@/Composables/formatPrice';
+import { router } from '@inertiajs/vue3';
 import { ref } from 'vue';
 import dayjs from 'dayjs';
 
@@ -7,7 +8,9 @@ import Column from 'primevue/column';
 import DataTable from 'primevue/datatable';
 import Divider from 'primevue/divider';
 import Tag from 'primevue/tag';
-import { router } from '@inertiajs/vue3';
+
+import Modal from '@/Components/Modal.vue';
+import ModalMessage from '@/Components/Modal/ModalMessage.vue';
 
 const emit = defineEmits(['open-review-dialog']);
 
@@ -23,9 +26,9 @@ const props = defineProps({
     }
 });
 
-const booking = ref(null);
 const expandedRows = ref({});
-const reviewDialog = ref(false);
+const isVisible = ref(false);
+const selectedBooking = ref(null);
 
 const bookingDetails = [
     {
@@ -38,7 +41,7 @@ const bookingDetails = [
     },
     {
         title: 'Guide Type',
-        value: (booking) => 'No Guide Type Yet'
+        value: (booking) => booking.guide_type != null ? booking.guide_type : 'No Guide Type Yet.'
     },
     {
         title: 'Duration',
@@ -56,12 +59,13 @@ const bookingDetails = [
 
 function review(bookingData) {
     var array = [];
+
     switch(bookingData.status) {
         case 'confirmed':
             array['label'] = 'Cancel';
             array['status'] = 'confirmed';
             array['icon'] = 'pi pi-times-circle';
-            array['action'] = (bookingData) => router.patch(route('booking.update', { booking: bookingData.id}))
+            array['action'] = () => { isVisible.value = true; selectedBooking.value = bookingData; };
             array['class'] = 'group text-sm font-bold text-red-500 flex justify-center items-center gap-2';
             break;
         case 'completed':
@@ -70,11 +74,10 @@ function review(bookingData) {
             array['label'] = 'Review';
             array['status'] = 'completed';
             array['icon'] = 'pi pi-pen-to-square';
-            array['action'] = (bookingData) => emit('open-review-dialog', bookingData);
+            array['action'] = () => emit('open-review-dialog', bookingData);
             array['class'] = 'group text-sm font-bold text-orange-500 flex justify-center items-center gap-2';
             break;
-    }
-    return array;
+    } return array;
 }
 
 function rowsPerPageOptions(length) {
@@ -82,9 +85,16 @@ function rowsPerPageOptions(length) {
     const divisor = 5; const dividend = length; 
     const quotient = dividend / divisor;
     for(var i = 1; i < quotient; i++) { pageOptions.value.push(i * divisor); }
-    return pageOptions.value;
+    return pageOptions.value;   
 }
 
+const cancelBooking = () => {
+    // BUG: success callback does not triggers
+    router.patch(route('booking.update', { booking: selectedBooking.value.id }), {
+        onSuccess: () => isVisible.value = false,
+    });
+};
+    
 const getBookingValue = statusName => props.bookingStatuses.find(status => status.name === statusName).value;
 const getBookingSeverity = statusName => props.bookingStatuses.find(status => status.name === statusName).severity;
 const formatDestination = destinations => destinations.map(destination => destination.name).join(', ');
@@ -92,6 +102,15 @@ const formatDestination = destinations => destinations.map(destination => destin
 </script>
 
 <template>
+    <ModalMessage
+        :show="isVisible"
+        type="cancel"
+        title="Cancel Booking"
+        @cancel="isVisible = false"
+        @close="isVisible = false"
+        @trigger-action="cancelBooking"
+    />
+
     <DataTable
         v-model:expandedRows="expandedRows" dataKey="id"
         :value="bookings" paginator
@@ -129,7 +148,10 @@ const formatDestination = destinations => destinations.map(destination => destin
         </Column>
         <Column>
             <template #body="{ data }">
-                <a :class="review(data)['class']">
+                <a 
+                    :class="review(data)['class']"
+                    @click="review(data)['action']"
+                >
                     <i :class="review(data)['icon']"></i>
                     <span class="group-hover:underline">
                         {{ review(data)['label'] }}

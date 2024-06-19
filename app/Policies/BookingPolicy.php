@@ -4,7 +4,7 @@ namespace App\Policies;
 
 use App\Models\Booking;
 use App\Models\User;
-use Illuminate\Http\Response;
+use Illuminate\Auth\Access\Response;
 
 class BookingPolicy
 {
