@@ -29,7 +29,11 @@ export default {
                 error: {
                     ...colors.red,
                     DEFAULT: colors.red['600']
-                }
+                },
+                success: {
+                    ...colors.emerald,
+                    DEFAULT: colors.emerald['600']
+                },
             }
         },
     },

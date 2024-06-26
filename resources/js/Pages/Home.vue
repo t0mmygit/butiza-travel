@@ -6,6 +6,8 @@ import IconField from 'primevue/iconfield';
 import InputText from 'primevue/inputtext';
 import InputIcon from 'primevue/inputicon';
 import InputGroup from 'primevue/inputgroup';
+import Carousel from 'primevue/carousel';
+import HomeCarousel from '@/Pages/Home/Carousel.vue';
 import Modal from '@/Components/Modal.vue';
 import ModalGroupTour from '@/Components/Modal/ModalGroupTour.vue';
 import { router, Head } from '@inertiajs/vue3';
@@ -18,29 +20,46 @@ function routeTo(routePath) {
     else router.get(route(routePath));
 }
 
+const homeImage = 'https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D';
+const dummyImage = 'https://cdn.tourradar.com/s3/tour/1500x800/228465_624e71afe4389.jpg';
+
 const heroBoxes = [
     {
         img: 'https://static.travelstride.com/store/ef/c8a39facc946ed960e425e6e27569d/4f8b67971e48794c9d63975391f5eb02.jpg',
+        header: 'Explore Our Planned Tours',
+        paragraph: ' Duis aute irure dolor in reprehenderit in voluptate.',
+        button: 'Explore',
+        route: 'explore.index'
+    },
+    {
+        img: 'https://static.travelstride.com/store/ef/c8a39facc946ed960e425e6e27569d/4f8b67971e48794c9d63975391f5eb02.jpg',
         header: 'Customize Your Adventure',
-        paragraph: 'Create your dream vacation with our easy planner. Craft your perfect adventure.',
+        paragraph: 'Duis aute irure dolor in reprehenderit in voluptate.',
         button: 'Customize',
         route: 'customize'
     },
     {
         img: 'https://static.travelstride.com/store/ef/c8a39facc946ed960e425e6e27569d/4f8b67971e48794c9d63975391f5eb02.jpg',
         header: 'Share the Adventure, Split the Cost',
-        paragraph: 'Traveling with friends made easy! Split bills hassle-free on group tours.',
+        paragraph: ' Duis aute irure dolor in reprehenderit in voluptate.',
         button: 'Group Tour',
         route: 'groupTour'
     },
     {
         img: 'https://static.travelstride.com/store/ef/c8a39facc946ed960e425e6e27569d/4f8b67971e48794c9d63975391f5eb02.jpg',
         header: 'Explore the Community',
-        paragraph: 'Traveling with friends made easy! Split bills hassle-free on group tours.',
+        paragraph: ' Duis aute irure dolor in reprehenderit in voluptate.',
         button: 'Community',
         route: 'community'
     },
-]
+];
+
+const images = ref([
+    {
+        name: 'name',
+        price: 'name',
+    }
+]);
 
 </script>
 
@@ -51,15 +70,10 @@ const heroBoxes = [
         :show="tourModal"
         @close="tourModal = false"
     >
-        <ModalGroupTour />
+        <ModalGroupTour />  
     </Modal>
 
-    <div class="flex flex-col min-h-screen">
-        <NavBar />
-        <main class="flex-1 bg-gray-200">
-            <div id="main-container" class="bg-local bg-cover bg-center" style="background-image: url('https://keycdn.borneoecotours.com/images/cache/tours/cover/bb07a-1000x1000.webp');">
-            <!-- <div id="main-container" class="bg-neutral-500 bg-local bg-cover bg-center"> -->
-                <div id="content-container" class="py-10 mb-8">
+       <!-- <div id="content-container" class="py-10 mb-8">
                     <h1 class="text-2xl text-center">Start Your Adventure Around Malaysia</h1>
                     <InputGroup class="py-8">
                         <IconField iconPosition="left" class="flex mx-auto">
@@ -67,39 +81,26 @@ const heroBoxes = [
                             <InputText placeholder="Search" class="rounded-full" />
                         </IconField>
                     </InputGroup>
+                </div> -->
+                
 
-                    <!-- <div class="flex justify-center gap-16 py-10 text-center">
-                        <div id="group-tour" class="relative">
-                            <div class="bg-white h-fit w-96 rounded-lg shadow-md p-6 items-center">
-                                <div class="mb-4">
-                                    <h3 class="font-bold">Customize Your Adventure</h3>
-                                    <p>Create your dream vacation with our easy planner. Craft your perfect adventure.</p>
-                                </div>
-                                <Button @click="customize" label="Customize" text raised class="rounded-full bg-white text-sm" />
-                            </div>
-                        </div>
-                        <div id="custom-tour">
-                            <div class="flex flex-col items-center bg-white min-h-full w-96 rounded-lg shadow-md p-6">
-                                <div class="mb-4">
-                                    <h3 class="font-bold">Share the Adventure, Split the Cost</h3>
-                                    <p>Traveling with friends made easy! Split bills hassle-free on group tours.</p>
-                                </div>
-                                <Button @click="tourModal = true" label="Group Tour" text raised class="rounded-full bg-white text-sm" />
-                            </div>
-                        </div>
-                    </div> -->  
-                </div>
-            </div>
+    <div class="flex flex-col min-h-screen">
+        <NavBar />
+        <main class="flex-1 bg-gray-200 h-full w-full">
+            <!-- <div class="bg-cyan-400 lg:max-h-[600px] bg-fixed">
+                <img :src="homeImage" class="object-cover max-h-[600px] w-full">
+            </div> -->
+            <HomeCarousel />
 
             <section class="my-8 mx-auto max-w-2xl xl:max-w-7xl">
-                <h1 class="mb-4">More Features</h1>
-                <div class="grid grid-cols-3 gap-8 min-h-min">
+                <h1 class="mb-4">Start Your Journey</h1>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 min-h-min">
                     <div v-for="heroBox in heroBoxes" class="bg-white min-h-40 rounded-lg p-3 cursor-pointer shadow-lg">
                         <!-- <img 
                             :src="heroBox.img"
                             class="rounded-md"
                         > -->
-                        <div class="my-4">
+                        <div class="mb-4">
                             <h3 class="font-bold">{{ heroBox.header }}</h3>
                             <p>{{ heroBox.paragraph }}</p>
                         </div>
@@ -111,7 +112,6 @@ const heroBoxes = [
                         />
                     </div>
                 </div>
-
             </section>
         </main>
         <Footer />

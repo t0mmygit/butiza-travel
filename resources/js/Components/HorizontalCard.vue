@@ -5,6 +5,7 @@ import PrimeButton from 'primevue/button';
 import { router, usePage, Link } from '@inertiajs/vue3';
 import { computed, ref } from 'vue';
 import { useFormatPrice } from '@/Composables/formatPrice.js';
+import { useFormatText } from '@/Composables/formatText';
 
 const props = defineProps({
     tour: {
@@ -17,8 +18,6 @@ const props = defineProps({
         type: Boolean
     }
 });
-
-// console.log(usePage().props.cookie.guest_id);
 
 const emit = defineEmits(['compare-tour', 'host-tour', 'add-bookmark'])
 
@@ -34,16 +33,6 @@ const viewTour = () => {
 
 const bookmark = computed(() => {
     const bookmarks = ref(props.tour.bookmarks);
-    // const userBookmarks = ref(props.tour.userBookmarks);
-    // const guestBookmarks = ref(props.tour.guestBookmarks);
-
-    // if (usePage().props.auth.user) {
-    //     return userBookmarks.value.find(bookmark => 
-    //         bookmark.user_id === usePage().props.auth.user.id);
-    // } else {
-    //     return guestBookmarks.value.find(bookmark => 
-    //         bookmark.user_id === usePage().props.cookie.guest_id);
-    // }
 
     if (usePage().props.auth.user) {
         return bookmarks.value.find(bookmark => 
@@ -56,24 +45,6 @@ const bookmark = computed(() => {
 
 const triggerBookmark = () => {
     const bookmarks = ref(props.tour.bookmarks);
-    // const userBookmarks = ref(props.tour.userBookmarks);
-    // const guestBookmarks = ref(props.tour.guestBookmarks);
-    
-    // if (userBookmarks.value.length > 0 && usePage().props.auth.user) {
-    //     const bookmark = userBookmarks.value.find(bookmark => 
-    //         bookmark.user_id === usePage().props.auth.user.id);
-    //     if (bookmark) {
-    //         router.delete(route('bookmark.destroy', bookmark.id));
-    //         return;
-    //     }
-    // } else {
-    //     const bookmark = guestBookmarks.value.find(bookmark => 
-    //         bookmark.user_id === usePage().props.auth.user.id);
-    //     if (bookmark) {
-    //         router.delete(route('bookmark.destroy', bookmark.id));
-    //         return;
-    //     }
-    // }
     if (bookmarks.value.length > 0) {
         if (usePage().props.auth.user != null) {
             const bookmark = bookmarks.value.find(bookmark => 
@@ -119,7 +90,7 @@ const formatDestination = destinations => destinations.map(destination => destin
             <div id="image" class="aspect-square bg-slate-300 flex-initial min-w-60 max-w-60 relative">
                 <img 
                     class="object-cover rounded size-60" 
-                    src="https://static.travelstride.com/store/c3/bbdab0beb54663a00825b0096702d3/e89d69f64504697816cc35e6eb3ba94d.jpg"
+                    src="https://cdn.tourradar.com/s3/tour/1500x800/228465_624e71afe4389.jpg"
                 >
                 <span class="group absolute top-0 right-0 p-3 cursor-pointer">
                     <div class="group-hover:bg-white bg-black/50 rounded-full size-8 flex justify-center items-center" @click="triggerBookmark">
@@ -145,8 +116,12 @@ const formatDestination = destinations => destinations.map(destination => destin
 
                 <div id="additional" class="flex gap-10 pr-4">
                     <div>
+                        <h3 class="font-bold">Guide Type</h3>
+                        <span>{{ useFormatText(tour.guide_type) }}</span>
+                    </div>
+                    <div>
                         <h3 class="font-bold">Travel Intensity</h3>
-                        <span>{{ tour.travel_intensity }}</span>
+                        <span>{{ useFormatText(tour.travel_intensity) }}</span>
                     </div>
                     <div>
                         <h3 class="font-bold">Lodging Level</h3>

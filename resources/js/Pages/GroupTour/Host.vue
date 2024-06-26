@@ -76,7 +76,7 @@ const form = useForm({
                         </p>
                         <div class="flex gap-4">
                             <Button @click="preset">Select a preset tour</Button>
-                            <Button>Customize a group tour</Button>
+                            <Button disabled>Customize a group tour</Button>
                         </div>
                     </div>
                     <div v-else>
@@ -111,6 +111,7 @@ const form = useForm({
                                         v-model="selectedPrivacy"
                                         :options="options"
                                     />
+                                    <!-- Need Explanation -->
                                     <ToggleButton v-model="selectedLock" onLabel="Locked" offLabel="Unlocked" onIcon="pi pi-lock"
                                         offIcon="pi pi-lock-open"
                                     />

@@ -19,6 +19,10 @@ Route::get('/', function () {
    return Inertia::render('Home'); 
 })->name('home');
 
+Route::get('/question', function () {
+   return Inertia::render('Question'); 
+})->name('question');
+
 Route::get('/customize', function () {
     return Inertia::render('Customize');
 })->name('customize');
@@ -53,15 +57,16 @@ Route::controller(BookingController::class)->group(function () {
 });
 
 Route::controller(ReviewController::class)->group(function () {
-    Route::post('/profile/review/{tour}')->name('review.store');
-    // Route::patch('/profile/review/{review}')->name('review.update');
+    Route::post('/profile/review/{tour}', 'store')->name('review.store');
 });
+// Route::patch('/profile/review/{review}')->name('review.update');
 
 Route::middleware('auth')->group(function () {
     Route::controller(GroupTourController::class)->group(function () {
         Route::get('/group-tour', 'index')->name('group-tour.index');
         Route::get('/group-tour/lobby', 'lobby')->name('group-tour.lobby');
         Route::post('/group-tour/create', 'store')->name('group-tour.store');
+        Route::delete('/group-tour/delete/{groupTour}', 'destroy')->name('group-tour.destroy');
     });
     
     Route::controller(PostController::class)->group(function () {
@@ -70,6 +75,7 @@ Route::middleware('auth')->group(function () {
     });
     
     Route::controller(ProfileController::class)->group(function () {
+        // Route::get('/profile', 'index')->name('profile.account');
         Route::get('/profile', 'index')->name('profile.account');
         Route::get('/profile/edit', 'edit')->name('profile.edit');
         Route::get('/profile/history', 'history')->name('profile.history');

@@ -4,11 +4,12 @@ namespace App\Http\Controllers;
 
 use App\Models\Review;
 use App\Models\Tour;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 
 class ReviewController extends Controller
 {
-    public function store(Request $request, Tour $tour)
+    public function store(Request $request, Tour $tour): RedirectResponse
     {
         $user = $request->user();
 
@@ -26,14 +27,16 @@ class ReviewController extends Controller
             'rating' => $validated['rating'],
             'title' => $validated['title'],
             'content' => $validated['content'],
-            'status' => false,
+            'status' => 'approved',
         ]);
 
         $user->reviews()->save($review);
+
+        return redirect()->route('profile.history');
     }
 
-    public function update(Request $request, Review $review)
-    {
+    // public function update(Request $request, Review $review)
+    // {
         
-    }
+    // }
 }

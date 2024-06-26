@@ -13,12 +13,14 @@ import Divider from 'primevue/divider';
 
 import TextInput from '@/Components/TextInput.vue';
 import InputError from '@/Components/InputError.vue';
+import Form from '@/Pages/Tour/Partials/Form.vue';
 
 import { ref, computed } from 'vue';
 import { useForm } from '@inertiajs/vue3';
 
 import dayjs from 'dayjs';
 import { useFormatPrice } from '@/Composables/formatPrice.js'; 
+import { useFormatText } from '@/Composables/formatText';
 
 const paymentSection = ref(false);
 const selectedContactMethod = ref(null);
@@ -30,7 +32,7 @@ const props = defineProps({
     },
     availability: {
         type: Object,
-        required: true
+        required: true,
     },
     contact_methods: {
         type: Object,
@@ -59,7 +61,9 @@ const bookingForm = useForm({
     tour_id: reactiveTour,
     contact_method: reactiveContactMethod,
     departure_date: props.availability.departure_date,
-    passenger: null,
+    finished_date: props.availability.finished_date,
+    adult: null,
+    child: null,
     note: null,
     first_name: null,
     last_name: null,
@@ -78,6 +82,25 @@ const paymentForm = useForm({
     terms: null,
 });
 
+const tourDetails = [
+    {
+        header: props.tour.name,
+        info: `${props.tour.day} days`
+    },
+    {
+        header: 'Departure Date',
+        info: dayjs(props.availability.departure_date).format('DD MMMM YYYY'),
+    },
+    {
+        header: 'Finished Date',
+        info: dayjs(props.availability.finished_date).format('DD MMMM YYYY'),
+    },
+    {
+        header: 'Guide Type',
+        info: useFormatText(props.tour.guide_type),
+    },
+];
+
 const bookingValidation = () => {
     bookingForm.post(route('tour.validate-booking'), {
         onSuccess: () => paymentSection.value = true,
@@ -93,83 +116,118 @@ const paymentValidation = () => {
     });
 };
 
-const datePlaceholder = () => {
-    return 'Departure Date: ' + dayjs(props.availability.departure_date).format('DD MMMM YYYY');
-};
+// const datePlaceholder = () => {
+//     return 'Departure Date: ' + dayjs(props.availability.departure_date).format('DD MMMM YYYY');
+// };
 
 </script>
 
 <template>
     <MarginLayout>
         <div class="bg-white h-fit shadow py-6">
-            <div class="max-w-sm lg:max-w-full lg:mx-16 flex items-center relative">
+            <div class="flex items-center mx-auto w-11/12 lg:w-5/6 xl:max-w-7xl">
                 <SvgLogo />
             </div>
         </div>
 
-        <section class="my-8 mx-auto lg:flex xl:flex max-w-2xl xl:max-w-7xl">
-            <Avatar icon="pi pi-user" class="mt-3 bg-white" size="large" shape="circle" />
-            <div class="grow">
-                <div class="mx-auto
-                    max-w-sm
-                    lg:max-w-lg
-                    xl:max-w-4xl
-                    bg-white shadow rounded py-6 px-5 relative"
-                >
+        <section class="my-8 mx-auto lg:flex w-11/12 lg:w-5/6 xl:max-w-7xl">
+            <!-- <Avatar icon="pi pi-user" class="mt-3 bg-white" size="large" shape="circle" /> -->
+            <div class="flex w-full">
+                <div class="flex mt-3">
+                    <Avatar icon="pi pi-user" class="bg-white mr-3" size="large" shape="circle" />
+                    <div class="bg-white translate-y-full translate-x-1/2 origin-center rotate-45 size-4 z-50"></div>
+                </div>
+                <div class="mx-auto grow max-w-full mr-4">
                     <!-- Title -->
                     <section v-if="!paymentSection">
-                        <div class="flex items-center mb-6">
+                        <!-- <div class="flex items-center">
                             <div class="bg-white rotate-45 size-4 absolute xl:left-[-6px]"></div>
                             <h1>Hey there, We just need a few details to book this tour.</h1>
-                        </div>
+                        </div> -->
                         <!-- Booking Details -->
                         <form>
-                            <div class="mb-4 flex flex-col gap-2">
-                                <TextInput :placeholder="datePlaceholder()" disabled />
-                                <InputError :message="bookingForm.errors.departure_date" />
-                            </div>
-                            <div class="mb-8 flex flex-col gap-2">
-                                <h4>How many people are traveling? *</h4>
-                                <TextInput v-model="bookingForm.passenger" type="number" :error="bookingForm.errors.passenger" />
-                            </div>
-                            <div class="mb-8 flex flex-col gap-2">
-                                <h2>Special Request & Questions</h2>
-                                <textarea
-                                    v-model="bookingForm.note"
-                                    placeholder="Feel free to tell us anything you'd like or how you want to make the trip perfect for you. (optional)"
-                                    class="rounded-md border-neutral-300 shadow"
-                                ></textarea>
-                                <InputError :message="bookingForm.errors.note" />
-                            </div>
-                            <div class="mb-8 flex flex-col gap-2">
-                                <h2>Contact Info</h2>
-                                <div class="flex gap-6 mt-4">
-                                    <TextInput v-model="bookingForm.first_name" label="First Name *" :error="bookingForm.errors.first_name" />
-                                    <TextInput v-model="bookingForm.last_name" label="Last Name *" :error="bookingForm.errors.last_name" />
+                            <!-- Number of travellers -->
+                            <Form :index="1" title="How many are travelling?">
+                                <div 
+                                    class="bg-white relative px-6 py-3 flex items-center justify-between rounded-xl outline outline-1 outline-neutral-300"
+                                    :class="{'outline-error': bookingForm.errors.adult}"
+                                >
+                                    <h2>Adult</h2>
+                                    <InputNumber
+                                        v-model="bookingForm.adult"
+                                        showButtons buttonLayout="horizontal"
+                                        :min="0" :max="99"
+                                    >
+                                        <template #incrementbuttonicon>
+                                            <span class="pi pi-plus"></span>
+                                        </template>
+                                        <template #decrementbuttonicon>
+                                            <span class="pi pi-minus"></span>
+                                        </template>
+                                    </InputNumber>
                                 </div>
-                                <div class="flex gap-6 mt-4">
-                                    <TextInput v-model="bookingForm.email" label="Email *" :error="bookingForm.errors.email" />
-                                    <TextInput v-model="bookingForm.phone_number" label="Phone Number *" type="tel" inputmode="numeric" pattern="[0-9]*" :error="bookingForm.errors.phone_number" />
+                                <div 
+                                    class="bg-white relative px-6 py-3 flex items-center justify-between rounded-xl outline outline-1 outline-neutral-300"
+                                    :class="{'outline-error': bookingForm.errors.child}"
+                                >
+                                    <h2>Child (3 - 11)</h2>
+                                    <InputNumber
+                                        v-model="bookingForm.child"
+                                        showButtons buttonLayout="horizontal"
+                                        :min="0" :max="99"
+                                    >
+                                        <template #incrementbuttonicon>
+                                            <span class="pi pi-plus"></span>
+                                        </template>
+                                        <template #decrementbuttonicon>
+                                            <span class="pi pi-minus"></span>
+                                        </template>
+                                    </InputNumber>
                                 </div>
-                            </div>
-                            <div class="mb-8 flex flex-col gap-2">
-                                <h2>How should we contact you?</h2>
-                                <div class="flex gap-4">
-                                    <Button
-                                        v-for="method in contact_methods"
-                                        :key="method.id"
-                                        :label="method.method_name"
-                                        :icon="getContactMethodIcon(method.method_name)"
-                                        plain text raised
-                                        class="flex-1 shadow-none text-base outline outline-1 outline-gray-300 rounded hover:outline-indigo-500 hover:bg-white"
-                                        :class="[{'border-primary bg-primary-100 text-black': selectedContactMethod === method.id}]"
-                                        @click="selectContactMethod(method.id)"
-                                    />
+                                <InputError :message="bookingForm.errors.adult || bookingForm.errors.child" />
+                            </Form>
+
+                            <Form :index="2" title="Add traveller details">
+                                <template #subtitle>
+                                    <div class="pb-3">
+                                        <h3>Lead Traveller</h3>
+                                        <small>This traveller will serve as the contact person for the booking.</small>
+                                    </div>
+                                </template>
+                                <div class="flex flex-col gap-2">
+                                    <div class="flex gap-6">
+                                        <TextInput v-model="bookingForm.first_name" label="First Name" :error="bookingForm.errors.first_name" required />
+                                        <TextInput v-model="bookingForm.last_name" label="Last Name" :error="bookingForm.errors.last_name" required />
+                                    </div>
+                                    <div class="flex gap-6">
+                                        <TextInput v-model="bookingForm.email" label="Email" :error="bookingForm.errors.email" required />
+                                        <TextInput v-model="bookingForm.phone_number" label="Phone Number" type="tel" :error="bookingForm.errors.phone_number" required />
+                                    </div>
                                 </div>
-                                <InputError :message="bookingForm.errors.contact_method" />
-                            </div>
+                            </Form>
+
+                            <Form :index="3" title="Additional details">
+                                <TextInput v-model="bookingForm.note" label="Special Requests / Questions" type="textarea" />
+                                <div class="flex flex-col gap-2">
+                                    <h5>How should we contact you?</h5>
+                                    <div class="flex gap-4">
+                                        <Button
+                                            v-for="method in contact_methods"
+                                            :key="method.id"
+                                            :label="method.method_name"
+                                            :icon="getContactMethodIcon(method.method_name)" 
+                                            @click="selectContactMethod(method.id)"
+                                            rounded plain text outlined
+                                            class="flex-1"
+                                            :class="[{'bg-primary text-white': selectedContactMethod === method.id}]"
+                                        />
+                                    </div>
+                                    <InputError :message="bookingForm.errors.contact_method" />
+                                </div>
+                            </Form>
                         </form>
                     </section>
+
                     <!-- Payment Section -->
                     <section v-else>
                         <div class="flex items-center mb-6">
@@ -241,20 +299,23 @@ const datePlaceholder = () => {
                     Change Booking Details
                 </small>
             </div>
+            
             <div class="min-w-72 max-w-72 h-fit hidden xl:block">
+
+                <!-- Trip Details -->
                 <div class="bg-white rounded-md shadow-md mb-8">
                     <img 
                         src="https://static.travelstride.com/store/51/ad4f08f81843578f3ea235b037593e/b669206bb8425f9409b22d1a87c8d181.jpg"
                         class="rounded-t-md"
                     >
-                    <div class="p-3">
-                        <h2>{{ tour.name }}</h2>
-                        <div class="flex items-center justify-between">
-                            <span class="text-xl font-medium">{{ tour.day }} Days</span>
-                            <span class="text-xl font-medium"><small class="text-black">From</small> {{ useFormatPrice(tour.base_price) }}</span>
+                    <div class="flex flex-col p-3 gap-3">
+                        <div v-for="tour in tourDetails">
+                            <h2>{{ tour.header }}</h2>
+                            <p>{{ tour.info }}</p>
                         </div>
                     </div>
                 </div>
+
                 <div v-if="paymentSection" class="bg-white rounded-md shadow-md mb-8 p-3">
                     <h2 class="mb-4">Price Breakdown</h2>
                     <div class="flex justify-between">
@@ -277,9 +338,10 @@ const datePlaceholder = () => {
                 </div>
                 <Button 
                     v-if="!paymentSection"
-                    class="w-full justify-center"
+                    label="Continue"
+                    class="w-full justify-center" rounded
                     @click="bookingValidation"
-                >Continue</Button>
+                />
             </div>
         </section>
     </MarginLayout>

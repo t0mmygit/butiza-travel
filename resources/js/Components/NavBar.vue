@@ -44,19 +44,19 @@ const closeContactDialog = () => {
         <ContactForm @close-contact-dialog="closeContactDialog" />
     </Dialog>
 
-    <div class="bg-white h-20 shadow z-50">
-        <div class="flex items-center h-full m-auto lg:w-5/6 xl:w-11/12 2xl:w-7/12">
+    <div class="bg-white h-20 shadow z-50 sticky top-0">
+        <div class="flex items-center mx-auto h-full lg:w-5/6 xl:max-w-7xl">
             <div id="left" class="mr-auto">
                 <SvgLogo />
             </div>
-            <IconField v-if="!route().current('home')" iconPosition="left">
+            <!-- <IconField v-if="!route().current('home')" iconPosition="left">
                 <InputIcon class="pi pi-search" />
                 <InputText 
                     placeholder="Search" 
                     class="rounded-lg" 
                     @focusin="mask = true" @focusout="mask = false"
                 />
-            </IconField>
+            </IconField> -->
             <div class="flex gap-4 mx-auto">
                 <NavLink label="Home" :href="route('home')" :active="route().current('home')" />
                 <NavLink label="Explore" :href="route('explore.index')" :active="route().current('explore.index')" />
@@ -66,7 +66,7 @@ const closeContactDialog = () => {
                 <RoundedButton class="flex gap-2" @click="contactDialog = true">
                     <i class="pi pi-info-circle"></i>Contact Us
                 </RoundedButton>
-                <RoundedButton class="flex gap-2" @click="route('profile.bookmark')">
+                <RoundedButton class="flex gap-2" @click="$inertia.get(route('profile.bookmark'))">
                     <i class="pi pi-bookmark"></i>Bookmark
                 </RoundedButton>
                 <RoundedButton v-if="!$page.props.auth.user" class="flex gap-2" @click="modal = true">

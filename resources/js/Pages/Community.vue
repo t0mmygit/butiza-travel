@@ -167,7 +167,7 @@ window.addEventListener('scroll', onScroll);
     <div class="flex lg:max-w-6xl mx-auto">
         <section class="flex flex-row w-full min-h-dvh justify-center">
             <header class="sticky flex-none items-end">
-                <div class="flex m-2 justify-center shadow rounded px-2" @click="route('home')">
+                <div class="flex m-2 justify-center shadow rounded px-2" @click="$inertia.get(route('home'))">
                     <small class="flex cursor-pointer py-2 items-center gap-2">
                         <i class="pi pi-angle-left"></i>
                         Exit Community
@@ -199,6 +199,7 @@ window.addEventListener('scroll', onScroll);
                             </div>
                         </div>
                         <div class="p-3">
+                            <!-- Create Post & Group Tour -->
                             <div class="flex gap-2 mb-4">
                                 <Button label="Create Post" outlined class="flex-1" @click="createPost" />
                                 <Button label="Create Group Tour" outlined class="flex-1" @click="createGroupTour" />
@@ -236,7 +237,7 @@ window.addEventListener('scroll', onScroll);
                                     <ChirpTopSection :post="post" />
                                     <ChirpGroupTour
                                         :post="post"
-                                        image="https://static.travelstride.com/store/map_image/5061423/attachment/2a1bc8851483009a6ce5dce769eb39dd.jpg"
+                                        image="https://cdn.tourradar.com/s3/tour/1500x800/228465_624e71afe4389.jpg"
                                     />
                                     <p class="mb-2">{{ post.description }}</p>
                                 </section>

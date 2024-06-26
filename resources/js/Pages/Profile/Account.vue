@@ -38,17 +38,17 @@ const stats = [
                         <Avatar icon="pi pi-user" size="xlarge" shape="circle" class="size-40 mb-2" />
                         <h1>{{ user.name }}</h1>
                         <span class="text-sm mb-2">Joined since <strong>{{ dayjs(user.created_at).format('DD MMMM YYYY') }}</strong></span>
-                        <p class="text-center">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
+                        <p class="text-center">{{ user.biography ? user.biography : "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua." }}</p>
                     </div>
-                    <div class="flex w-full gap-6">
-                        <div v-for="stat in stats" class="flex flex-1 flex-col items-center justify-center aspect-square shadow sm:rounded-lg p-2 sm:p-4">
+                    <div class="flex w-full gap-6 justify-center">
+                        <div v-for="stat in stats" class="flex flex-1 flex-col items-center justify-center aspect-square shadow sm:rounded-lg p-2 sm:p-4 max-w-[180px]">
                             <h1>{{ stat.value }}</h1>
                             <span>{{ stat.label }}</span>
                         </div>
                     </div>
                 </div>
             </div>
-            <div class="flex-1">
+            <div v-if="user.id === $page.props.auth.user.id" class="flex-1">
                 <ProfileEdit />
             </div>
         </div>

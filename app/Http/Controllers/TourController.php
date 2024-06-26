@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Enums\BookingStatus;
+use App\Enums\GuideType;
+
 use App\Models\Tour;
 use App\Models\Reservation;
 use App\Models\Availability;
@@ -32,8 +34,13 @@ class TourController extends Controller
             'destinations', 
             'highlights',
             'itineraries.days', 
-            'note.subjects.bulletPoints'
+            'note.subjects.bulletPoints',
+            'reviews.user',
+            'reviews.tour',
+            'bookmarks',
         ])->findOrFail($tourId);
+
+        GuideType::getLabel($tour->guide_type);
 
         return Inertia::render('Tour/Index', [
             'tour' => $tour,
@@ -94,12 +101,17 @@ class TourController extends Controller
             'tour_id'        => 'required|numeric',
             'contact_method' => 'required|numeric',
             'departure_date' => 'required|date',
-            'passenger'      => 'required|numeric|max:20',
+            'finished_date' => 'required|date',
+            'adult'      => 'required_without:child|nullable|numeric|min:1|max:99',
+            'child'      => 'required_without:adult|nullable|numeric|min:1|max:99',
             'note'           => 'string|nullable',
             'first_name'     => 'required|string',
             'last_name'      => 'required|string',
             'email'          => 'required|string|email:rfc,dns|lowercase',
             'phone_number'   => 'required|numeric',
+        ], [
+            'adult.required_without' => 'The traveller field is required.',
+            'child.required_without' => 'The traveller field is required.',
         ]);
     }
 
@@ -109,7 +121,9 @@ class TourController extends Controller
             'tour_id'        => 'required|numeric',
             'contact_method' => 'required|numeric',
             'departure_date' => 'required|date',
-            'passenger'      => 'required|numeric|max:20',
+            'finished_date' => 'required|date',
+            'adult'      => 'required_without:child|nullable|numeric|min:1|max:99',
+            'child'      => 'required_without:adult|nullable|numeric|min:1|max:99',
             'note'           => 'string|nullable',
             'first_name'     => 'required|string',
             'last_name'      => 'required|string',
@@ -122,6 +136,7 @@ class TourController extends Controller
         unset($validated['contact_method']);
 
         $validated['departure_date'] = date('Y-m-d', strtotime($validated['departure_date']));
+        $validated['finished_date'] = date('Y-m-d', strtotime($validated['finished_date']));
 
         $booking = Booking::create($validated);
         $availability = Availability::find($availabilityId);

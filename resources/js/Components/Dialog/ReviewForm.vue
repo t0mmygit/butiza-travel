@@ -26,10 +26,7 @@ const form = useForm({
 });
 
 const submitForm = () => {
-    form.post(route('review.store', { tour: props.booking.tour.id }), {
-        onSuccess: () => emit('close-review-dialog'),
-        onError: (error) => console.log(error),
-    })
+    form.post(route('review.store',  props.booking.tour.id))
 };
 
 </script>

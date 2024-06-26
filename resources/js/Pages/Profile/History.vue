@@ -31,6 +31,38 @@ const props = defineProps({
     }
 });
 
+const reservationDetails = [
+    {
+        title: 'Tour ID',
+        value: (reservation) => reservation.tour.id,   
+    },
+    {
+        title: 'Preferred Date',
+        value: (reservation) => dayjs(reservation.preferred_date).format('DD MMMM YYYY'),
+    },
+    {
+        title: 'Number of Passenger',
+        value: (reservation) => reservation.passenger,
+    }
+];
+
+// function reservationDetails() {
+//     const tour = [
+//         {
+//             title: 'Tour ID',
+//             value: (reservation) => reservation.tour.id,   
+//         },
+//         {
+//             title: 'Preferred Date',
+//             value: (reservation) => dayjs(reservation.preferred_date).format('DD MMMM YYYY'),
+//         },
+//         {
+//             title: 'Number of Passenger',
+//             value: (reservation) => reservation.passenger,
+//         }
+//     ]
+// }
+
 function openReviewDialog(bookingData) {
     booking.value = bookingData;
     reviewDialog.value = true;
@@ -38,6 +70,15 @@ function openReviewDialog(bookingData) {
 
 const reviewDialog = ref(false);
 const booking = ref(null);
+const expandedRows = ref({});
+
+function rowsPerPageOptions(length) {
+    var pageOptions = ref([]);
+    const divisor = 5; const dividend = length; 
+    const quotient = dividend / divisor;
+    for(var i = 1; i < quotient; i++) { pageOptions.value.push(i * divisor); }
+    return pageOptions.value;   
+}
 
 </script>
 
@@ -69,7 +110,11 @@ const booking = ref(null);
                 <section role="reservation">
                     <h1 class="mb-4">Reservation History</h1>
                     <div v-if="reservations.length != 0" class="bg-white shadow sm:rounded-lg">
-                        <DataTable :value="reservations" dataKey="id" tableStyle="min-width: 50rem">
+                        <DataTable v-model:expandedRows="expandedRows" dataKey="id" 
+                                    :value="reservations" paginator
+                                    :rows="reservations.length < 5 ? reservations.length : 5"
+                                    :rowsPerPageOptions="rowsPerPageOptions(reservations.length)" 
+                                    tableStyle="min-width: 50rem">
                             <Column expander style="width: 5rem" />
                             <Column header="Date">
                                 <template #body="{ data }">
@@ -82,14 +127,22 @@ const booking = ref(null);
                                     <Tag severity="danger" value="Pending" />
                                 </template>
                             </Column>
-                            <Column header="Action" class="flex items-center justify-center">
+                            <!-- <Column header="Action" class="flex items-center justify-center">
                                 <template #body="{ data, index }">
                                     <Button severity="danger" />
                                 </template>
-                            </Column>
+                            </Column> -->
                             <template #expansion="slotProps">
                                 <div class="p-3">
-                                    <h3>Reservation Details</h3>
+                                    <h3 class="mb-4">Reservation Details</h3>
+                                    <div class="shadow py-3 px-6 outline outline-1 outline-neutral-300 rounded text-sm">
+                                        <div class="flex space-x-8">
+                                            <div v-for="(detail, index) in reservationDetails" :key="index" class="flex flex-col text-sm">
+                                                <strong>{{ detail.title }}</strong>
+                                                <span v-html="detail.value(slotProps.data)"></span>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </template>
                         </DataTable>

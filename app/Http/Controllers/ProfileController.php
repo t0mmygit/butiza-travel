@@ -22,6 +22,10 @@ class ProfileController extends Controller
 {
     public function index(): Response
     {
+        // if (!$user) {
+        //     $userId = Auth::user()->id;
+        //     $user = User::with('posts', 'reviews', 'bookings')->findOrFail($userId);
+        // }
         $userId = Auth::user()->id;
         $user = User::with('posts', 'reviews', 'bookings')->findOrFail($userId);
 
@@ -54,7 +58,7 @@ class ProfileController extends Controller
 
         $request->user()->save();
 
-        return Redirect::route('profile.edit');
+        return Redirect::route('profile.account');
     }
 
     /**
@@ -120,8 +124,10 @@ class ProfileController extends Controller
             }
         }
 
-        $bookmarks = Bookmark::where('user_id', $user)
-                    ->with('tour')->get();
+        if ($user) {
+            $bookmarks = Bookmark::where('user_id', $user)
+                        ->with('tour')->get();
+        }
         
         return Inertia::render('Profile/Bookmark', [
             'bookmarks' => $bookmarks,

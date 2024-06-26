@@ -1,5 +1,6 @@
 <script setup>
 import { computed, ref } from 'vue';
+import { useFormatText } from '@/Composables/formatText';
 
 const emit = defineEmits(['update:checked', 'filter']);
 
@@ -40,7 +41,7 @@ const filter = (event) => {
                 class="rounded border-gray-500 text-indigo-600 shadow-sm"
                 @change="filter"
             />
-            <span class="whitespace-nowrap ml-2">{{ value }}</span>
+            <span class="whitespace-nowrap ml-2">{{ useFormatText(value) }}</span>
         </label>
     </div>
 </template>

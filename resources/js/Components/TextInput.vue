@@ -1,5 +1,6 @@
 <script setup>
 import { onMounted, ref, computed } from 'vue';
+import Textarea from 'primevue/textarea';
 
 const model = defineModel({
     type: [String, Number],
@@ -22,7 +23,10 @@ const props = defineProps({
     disabled: {
         type: Boolean,
         default: false
-    }
+    },
+    required: {
+        type: Boolean,
+    },
 });
 
 const input = ref(null);
@@ -43,13 +47,20 @@ const classes = computed(() =>
 
 <template>
     <div class="flex flex-col flex-1">    
-        <label v-if="label" class="text-neutral-500 text-sm mb-1 ml-2">{{ label }}</label>
-        <input
+        <label v-if="label" class="text-neutral-500 text-sm mb-1 ml-2">{{ label }}
+            <span v-if="required" class="text-error">*</span>
+        </label>
+        <input v-if="type != 'textarea'"
             :type="type"
             :placeholder="placeholder"
             :class="classes"
             v-model="model"
             :disabled="disabled"
+        />
+        <Textarea v-else 
+            v-model="model" 
+            :disabled="disabled"
+            :rows="5"
         />
         <p class="text-error text-sm mt-2">{{ error }}</p>
     </div>

@@ -44,6 +44,11 @@ class Tour extends Model
         return $this->hasOne(Note::class);
     }
 
+    public function reviews(): HasMany
+    {
+        return $this->hasMany(Review::class);
+    }
+
     public function bookmarks(): HasMany
     {
         return $this->hasMany(Bookmark::class);

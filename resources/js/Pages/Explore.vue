@@ -1,4 +1,5 @@
 <script setup>
+import { useFormatText } from '@/Composables/formatText';
 import NavBar from '@/Components/NavBar.vue';
 import Footer from '@/Components/Footer.vue';
 import CheckBoxFilter from '@/Components/CheckBoxFilter.vue';
@@ -124,7 +125,7 @@ const handleFilter = (value, column) => {
 
 const travelIntensity = {
     column: 'travel_intensity',
-    value: ['Relaxed', 'Moderate', 'Adventurous']   
+    value: ['relaxed', 'moderate', 'adventurous']   
 };
 
 const formatReadable = (text) => {
@@ -143,14 +144,16 @@ const formatReadable = (text) => {
             :items="items"
             @remove-compare-tour="removeCompareTour"
         />
-        <div id="heading-container" class="bg-gradient-to-r from-primary-200 to-primary-400 font-sans py-4 shadow border">
-            <div id="heading" class="m-auto lg:w-5/6 xl:w-11/12 2xl:w-7/12">
-                <h1 class="text-2xl font-bold">Explore Malaysia</h1>
+        <div id="heading-container" class="bg-gradient-to-r from-primary-200 to-primary-400 font-sans py-4 shadow border w-full">
+            <div id="heading" class="m-auto lg:w-11/12 xl:max-w-7xl">
+            <!-- <div id="heading" class="m-auto lg:w-5/6 xl:w-11/12 2xl:w-7/12"> -->
+                <h1 class="ml-4 lg:m-0 text-2xl font-bold">Explore Malaysia</h1>
             </div>
         </div>
-        <section id="content-container" class="grid lg:grid-cols-8 lg:w-5/6 xl:w-11/12 2xl:w-7/12 m-auto gap-6 my-4">
-            <div id="filter" class="col-span-2 lg:block hidden">
-                <div id="applied" class="bg-primary-100 h-fit mb-4 rounded-md p-4 shadow">
+        <section id="content-container" class="grid lg:grid-cols-8 lg:w-11/12 xl:max-w-7xl m-auto gap-6 my-4">
+        <!-- <section id="content-container" class="grid lg:grid-cols-8 lg:w-5/6 xl:w-11/12 2xl:w-7/12 m-auto gap-6 my-4"> -->
+            <div id="filter" class="col-span-2 xl:block hidden">
+                <div class="bg-primary-100 h-fit mb-4 rounded-md p-4 shadow">
                     <h3 class="font-bold text-xl">Applied Filters</h3>
                     <div v-if="currentFilter.length != 0" class="mt-4 gap-1 flex flex-col">
                         <div v-for="filter in currentFilter" class="flex justify-between">
@@ -158,7 +161,7 @@ const formatReadable = (text) => {
                                 Duration is {{ filter.filter.value[0] }} - {{ filter.filter.value[1] }} days
                             </span>
                             <span v-else>
-                                {{ formatReadable(filter.column) }} is {{ filter.filter }}
+                                {{ useFormatText(filter.column, true) }} is {{ useFormatText(filter.filter) }}
                             </span>
                             <!-- Delete SVG -->
                         </div>
@@ -198,12 +201,12 @@ const formatReadable = (text) => {
                             @filter="handleFilter"
                         />
                     </DropdownFilter>
-                    <DropdownFilter label="Age">
+                    <!-- <DropdownFilter label="Age">
                         <AgeFilter 
                             column="age"
                             @filter="handleFilter"
                         />
-                    </DropdownFilter>
+                    </DropdownFilter> -->
                 </div>
             </div>
             <div id="content" class="col-span-6">

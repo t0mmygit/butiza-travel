@@ -156,7 +156,7 @@ const headers  = [
     },
     {
         title: "Your Trip",
-        subtitle: "Please wait..."
+        subtitle: "Please confirm your trip preferences."
     }
 ]
 
@@ -479,7 +479,11 @@ const restrictions = [
                             </TabPanel>
                         </TabView>
                     </div>
-                    <div v-if="active != 0" class="flex flex-wrap justify-between mt-8">
+                    <div v-if="active == 6">
+                        
+                    </div>
+                    <!-- Button -->
+                    <div v-if="active != 0 && active != 6" class="flex flex-wrap justify-between mt-8">
                         <Button 
                             label="Previous" 
                             severity="secondary"

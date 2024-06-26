@@ -25,8 +25,8 @@ defineProps({
             />
         <Divider />
         <UpdatePasswordForm class="max-w-xl" />
-        <Divider />
-        <DeleteUserForm class="max-w-xl" />
+        <!-- <Divider />
+        <DeleteUserForm class="max-w-xl" /> -->
     </div>
 <!-- 
     <div class="p-4 sm:p-8 bg-white shadow sm:rounded-lg">
