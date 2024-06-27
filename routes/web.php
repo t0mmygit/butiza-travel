@@ -19,6 +19,14 @@ Route::get('/', function () {
    return Inertia::render('Home'); 
 })->name('home');
 
+Route::get('/about', function () {
+    return Inertia::render('About');
+})->name('about');
+
+Route::get('/collaboration', function () {
+    return Inertia::render('Collab');
+})->name('collab');
+
 Route::get('/question', function () {
    return Inertia::render('Question'); 
 })->name('question');

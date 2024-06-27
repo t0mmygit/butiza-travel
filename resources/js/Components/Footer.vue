@@ -30,8 +30,8 @@ const contactDialog = ref(false);
                 <div id="section-2">
                     <h3 class="text-lg font-bold mb-2">Butiza Travel</h3>
                     <ul class="list-none font-medium text-gray-800 cursor-pointer">
-                        <li>About Us</li>
-                        <!-- <li>Member Benefits</li> -->
+                        <li @click="$inertia.get(route('about'))">About Us</li>
+                        <li @click="$inertia.get(route('collab'))">Collaboration</li>
                         <li>Why Group Tour</li>
                     </ul>
                 </div>

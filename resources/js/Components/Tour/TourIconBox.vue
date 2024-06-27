@@ -2,9 +2,9 @@
 </script>
 
 <template>
-    <div class="bg-white outline outline-1 outline-neutral-300 flex h-16 rounded items-center justify-center flex-1 min-w-fit min-h-fit">
+    <div class="bg-white outline outline-2 outline-primary-300 flex h-16 rounded-lg items-center justify-center flex-1 min-w-fit min-h-fit">
         <header>
-            <div id="icon" class="items-center">
+            <div id="icon" class="flex items-center">
                 <slot name="header" />
             </div>
         </header>

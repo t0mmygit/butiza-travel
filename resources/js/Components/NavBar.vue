@@ -1,3 +1,4 @@
+
 <script setup>
 import NavLink from '@/Components/NavLink.vue';
 import RoundedButton from '@/Components/RoundedButton.vue';
@@ -8,6 +9,7 @@ import Dialog from 'primevue/dialog';
 import IconField from 'primevue/iconfield';
 import InputIcon from 'primevue/inputicon';
 import InputText from 'primevue/inputtext';
+import Button from 'primevue/button';
 import Toast from 'primevue/toast';
 import { useToast } from 'primevue/usetoast';
 
@@ -57,21 +59,49 @@ const closeContactDialog = () => {
                     @focusin="mask = true" @focusout="mask = false"
                 />
             </IconField> -->
-            <div class="flex gap-4 mx-auto">
+            <!-- <div class="flex gap-4 mx-auto">
                 <NavLink label="Home" :href="route('home')" :active="route().current('home')" />
                 <NavLink label="Explore" :href="route('explore.index')" :active="route().current('explore.index')" />
                 <NavLink label="Community" :href="route('community')" :active="route().current('community')" />
-            </div>
-            <div class="flex gap-4">
-                <RoundedButton class="flex gap-2" @click="contactDialog = true">
-                    <i class="pi pi-info-circle"></i>Contact Us
-                </RoundedButton>
-                <RoundedButton class="flex gap-2" @click="$inertia.get(route('profile.bookmark'))">
-                    <i class="pi pi-bookmark"></i>Bookmark
-                </RoundedButton>
-                <RoundedButton v-if="!$page.props.auth.user" class="flex gap-2" @click="modal = true">
-                    <i class="pi pi-sign-in"></i>Sign In
-                </RoundedButton>
+            </div> -->
+
+            <div class="flex gap-3">
+                <Button 
+                    label="Explore" 
+                    plain text rounded
+                    class="text-sm"
+                    @click="$inertia.get(route('explore.index'))"
+                />
+                <Button 
+                    label="Community" 
+                    plain text rounded 
+                    class="text-sm"
+                    @click="$inertia.get(route('community'))"
+                />
+                <Button 
+                    label="Promotion" 
+                    plain text rounded 
+                    class="text-sm"
+                    @click="contactDialog = true"
+                />
+                <Button 
+                    label="Contact Us" 
+                    plain text rounded 
+                    class="text-sm"
+                    @click="contactDialog = true"
+                />
+                <Button 
+                    icon="pi pi-bookmark"
+                    plain text rounded 
+                    class="text-sm"
+                    @click="$inertia.get(route('profile.bookmark'))"
+                />
+                <Button v-if="!$page.props.auth.user"
+                    label="Sign in"
+                    plain rounded 
+                    class="text-sm"
+                    @click="modal = true"
+                />
                 <SplitButton v-else 
                     :model="items" 
                     :label="$page.props.auth.user.name" 

@@ -69,13 +69,22 @@ const triggerBookmark = () => {
 };
 
 const formatPricePerDay = (price) => {
-    price = Math.ceil(price / props.tour.day);
+    price = Math.ceil(price / props.tour.duration);
     return useFormatPrice(price);
 };
 
 const itemsListener = computed(() => {
     let index = props.items.findIndex(item => item.id === props.tour.id);
     return index != -1 ?  true : false;
+});
+
+const rating = computed(() => {
+    var reviewRatings = 0;
+    props.tour.reviews.forEach(review => {
+        reviewRatings += review.rating;
+    });
+
+    return parseFloat(reviewRatings / props.tour.reviews.length).toFixed(1);
 });
 
 const formatDestination = destinations => destinations.map(destination => destination.name).join(', ');
@@ -102,9 +111,13 @@ const formatDestination = destinations => destinations.map(destination => destin
 
             <!-- Card Details -->
             <div class="mr-auto w-full">
-                <h1 class="mb-2 line-clamp-2">{{ tour.name }}</h1>
+                <h1 class="line-clamp-2">{{ tour.name }}</h1>
                 <div class="font-medium text-gray-500 mb-4">
-                    <span>No reviews yet</span>
+                    <div v-if="tour.reviews.length != 0" class="flex items-center gap-1">
+                        <span class="text-yellow-500">★ {{ rating }}</span>
+                        <span class="text-neutral-500">({{ tour.reviews.length > 1 ? `${tour.reviews.length} reviews` : `${tour.reviews.length} review`}})</span>
+                    </div>
+                    <span v-else>No reviews yet</span>
                 </div>
 
                 <dl class="grid grid-cols-3 mb-4">
@@ -129,8 +142,7 @@ const formatDestination = destinations => destinations.map(destination => destin
                     </div>
                     <div>
                         <h3 class="font-bold">Durations</h3>
-                        <span v-if="tour.day > 1">{{ tour.day }} Days</span>
-                        <span v-else-if="tour.day = 1">{{ tour.day }} Day</span>
+                        <span>{{ tour.duration > 1 ? `${tour.duration} Days` : `${tour.duration} Day` }}</span>
                     </div>
                 </div>
             </div>
@@ -141,7 +153,7 @@ const formatDestination = destinations => destinations.map(destination => destin
                     <span>From</span>
                     <strong class="text-2xl">{{ useFormatPrice(tour.base_price) }}</strong>
                     <span>Price per day</span>
-                    <strong>{{ formatPricePerDay(tour.base_price) }}</strong>
+                    <strong>RM{{ Math.ceil(tour.base_price / tour.duration) }}</strong>
                 </div>
                 <div class="flex flex-col place-self-end gap-2">
                     <PrimaryButton @click="viewTour">

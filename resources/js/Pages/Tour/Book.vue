@@ -85,7 +85,7 @@ const paymentForm = useForm({
 const tourDetails = [
     {
         header: props.tour.name,
-        info: `${props.tour.day} days`
+        info: `${props.tour.duration} days`
     },
     {
         header: 'Departure Date',
@@ -148,15 +148,13 @@ const paymentValidation = () => {
                         <form>
                             <!-- Number of travellers -->
                             <Form :index="1" title="How many are travelling?">
-                                <div 
-                                    class="bg-white relative px-6 py-3 flex items-center justify-between rounded-xl outline outline-1 outline-neutral-300"
-                                    :class="{'outline-error': bookingForm.errors.adult}"
-                                >
+                                <div class="bg-white relative px-6 py-3 flex items-center justify-between rounded-xl outline outline-1 outline-neutral-300">
                                     <h2>Adult</h2>
                                     <InputNumber
                                         v-model="bookingForm.adult"
                                         showButtons buttonLayout="horizontal"
-                                        :min="0" :max="99"
+                                        :min="0" :max="99" placeholder="0"
+                                        :invalid="bookingForm.errors.adult != null ? true : false"
                                     >
                                         <template #incrementbuttonicon>
                                             <span class="pi pi-plus"></span>
@@ -166,15 +164,13 @@ const paymentValidation = () => {
                                         </template>
                                     </InputNumber>
                                 </div>
-                                <div 
-                                    class="bg-white relative px-6 py-3 flex items-center justify-between rounded-xl outline outline-1 outline-neutral-300"
-                                    :class="{'outline-error': bookingForm.errors.child}"
-                                >
-                                    <h2>Child (3 - 11)</h2>
+                                <div class="bg-white relative px-6 py-3 flex items-center justify-between rounded-xl outline outline-1 outline-neutral-300">
+                                    <h2>Child</h2>
                                     <InputNumber
                                         v-model="bookingForm.child"
                                         showButtons buttonLayout="horizontal"
-                                        :min="0" :max="99"
+                                        :min="0" :max="99" placeholder="0"
+                                        :invalid="bookingForm.errors.child != null ? true : false"
                                     >
                                         <template #incrementbuttonicon>
                                             <span class="pi pi-plus"></span>
@@ -230,74 +226,79 @@ const paymentValidation = () => {
 
                     <!-- Payment Section -->
                     <section v-else>
-                        <div class="flex items-center mb-6">
-                            <div class="bg-white rotate-45 size-4 absolute xl:left-[-6px]"></div>
-                            <h1>Next, add your payment details and confirm your booking!</h1>
-                        </div>
-                        <h4 class="mb-2">Select your payment method:</h4>
-                        <TabView class="border rounded shadow-sm">
-                            <TabPanel header="Pay by card">
-                                <!-- Payment Form -->
-                                <form>
-                                    <div class="flex gap-4 mb-2">
-                                        <TextInput v-model="paymentForm.cardholder_name" label="Cardholder Name" placeholder="e.g. JOHN SMITH" :error="paymentForm.errors.cardholder_name" />
-                                        <!-- <TextInput v-model="paymentForm.card_number" type="number" label="Card Number" placeholder="**** **** **** ****" :error="paymentForm.errors.card_number" /> -->
-                                        <div class="flex flex-col">
-                                            <label class="text-neutral-500 text-sm mb-1 ml-2">Card Number</label>
-                                            <InputMask
-                                                v-model="paymentForm.card_number"
-                                                mask="9999 9999 9999 9999"
-                                                placeholder="**** **** **** ****"
+                        <div class="bg-white p-5 rounded-lg shadow">
+                            <h1 class="mb-3">Next, add your payment details and confirm your booking!</h1>
+                            <h4 class="mb-2">Select your payment method:</h4>
+                            <TabView class="border rounded shadow mb-4">
+                                <TabPanel header="Pay by card">
+                                    <!-- Payment Form -->
+                                    <form>
+                                        <div class="flex gap-4 mb-2">
+                                            <TextInput 
+                                                v-model="paymentForm.cardholder_name" 
+                                                label="Cardholder Name" 
+                                                placeholder="e.g. JOHN SMITH" 
+                                                :error="paymentForm.errors.cardholder_name"
+                                                class="flex-1"
                                             />
-                                        </div>
-                                    </div>
-                                    <div class="flex gap-4 mb-4">
-                                        <div class="flex flex-col w-1/2">
-                                            <label class="text-neutral-500 text-sm mb-1 ml-2">Expiry Date</label>
-                                            <InputGroup>
-                                                <InputNumber 
-                                                    v-model="paymentForm.card_month" 
-                                                    placeholder="MM"
-                                                    :min="1"
-                                                    :max="12"
-                                                 />
-                                                <InputGroupAddon>/</InputGroupAddon>
-                                                <InputNumber 
-                                                    v-model="paymentForm.card_year" 
-                                                    placeholder="YY" 
-                                                    :useGrouping="false"
+                                            <!-- <TextInput v-model="paymentForm.card_number" type="number" label="Card Number" placeholder="**** **** **** ****" :error="paymentForm.errors.card_number" /> -->
+                                            <div class="flex flex-1 flex-col">
+                                                <label class="text-neutral-500 text-sm mb-1 ml-2">Card Number</label>
+                                                <InputMask
+                                                    v-model="paymentForm.card_number"
+                                                    mask="9999 9999 9999 9999"
+                                                    placeholder="**** **** **** ****"
                                                 />
-                                            </InputGroup>
-                                            <InputError 
-                                                v-if="paymentForm.errors.card_month || paymentForm.errors.card_year" 
-                                                message="The card expiry date is required." 
-                                            />
+                                            </div>
                                         </div>
-                                        <TextInput v-model="paymentForm.card_cvv" label="CVV" type="number" placeholder="123" :error="paymentForm.errors.card_cvv" />
-                                    </div>
-                                    <h3 class="mt-4 ml-2 mb-2">Billing Details</h3>
-                                    <div class="flex gap-4">
-                                        <TextInput v-model="paymentForm.billing_address" label="Address" :error="paymentForm.errors.billing_address" />
-                                        <TextInput v-model="paymentForm.postal_code" label="Postal Code" type="number" :error="paymentForm.errors.postal_code" /> 
-                                    </div>
-                                </form>
-                            </TabPanel>
-                        </TabView>
-                        <div class="flex items-start mt-8 ml-2">
-                            <Checkbox v-model="paymentForm.terms" name="terms" binary :invalid="reactiveCheckbox" />
-                            <p class="ml-2">
-                                I accept and agree to Butiza Travel & Tour's
-                                <a class="underline text-primary">Terms & Condition</a>,  
-                                <a class="underline text-primary">Privacy Policy</a> and, 
-                                <a class="underline text-primary">Payment Cancellation and Refund Condition</a>.
-                            </p>
+                                        <div class="flex gap-4 mb-4">
+                                            <div class="flex flex-col flex-1">
+                                                <label class="text-neutral-500 text-sm mb-1 ml-2">Expiry Date</label>
+                                                <InputGroup>
+                                                    <InputNumber
+                                                        v-model="paymentForm.card_month"
+                                                        placeholder="MM"
+                                                        :min="1"
+                                                        :max="12"
+                                                     />
+                                                    <InputGroupAddon>/</InputGroupAddon>
+                                                    <InputNumber
+                                                        v-model="paymentForm.card_year"
+                                                        placeholder="YY"
+                                                        :useGrouping="false"
+                                                    />
+                                                </InputGroup>
+                                                <InputError
+                                                    v-if="paymentForm.errors.card_month || paymentForm.errors.card_year"
+                                                    message="The card expiry date is required."
+                                                />
+                                            </div>
+                                            <TextInput v-model="paymentForm.card_cvv" label="CVV" type="number" placeholder="123" :error="paymentForm.errors.card_cvv" />
+                                        </div>
+                                        <h3 class="ml-2 mb-2">Billing Details</h3>
+                                        <div class="flex gap-4">
+                                            <TextInput v-model="paymentForm.billing_address" label="Address" :error="paymentForm.errors.billing_address" />
+                                            <TextInput v-model="paymentForm.postal_code" label="Postal Code" type="number" :error="paymentForm.errors.postal_code" />
+                                        </div>
+                                    </form>
+                                </TabPanel>
+                            </TabView>
+                            <div class="flex items-start">
+                                <Checkbox v-model="paymentForm.terms" name="terms" binary :invalid="reactiveCheckbox" />
+                                <small class="ml-2">
+                                    I accept and agree to Butiza Travel & Tour's
+                                    <a class="underline text-primary">Terms & Condition</a>,
+                                    <a class="underline text-primary">Privacy Policy</a> and,
+                                    <a class="underline text-primary">Payment Cancellation and Refund Condition</a>.
+                                </small>
+                            </div>
                         </div>
                     </section>
+                    <small v-if="paymentSection" class="flex items-center ml-6 mt-2 cursor-pointer" @click="paymentSection = false">
+                        <i class="pi pi-angle-left"></i> 
+                        Change Booking Details
+                    </small>
                 </div>
-                <small v-if="paymentSection" class="flex items-center ml-6 mt-2 cursor-pointer" @click="paymentSection = false">
-                    <i class="pi pi-angle-left"></i> 
-                    Change Booking Details
-                </small>
             </div>
             
             <div class="min-w-72 max-w-72 h-fit hidden xl:block">

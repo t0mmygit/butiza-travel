@@ -13,7 +13,7 @@ class Tour extends Model
 {
     use HasFactory;
 
-    public function itineraries(): HasOne
+    public function itinerary(): HasOne
     {
         return $this->hasOne(Itinerary::class);
     }

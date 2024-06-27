@@ -24,7 +24,7 @@ class TourController extends Controller
         ]);
     }
 
-    public function show($tourId) 
+    public function show($tourId)
     {
         $tour = Tour::with([
             'activities',
@@ -33,7 +33,7 @@ class TourController extends Controller
             },
             'destinations', 
             'highlights',
-            'itineraries.days', 
+            'itinerary.days', 
             'note.subjects.bulletPoints',
             'reviews.user',
             'reviews.tour',
@@ -101,9 +101,9 @@ class TourController extends Controller
             'tour_id'        => 'required|numeric',
             'contact_method' => 'required|numeric',
             'departure_date' => 'required|date',
-            'finished_date' => 'required|date',
-            'adult'      => 'required_without:child|nullable|numeric|min:1|max:99',
-            'child'      => 'required_without:adult|nullable|numeric|min:1|max:99',
+            'finished_date'  => 'required|date',
+            'adult'          => 'required_without:child|nullable|numeric|max:99',
+            'child'          => 'required_without:adult|nullable|numeric|max:99',
             'note'           => 'string|nullable',
             'first_name'     => 'required|string',
             'last_name'      => 'required|string',
@@ -121,9 +121,9 @@ class TourController extends Controller
             'tour_id'        => 'required|numeric',
             'contact_method' => 'required|numeric',
             'departure_date' => 'required|date',
-            'finished_date' => 'required|date',
-            'adult'      => 'required_without:child|nullable|numeric|min:1|max:99',
-            'child'      => 'required_without:adult|nullable|numeric|min:1|max:99',
+            'finished_date'  => 'required|date',
+            'adult'          => 'required_without:child|nullable|numeric|max:99',
+            'child'          => 'required_without:adult|nullable|numeric|max:99',
             'note'           => 'string|nullable',
             'first_name'     => 'required|string',
             'last_name'      => 'required|string',

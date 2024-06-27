@@ -32,7 +32,7 @@ dayjs.extend(customParseFormat);
 const props = defineProps({
     tour: {
         type: Object,
-        required: true
+        required: true,
     }
 });
 
@@ -89,12 +89,16 @@ const tourDetails = ref([
     },
     {
         icon: 'pi pi-flag',
-        label: `Guide Type: ${props.tour.guide_type}`
+        label: `Guide Type: ${useFormatText(props.tour.guide_type)}`
     },
     {
-        icon: 'pi pi-flag',
+        icon: 'pi pi-car',
         label: `Travel Intensity: ${useFormatText(props.tour.travel_intensity)}`
-    }
+    },
+    // {
+    //     icon: 'pi pi-map-marker',
+    //     label: `Pick-up location: ${props.tour.pickup_location}`
+    // }
 ]);
 
 const reserveTour = () => {
@@ -212,8 +216,8 @@ const getMeterValue = meterData => {
         <div class="bg-white">
             <div class="mx-auto h-full lg:w-5/6 xl:max-w-7xl py-4">
                 <div class="flex items-center justify-between">
-                    <h1 class="text-4xl mb-3">{{ tour.name }}</h1>
-                    <div class="flex gap-4">
+                    <h1 class="text-3xl mb-3">{{ tour.name }}</h1>
+                    <!-- <div class="flex gap-4">
                         <div
                             class="flex items-center cursor-pointer hover:text-primary"
                             @click="displayGalleria = true"
@@ -226,19 +230,17 @@ const getMeterValue = meterData => {
                             @click="triggerBookmark"
                         >
                             <i :class="!bookmark ? 'pi pi-bookmark' : 'pi pi-bookmark-fill'"></i>
-                            <span class="ml-2">{{ !bookmark ? 'Save to bookmark' : 'Saved to bookmark' }}</span>
+                            <span class="ml-2">{{ !bookmark ? 'Save' : 'Saved' }}</span>
                         </div>
-                    </div>
+                    </div> -->
                 </div>
                 <div class="flex flex-nowrap justify-center mb-4 w-full h-full gap-6">
-                    <div class="flex-1 w-full h-full rounded-xl">
+                    <div class="flex-1 w-full h-full rounded-xl cursor-pointer" @click="displayGalleria = true">
                         <!-- Carousel -->
                         <Galleria :value="images" :responsiveOptions="responsiveOptions" :numVisible="5" 
                             :circular="true" :showThumbnails="false" :autoPlay="true" :transitionInterval="10000"
                         >
                             <template #item="slotProps">
-                                <!-- <div class="absolute bg-gradient-to-l from-black/25 to-black/0 w-[250px] h-full top-0 right-0 rounded-xl"></div>
-                                <div class="absolute bg-gradient-to-r from-black/25 to-black/0 w-[250px] h-full top-0 left-0 rounded-xl"></div> -->
                                 <img :src="slotProps.item.itemImageSrc" :alt="slotProps.item.alt" class="w-full aspect-video object-cover rounded-xl" />
                             </template>
                             <template #thumbnail="slotProps">
@@ -257,13 +259,14 @@ const getMeterValue = meterData => {
                     </div>
 
                     <!-- Buttons -->
-                    <section class="flex flex-col gap-6">
-
-                        <!--  -->
-                        <div class="shadow-md outline outline-1 outline-primary-200 rounded-2xl p-4">
-                            <div class="flex flex-col justify-end text-2xl pb-3">
+                    <!-- <section class="flex flex-col gap-6"> -->
+                    <section class="grid h-fit gap-6">
+                        <div class="shadow-md outline outline-1 outline-primary-200 rounded-2xl p-4 h-fit">
+                            <div class="flex flex-col justify-start w-full pb-3">
                                 <span class="text-sm">From</span>
-                                <strong>{{ useFormatPrice(tour.base_price) }}</strong>
+                                <strong class="text-xl">{{ useFormatPrice(tour.base_price) }}</strong>
+                                <small>Price per person</small>
+                                <small>{{ useFormatPrice(tour.base_price / tour.duration) }}</small>
                             </div>
                             <div class="flex flex-col gap-3 lg:min-w-[300px]">
                                 <a v-if="tour.availabilities.length > 1" href="#available" class="flex-1">
@@ -275,15 +278,32 @@ const getMeterValue = meterData => {
                         </div>
 
                         <!-- Details -->
-                        <div class="bg-primary-100/25 outline outline-2 outline-primary shadow-md rounded-2xl p-4">
-                            <div v-for="tour in tourDetails" class="flex items-center gap-4 mb-3">
+                        <div class="bg-primary-100/25 outline outline-2 outline-primary shadow-md rounded-2xl flex flex-col p-4 h-fit gap-2">
+                            <div v-for="tour in tourDetails" class="flex items-center gap-3">
                                 <i :class="tour.icon"></i>
                                 <span>{{ tour.label }}</span>
                             </div>
-                            <a href="#itinerary"><Button 
+                            <a v-if="tour.itinerary.days.length" href="#itinerary"><Button 
                                 label="See itinerary details" icon="pi pi-map"
                                 severity="constrast" class="w-full" rounded outlined
                             /></a>
+                        </div>
+
+                        <div class="flex gap-3 text-sm justify-between">
+                            <div
+                                class="flex items-center cursor-pointer hover:text-primary"
+                                @click="displayGalleria = true"
+                            >
+                                <i class="pi pi-images"></i>
+                                <span class="ml-2">View Gallery</span>
+                            </div>
+                            <div
+                                class="flex items-center cursor-pointer hover:text-primary"
+                                @click="triggerBookmark"
+                            >
+                                <i :class="!bookmark ? 'pi pi-bookmark' : 'pi pi-bookmark-fill'"></i>
+                                <span class="ml-2">{{ !bookmark ? 'Save to bookmark' : 'Saved to bookmark' }}</span>
+                            </div>
                         </div>
 
                         <!-- <Button label="Download Brochure" severity="constrast" rounded text outlined /> -->
@@ -305,46 +325,24 @@ const getMeterValue = meterData => {
 
             <!-- Details -->
             <TourContent id="detail" title="Details">
+                <div class="flex gap-4 mb-8">
+                    <TourIconBox>
+                        <template #header>
+                            <i class="pi pi-map-marker"></i>
+                            <!-- <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-6">
+                                <path fill-rule="evenodd" d="M7.5 6a4.5 4.5 0 1 1 9 0 4.5 4.5 0 0 1-9 0ZM3.751 20.105a8.25 8.25 0 0 1 16.498 0 .75.75 0 0 1-.437.695A18.683 18.683 0 0 1 12 22.5c-2.786 0-5.433-.608-7.812-1.7a.75.75 0 0 1-.437-.695Z" clip-rule="evenodd" />
+                            </svg> -->
+                        </template>
+                        <template #main>
+                            <h3 class="font-black">Pick-up Location</h3>
+                            <span>{{ tour.pickup_location }}</span>
+                        </template>
+                    </TourIconBox>
+                </div>
                 <div>
                     <h2>Description</h2>
                     <p class="text-black text-justify">{{ tour.description }}</p>
-                </div>
-                <!-- <div class="flex gap-4 mb-8">
-                    <TourIconBox>
-                        <template #header>
-                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-6">
-                                <path fill-rule="evenodd" d="M8.25 6.75a3.75 3.75 0 1 1 7.5 0 3.75 3.75 0 0 1-7.5 0ZM15.75 9.75a3 3 0 1 1 6 0 3 3 0 0 1-6 0ZM2.25 9.75a3 3 0 1 1 6 0 3 3 0 0 1-6 0ZM6.31 15.117A6.745 6.745 0 0 1 12 12a6.745 6.745 0 0 1 6.709 7.498.75.75 0 0 1-.372.568A12.696 12.696 0 0 1 12 21.75c-2.305 0-4.47-.612-6.337-1.684a.75.75 0 0 1-.372-.568 6.787 6.787 0 0 1 1.019-4.38Z" clip-rule="evenodd" />
-                                <path d="M5.082 14.254a8.287 8.287 0 0 0-1.308 5.135 9.687 9.687 0 0 1-1.764-.44l-.115-.04a.563.563 0 0 1-.373-.487l-.01-.121a3.75 3.75 0 0 1 3.57-4.047ZM20.226 19.389a8.287 8.287 0 0 0-1.308-5.135 3.75 3.75 0 0 1 3.57 4.047l-.01.121a.563.563 0 0 1-.373.486l-.115.04c-.567.2-1.156.349-1.764.441Z" />
-                            </svg>
-                        </template>
-                        <template #main>
-                            <h3 class="font-black">Group Size</h3>
-                            <span>Maximum of {{ tour.max_passenger }} people</span>
-                        </template>
-                    </TourIconBox>
-                    <TourIconBox>
-                        <template #header>
-                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-6">
-                                <path fill-rule="evenodd" d="M7.5 6a4.5 4.5 0 1 1 9 0 4.5 4.5 0 0 1-9 0ZM3.751 20.105a8.25 8.25 0 0 1 16.498 0 .75.75 0 0 1-.437.695A18.683 18.683 0 0 1 12 22.5c-2.786 0-5.433-.608-7.812-1.7a.75.75 0 0 1-.437-.695Z" clip-rule="evenodd" />
-                            </svg>
-                        </template>
-                        <template #main>
-                            <h3 class="font-black">Age Range</h3>
-                            <span>{{ tour.min_age }} - {{ tour.max_age }}</span>
-                        </template>
-                    </TourIconBox>
-                    <TourIconBox>
-                        <template #header>
-                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-6">
-                                <path fill-rule="evenodd" d="M12 2.25a.75.75 0 0 1 .75.75v.756a49.106 49.106 0 0 1 9.152 1 .75.75 0 0 1-.152 1.485h-1.918l2.474 10.124a.75.75 0 0 1-.375.84A6.723 6.723 0 0 1 18.75 18a6.723 6.723 0 0 1-3.181-.795.75.75 0 0 1-.375-.84l2.474-10.124H12.75v13.28c1.293.076 2.534.343 3.697.776a.75.75 0 0 1-.262 1.453h-8.37a.75.75 0 0 1-.262-1.453c1.162-.433 2.404-.7 3.697-.775V6.24H6.332l2.474 10.124a.75.75 0 0 1-.375.84A6.723 6.723 0 0 1 5.25 18a6.723 6.723 0 0 1-3.181-.795.75.75 0 0 1-.375-.84L4.168 6.241H2.25a.75.75 0 0 1-.152-1.485 49.105 49.105 0 0 1 9.152-1V3a.75.75 0 0 1 .75-.75Zm4.878 13.543 1.872-7.662 1.872 7.662h-3.744Zm-9.756 0L5.25 8.131l-1.872 7.662h3.744Z" clip-rule="evenodd" />
-                            </svg>
-                        </template>
-                        <template #main>
-                            <h3 class="font-black">Travel Intensity</h3>
-                            <span>{{ useFormatText(tour.travel_intensity) }}</span>
-                        </template>
-                    </TourIconBox>
-                </div> -->
+                </div>  
                 <TourTextBox label="Destinations" :value="tour.destinations" />
                 <TourTextBox label="Activities" :value="tour.activities" />
                 <div class="mt-8" v-if="tour.highlights.length != 0">
@@ -359,9 +357,9 @@ const getMeterValue = meterData => {
             </TourContent>
 
             <!-- Itinerary -->
-            <TourContent id="itinerary" title="Itinerary">
+            <TourContent v-if="tour.itinerary.days.length != 0" id="itinerary" title="Itinerary">
                 <TourStepper 
-                    :days="tour.itineraries.days"
+                    :days="tour.itinerary.days"
                 />
             </TourContent>
 

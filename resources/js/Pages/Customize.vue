@@ -480,7 +480,21 @@ const restrictions = [
                         </TabView>
                     </div>
                     <div v-if="active == 6">
-                        
+                        <div v-for="(categoryValue, categoryName) in tripDetails.overallDetails.value" class="flex flex-col mb-3">
+                            <h4 class="capitalize">{{ categoryName }}</h4>
+                            <div v-if="categoryName != 'budget' && categoryName != 'duration'" class="flex gap-3">
+                                <div v-for="value in categoryValue.value">
+                                    <h4 class="font-semibold text-black">{{ value }}</h4>
+                                </div>
+                            </div>
+                            <div v-else-if="categoryName == 'budget'" v-for="event in categoryValue.value" class="flex">
+                                <h4 class="font-semibold text-black">RM{{ event.item[0] }} - RM{{ event.item[1] }}</h4>
+                            </div>
+                            <div v-else-if="categoryName == 'duration'" v-for="event in categoryValue.value">
+                                <h4 class="font-semibold text-black">{{ event.item[0] }} - {{ event.item[1] }} Days</h4>
+                            </div>
+                        </div>
+                        <Button label="Confirm" />
                     </div>
                     <!-- Button -->
                     <div v-if="active != 0 && active != 6" class="flex flex-wrap justify-between mt-8">
@@ -517,7 +531,7 @@ const restrictions = [
                     </div>  
                 </div>
             </div>
-            <div class="bg-white rounded shadow min-w-72 max-w-72 h-fit py-6 px-4 hidden xl:block">
+            <div v-if="active != 6" class="bg-white rounded shadow min-w-72 max-w-72 h-fit py-6 px-4 hidden xl:block">
                 <h2 class="mb-4">My Trip</h2>
                 <div v-if="Object.keys(tripDetails.overallDetails.value).length != 0" class="flex flex-col gap-4">
                     <div 
