@@ -7,6 +7,7 @@ use App\Http\Controllers\BookmarkController;
 use App\Http\Controllers\BookingController;
 use App\Http\Controllers\CommunityController;
 use App\Http\Controllers\CustomerSupportController;
+use App\Http\Controllers\CustomizeController;
 use App\Http\Controllers\GroupTourController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\PostController;
@@ -31,13 +32,15 @@ Route::get('/question', function () {
    return Inertia::render('Question'); 
 })->name('question');
 
-Route::get('/customize', function () {
-    return Inertia::render('Customize');
-})->name('customize');
-
+Route::resource('/explore', ExploreController::class)->only(['index', 'show']);
 Route::get('/community', [CommunityController::class, 'index'])->name('community');
+
 Route::resource('tour', TourController::class)->only(['index', 'show']);
-Route::resource('explore', ExploreController::class)->only(['index', 'show']);
+
+Route::controller(CustomizeController::class)->group(function () {
+    Route::get('/customize', 'index')->name('customize');
+    Route::post('/customize/store', 'store')->name('customize.store');
+});
 
 Route::controller(AuthController::class)->group(function () {
     Route::post('/send-email', 'sendEmail')->name('auth.email');
@@ -48,10 +51,10 @@ Route::controller(AuthController::class)->group(function () {
 
 Route::controller(TourController::class)->group(function () {
     Route::get('/reserve', 'showReserveForm')->name('tour.reserve');
-    Route::get('/book/{availabilityId}', 'showBookingForm')->name('tour.book');
+    // Route::get('/book/{availabilityId}', 'showBookingForm')->name('tour.book');
     Route::post('/submit-reservation', 'submitReservation')->name('tour.submit-reservation');
-    Route::post('/validate-booking', 'validateBooking')->name('tour.validate-booking');
-    Route::post('/submit-booking/{id}', 'storeBooking')->name('tour.store-booking');
+    // Route::post('/validate-booking', 'validateBooking')->name('tour.validate-booking');
+    // Route::post('/submit-booking/{id}', 'storeBooking')->name('tour.store-booking');
 });
 
 Route::get('/profile/bookmark', [ProfileController::class, 'bookmark'])->name('profile.bookmark');
@@ -61,6 +64,9 @@ Route::post('/customer-query', [CustomerSupportController::class, 'store'])->nam
 Route::delete('/bookmark/{bookmark}', [BookmarkController::class, 'destroy'])->name('bookmark.destroy');
 
 Route::controller(BookingController::class)->group(function () {
+    Route::get('/book/{availabilityId}', 'show')->name('booking.show');
+    Route::post('/book/{id}', 'store')->name('booking.store');
+    Route::post('/book/validate', 'validate')->name('booking.validate');
     Route::patch('/profile/booking/{booking}', 'update')->name('booking.update');
 });
 
