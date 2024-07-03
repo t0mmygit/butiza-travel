@@ -95,10 +95,6 @@ const tourDetails = ref([
         icon: 'pi pi-car',
         label: `Travel Intensity: ${useFormatText(props.tour.travel_intensity)}`
     },
-    // {
-    //     icon: 'pi pi-map-marker',
-    //     label: `Pick-up location: ${props.tour.pickup_location}`
-    // }
 ]);
 
 const reserveTour = () => {
@@ -109,9 +105,9 @@ const reserveTour = () => {
     }
 };
 
-const bookDate = (availability_id) => {
+const bookDate = (availabilityId) => {
     try {
-        form.get(route('tour.book', { availabilityId: availability_id }));
+        form.get(route('booking.show', { availabilityId: availabilityId }));
     } catch (error) {
         console.error('Error reserving tour:', error);
     }
@@ -217,22 +213,6 @@ const getMeterValue = meterData => {
             <div class="mx-auto h-full lg:w-5/6 xl:max-w-7xl py-4">
                 <div class="flex items-center justify-between">
                     <h1 class="text-3xl mb-3">{{ tour.name }}</h1>
-                    <!-- <div class="flex gap-4">
-                        <div
-                            class="flex items-center cursor-pointer hover:text-primary"
-                            @click="displayGalleria = true"
-                        >
-                            <i class="pi pi-images"></i>
-                            <span class="ml-2">Gallery</span>
-                        </div>
-                        <div
-                            class="flex items-center cursor-pointer hover:text-primary"
-                            @click="triggerBookmark"
-                        >
-                            <i :class="!bookmark ? 'pi pi-bookmark' : 'pi pi-bookmark-fill'"></i>
-                            <span class="ml-2">{{ !bookmark ? 'Save' : 'Saved' }}</span>
-                        </div>
-                    </div> -->
                 </div>
                 <div class="flex flex-nowrap justify-center mb-4 w-full h-full gap-6">
                     <div class="flex-1 w-full h-full rounded-xl cursor-pointer" @click="displayGalleria = true">
@@ -265,7 +245,7 @@ const getMeterValue = meterData => {
                             <div class="flex flex-col justify-start w-full pb-3">
                                 <span class="text-sm">From</span>
                                 <strong class="text-xl">{{ useFormatPrice(tour.base_price) }}</strong>
-                                <small>Price per person</small>
+                                <small>Price per day</small>
                                 <small>{{ useFormatPrice(tour.base_price / tour.duration) }}</small>
                             </div>
                             <div class="flex flex-col gap-3 lg:min-w-[300px]">

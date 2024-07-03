@@ -102,7 +102,7 @@ const tourDetails = [
 ];
 
 const bookingValidation = () => {
-    bookingForm.post(route('tour.validate-booking'), {
+    bookingForm.post(route('booking.validate'), {
         onSuccess: () => paymentSection.value = true,
         onError: (error) => console.error(error),
     });
@@ -110,9 +110,9 @@ const bookingValidation = () => {
 
 const paymentValidation = () => {
     paymentForm.post(route('validate-payment'), {
-        onSuccess: () => bookingForm.post(route('tour.store-booking', { id: props.availability.id })),
+        onSuccess: () => bookingForm.post(route('booking.store', { id: props.availability.id })),
         onError: (error) => console.error(error),
-        onFinish: () => bookingForm.post(route('tour.store-booking', { id: props.availability.id })),
+        onFinish: () => bookingForm.post(route('booking.store', { id: props.availability.id })),
     });
 };
 
