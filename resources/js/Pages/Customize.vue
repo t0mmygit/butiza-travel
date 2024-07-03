@@ -1,6 +1,7 @@
 <script setup>
 import MarginLayout from '@/Layouts/MarginLayout.vue';
 import Checkbox from '@/Components/Checkbox.vue';
+import { useFormatText } from '@/Composables/formatText';
 
 // PrimeVue 
 import Steps from 'primevue/steps';
@@ -10,11 +11,36 @@ import Button from 'primevue/button';
 import IconField from 'primevue/iconfield';
 import InputText from 'primevue/inputtext';
 import InputIcon from 'primevue/inputicon';
+import Calendar from 'primevue/calendar';
 import TabView from 'primevue/tabview';
 import TabPanel from 'primevue/tabpanel';
 import Fieldset from 'primevue/fieldset';
 import Slider from 'primevue/slider';
+import Textarea from 'primevue/textarea';
 import { ref, computed } from 'vue';
+import { router, useForm } from '@inertiajs/vue3';
+import dayjs from 'dayjs';
+
+const props = defineProps({
+    destinations: {
+        type: [Array, Object],
+    },
+    activities: {
+        type: [Array, Object],
+    },
+    guide_types: {
+        type: [Array, Object],
+    },
+    lodge_types: {
+        type: [Array, Object],
+    },
+    travel_intensities: {
+        type: [Array, Object],
+    },
+    age_range: {
+        type: [Array, Object],
+    },
+});
 
 const active = ref(0);
 const budget = ref([0, 5000]);
@@ -28,8 +54,23 @@ const useSelection = () => {
 
     const selectItem = (item) => {
         const index = selectedItems.value.findIndex(selectedItem => selectedItem === item);
-        if (index == -1) selectedItems.value.push(item);
-        else selectedItems.value.splice(index, 1);
+        if (index != -1) selectedItems.value.splice(index, 1);
+        else selectedItems.value[0] = item;
+    };
+
+    const selectDate = (item) => {
+        const index = selectedItems.value.findIndex(selectedItem => selectedItem === item);
+        if (index != -1) { 
+            selectedItems.value.splice(index, 1);
+        } else {
+            selectedItems.value[0] = dayjs(item).format('YYYY-MM-DD');
+        }
+    };
+
+    const selectItems = (item) => {
+        const index = selectedItems.value.findIndex(selectedItem => selectedItem === item);
+        if (index != -1) selectedItems.value.splice(index, 1);
+        else selectedItems.value.push(item);
     };
 
     const sliderItem = (item, column) => {
@@ -42,7 +83,7 @@ const useSelection = () => {
         else selectedItems.value.push(sliderObject);    
     };
 
-    return { selectedItems, selectItem, sliderItem };
+    return { selectedItems, selectItem, selectDate, selectItems, sliderItem };
 };
 
 const selectedDestination = useSelection();
@@ -60,49 +101,40 @@ const useTripDetails = (selections) => {
         overallDetails: computed(() => {
             const overallDetails = {};
             for (const [key, selectedItems] of Object.entries(selections)) {
-                // Insert the key and assign value into each respective items
-                if (selectedItems.value.length != 0) overallDetails[key] = selectedItems;
+                if (selectedItems.length != 0) overallDetails[key] = selectedItems;
             }
             return overallDetails;
         })
-    }
-}
+    };
+};
 
 const tripDetails = useTripDetails({
-    destination: selectedDestination.selectedItems,
-    guide: selectedGuide.selectedItems,
-    intensity: selectedIntensity.selectedItems,
-    activity: selectedActivity.selectedItems,
-    lodging: selectedLodging.selectedItems,
-    age: selectedAge.selectedItems,
-    budget: selectedBudget.selectedItems,
-    date: selectedDate.selectedItems,
-    duration: selectedDuration.selectedItems
+    destination: selectedDestination.selectedItems.value,
+    guide: selectedGuide.selectedItems.value,
+    intensity: selectedIntensity.selectedItems.value,
+    activity: selectedActivity.selectedItems.value,
+    lodging: selectedLodging.selectedItems.value,
+    age: selectedAge.selectedItems.value,
+    budget: selectedBudget.selectedItems.value,
+    date: selectedDate.selectedItems.value,
+    duration: selectedDuration.selectedItems.value,
 });
 
 const searchDestination = computed(() => {
-    if (!filterDestination.value) return destinations;
-    else return destinations.filter(destination => destination.includes(filterDestination.value));
+    if (!filterDestination.value) return props.destinations;
+    else return props.destinations.filter(destination => destination.includes(filterDestination.value));
 });
 
-const isDestinationSelected = (destination) => selectedDestination.selectedItems.value.some(dest => dest === destination);
-const isActivitySelected = (activity) => selectedActivity.selectedItems.value.some(act => act === activity);
-const isLodgeSelected = (lodging) => selectedLodging.selectedItems.value.some(lodge => lodge === lodging);
+const isDestinationSelected = destination => selectedDestination.selectedItems.value.some(dest => dest === destination);
+const isActivitySelected = activity => selectedActivity.selectedItems.value.some(act => act === activity);
+const isLodgeSelected = lodging => selectedLodging.selectedItems.value.some(lodge => lodge === lodging);
 
-// Get the next 8 months (MONTH YEAR) list of string
-const getMonths = () => {
-    var months = [];
-    var currentDate = new Date();
-    for (let i = 1; i <= 8; i++) {
-        var nextMonth = new Date(currentDate.getFullYear(), currentDate.getMonth() + i, 1);
-        months.push(nextMonth.toLocaleString('default', { month: 'long', year: 'numeric' }))
-    } 
-    return months;
+const setFlexibleDate = (status) => { 
+    isFlexible.value = !!status;
+    selectedDate.selectedItems.value = [];
 };
 
-const setFlexibleDate = (status) => isFlexible.value = !!status;
-
-const months = getMonths();
+const minDate = () => new Date();
 
 const items = ref([
     {
@@ -158,7 +190,7 @@ const headers  = [
         title: "Your Trip",
         subtitle: "Please confirm your trip preferences."
     }
-]
+];
 
 const guidelines = [
     {
@@ -175,69 +207,6 @@ const guidelines = [
     }
 ];
 
-const destinations = [
-    "Kuala Lumpur",
-    "Penang",
-    "Langkawi",
-    "Malacca (Melaka)",
-    "Cameron Highlands",
-    "Kota Kinabalu",
-    "Kuching",
-    "Perhentian Islands",
-    "Tioman Island",
-    "Taman Negara"
-];
-
-const preferences = [
-    {
-        guide: "Guided",
-        description: "Follow the leader! Join a group led by a knowledgeable guide provided by the travel service, ensuring you don't miss any highlights."
-    },
-    {
-        guide: "Private Guided",
-        description: "Your exclusive adventure! Choose who joins you and enjoy the expertise of a dedicated guide provided by the travel service as you explore."
-    },
-    {
-        guide: "Independent",
-        description: "Your trip was planned from the get-go, but explore at your own pace without the guidance of a dedicated tour leader."
-    }
-];
-
-const travels = [
-    {
-        intensity: "Relaxed",
-        description: "Ideal for leisurely travelers, this level involves minimal physical exertion. Activities are gentle, such as short walks and easy sightseeing, catering to all ages and fitness levels."
-    },
-    {
-        intensity: "Moderate",
-        description: "Suited for active travelers, this level includes moderate physical activity like hiking and walking tours. Participants should have a reasonable level of fitness and be comfortable with walking on varied terrain."
-    },
-    {
-        intensity: "Adventurous",
-        description: "Tailored for thrill-seekers, this level offers challenging activities such as strenuous hikes and outdoor adventures. Participants need a high level of fitness and stamina to tackle demanding terrain and activities."
-    }
-];
-
-const activities = [
-  "City Exploration",
-  "Outdoor Adventures",
-  "Cultural Immersion",
-  "Culinary Experiences",
-  "Nature and Wildlife",
-  "Relaxation and Wellness",
-  "Adventure Sports",
-  "Birding"
-];
-
-const lodging = [
-    "Hotels",
-    "Resorts",
-    "Hostels",
-    "Camping"
-]
-
-const ages = ["65+", "50-64", "36-49", "18-35", "12-17", "6-11", "5 and under"];
-
 const restrictions = [
     {
         title: "Activity and Attractions",
@@ -253,12 +222,36 @@ const restrictions = [
     }
 ];
 
+const form = useForm({
+    destinations: computed(() => tripDetails.overallDetails.value.destination ?? []),
+    activities: computed(() => tripDetails.overallDetails.value.activity ?? []),
+    guide_type: computed(() => tripDetails.overallDetails.value.guide?.[0] ?? null),
+    lodge_type: computed(() => tripDetails.overallDetails.value.lodging?.[0] ?? null),
+    start_date: computed(() => tripDetails.overallDetails.value.date?.[0] ?? null),
+    travel_intensity: computed(() => tripDetails.overallDetails.value.intensity?.[0] ?? null),
+    age_range: computed(() => tripDetails.overallDetails.value.age ?? []),
+    min_budget: computed(() => tripDetails.overallDetails.value.budget?.[0]?.item?.[0] ?? null),
+    max_budget: computed(() => tripDetails.overallDetails.value.budget?.[0]?.item?.[1] ?? null),
+    min_duration: computed(() => tripDetails.overallDetails.value.duration?.[0]?.item?.[0] ?? null),
+    max_duration: computed(() => tripDetails.overallDetails.value.duration?.[0]?.item?.[1] ?? null),
+    // note: null,
+});
+
+const submitForm = () => {
+    form.post(route('customize.store'), {
+        onSuccess: () => form.reset(),
+        onError: (error) => console.error('Error:', error),
+        onFinish: () => console.log('Finish:', tripDetails.overallDetails.value),
+    });
+};
+
+
 </script>
 
 <template>
     <MarginLayout>
         <div id="stepper" class="bg-white h-fit shadow py-6">
-            <div class="max-w-sm lg:max-w-full lg:mx-16 flex items-center relative">
+            <div class="w-11/12 lg:max-w-full lg:mx-16 flex items-center relative mx-auto">
                 <SvgLogo />
                 <Steps 
                     v-model:activeStep="active" 
@@ -268,17 +261,17 @@ const restrictions = [
                 />
             </div>
         </div>
-        <section class="my-8 mx-auto lg:flex xl:flex max-w-2xl xl:max-w-7xl">
-            <Avatar icon="pi pi-user" class="mt-3 bg-white" size="large" shape="circle" />
+        <section class="my-8 mx-auto max-w-2xl lg:flex xl:flex xl:max-w-7xl">
+            <Avatar icon="pi pi-user" class="mb-6 ml-1 xl:mt-3 xl:ml-0 bg-white" size="large" shape="circle" />
             <div class="grow">
                 <div class="mx-auto
-                    max-w-sm
+                    max-w-11/12
                     lg:max-w-lg
                     xl:max-w-4xl
                     bg-white shadow rounded py-6 px-5 relative"
                 >
                     <div class="flex items-center">
-                        <div class="bg-white rotate-45 size-4 absolute xl:left-[-6px]"></div>
+                        <div class="bg-white rotate-45 size-4 absolute top-[-6px] xl:left-[-6px] xl:top-6"></div>
                         <h1>{{ headers[active].title }}</h1>
                     </div>
                     <p class="text-lg mb-8">
@@ -312,16 +305,16 @@ const restrictions = [
                             <div 
                                 v-for="destination in searchDestination" 
                                 class="bg-gray-200 rounded-lg relative hover:shadow"
-                                @click="selectedDestination.selectItem(destination)"
+                                @click="selectedDestination.selectItems(destination.name)"
                             >
-                                <img src="" class="aspect-video">
+                                <img :src="destination.image" class="aspect-video">
                                 <div class="flex flex-col">
-                                    <span v-if="isDestinationSelected(destination)" class="absolute top-0 right-0 p-3">
+                                    <span v-if="isDestinationSelected(destination.name)" class="absolute top-0 right-0 p-3">
                                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-6 h-6">
                                             <path fill-rule="evenodd" d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12Zm13.36-1.814a.75.75 0 1 0-1.22-.872l-3.236 4.53L9.53 12.22a.75.75 0 0 0-1.06 1.06l2.25 2.25a.75.75 0 0 0 1.14-.094l3.75-5.25Z" clip-rule="evenodd" />
                                         </svg>
                                     </span>
-                                    <span class="absolute bottom-0 right-0 px-4 pb-2">{{ destination }}</span>
+                                    <span class="absolute bottom-0 right-0 px-4 pb-2 text-right">{{ destination.name }}</span>
                                 </div>
                             </div>
                         </div>
@@ -332,20 +325,19 @@ const restrictions = [
                         <TabView>
                             <TabPanel header="Travel Guide">
                                 <Fieldset 
-                                    v-for="preference in preferences"
-                                    :legend="preference.guide"
+                                    v-for="guide in guide_types"
+                                    :legend="useFormatText(guide.type)"
                                     class="mb-4 cursor-pointer"
-                                    :class="{'border-primary': selectedGuide.selectedItems.value.includes(preference.guide)}"
-                                    @click="selectedGuide.selectItem(preference.guide)"
+                                    :class="{'border-primary': selectedGuide.selectedItems.value.includes(guide.type)}"
+                                    @click="selectedGuide.selectItem(guide.type)"
                                 >
-                                    <p>{{ preference.description }}</p>
+                                    <p>{{ guide.description }}</p>
                                 </Fieldset>
                             </TabPanel>
                             <TabPanel header="Travel Intensity">
                                 <Fieldset
-                                    v-for="travel in travels"
-                                    :key="travel.id"
-                                    :legend="travel.intensity"
+                                    v-for="travel in travel_intensities"
+                                    :legend="useFormatText(travel.intensity)"
                                     class="mb-4 cursor-pointer"
                                     :class="{'border-primary': selectedIntensity.selectedItems.value.includes(travel.intensity)}"
                                     @click="selectedIntensity.selectItem(travel.intensity)"
@@ -364,16 +356,16 @@ const restrictions = [
                                     <div 
                                         v-for="activity in activities" 
                                         class="bg-gray-200 rounded-lg relative hover:shadow"
-                                        @click="selectedActivity.selectItem(activity)"
+                                        @click="selectedActivity.selectItems(activity.name)"
                                     >
-                                        <img src="" class="aspect-video">
+                                        <img :src="activity.image" class="aspect-video">
                                         <div class="flex flex-col">
-                                            <span v-if="isActivitySelected(activity)" class="absolute top-0 right-0 p-3">
+                                            <span v-if="isActivitySelected(activity.name)" class="absolute top-0 right-0 p-3">
                                                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-6 h-6">
                                                     <path fill-rule="evenodd" d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12Zm13.36-1.814a.75.75 0 1 0-1.22-.872l-3.236 4.53L9.53 12.22a.75.75 0 0 0-1.06 1.06l2.25 2.25a.75.75 0 0 0 1.14-.094l3.75-5.25Z" clip-rule="evenodd" />
                                                 </svg>
                                             </span>
-                                            <span class="absolute bottom-0 right-0 px-4 pb-2">{{ activity }}</span>
+                                            <span class="absolute bottom-0 right-0 px-4 pb-2">{{ activity.name }}</span>
                                         </div>
                                     </div>
                                 </div>
@@ -381,18 +373,18 @@ const restrictions = [
                             <TabPanel header="Lodge">
                                 <div class="grid lg:grid-cols-4 gap-4">
                                     <div
-                                        v-for="lodge in lodging"
+                                        v-for="lodge in lodge_types"
                                         class="bg-gray-200 rounded-lg relative hover:shadow"
-                                        @click="selectedLodging.selectItem(lodge)"
+                                        @click="selectedLodging.selectItem(lodge.type)"
                                     >
                                         <img src="" class="aspect-video">
                                         <div class="flex flex-col">
-                                            <span v-if="isLodgeSelected(lodge)" class="absolute top-0 right-0 p-3">
+                                            <span v-if="isLodgeSelected(lodge.type)" class="absolute top-0 right-0 p-3">
                                                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-6 h-6">
                                                     <path fill-rule="evenodd" d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12Zm13.36-1.814a.75.75 0 1 0-1.22-.872l-3.236 4.53L9.53 12.22a.75.75 0 0 0-1.06 1.06l2.25 2.25a.75.75 0 0 0 1.14-.094l3.75-5.25Z" clip-rule="evenodd" />
                                                 </svg>
                                             </span>
-                                            <span class="absolute bottom-0 right-0 px-4 pb-2">{{ lodge }}</span>
+                                            <span class="absolute bottom-0 right-0 px-4 pb-2">{{ useFormatText(lodge.type) }}</span>
                                         </div>
                                     </div>
                                 </div>
@@ -404,13 +396,13 @@ const restrictions = [
                     <div v-if="active == 4">
                         <TabView>
                             <TabPanel header="Age">
-                                <div class="grid lg:grid-cols-4 gap-4 mt-2">
-                                    <div v-for="(age, index) in ages" :key="index" class="bg-gray-200 rounded">
+                                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mt-2">
+                                    <div v-for="(age, index) in age_range" :key="index" class="bg-gray-200 rounded">
                                         <Button 
-                                            :label="age" 
-                                            :class="['w-full' ,{'border-primary bg-primary-100 text-black': selectedAge.selectedItems.value.includes(age)}]" 
+                                            :label="age.range" 
+                                            :class="['w-full' ,{'border-primary bg-primary-100 text-black': selectedAge.selectedItems.value.includes(age.range)}]" 
                                             outlined severity="secondary" 
-                                            @click="selectedAge.selectItem(age)"
+                                            @click="selectedAge.selectItems(age.range)"
                                         />
                                     </div>
                                     <small @click="restriction = !restriction" class="underline text-gray-500 cursor-pointer items-center justify-center flex">Age Guideline</small>
@@ -435,30 +427,44 @@ const restrictions = [
                             </TabPanel>
                         </TabView>
                     </div>
+
+                    <!-- Start Date & Duration -->
                     <div v-if="active == 5">
                         <TabView>
                             <TabPanel header="Start Date">
                                 <p class="mb-4">Not sure yet? Choose 'I'm flexible'.</p>
-                                <div class="flex items-start">
-                                    <Checkbox 
-                                        label="I'm flexible" 
-                                        value="flexible" 
-                                        @update:checked="setFlexibleDate" 
-                                    />
-                                    <div class="m-auto">
-                                        <p class="mb-4">Or select the months in which you want to start your trip:</p>
-                                        <div class="grid grid-cols-2 gap-y-2 pl-2">
-                                            <Checkbox
-                                                v-for="(month, index) in months"
-                                                :key="index"
-                                                :label="month"
-                                                :value="month"
-                                                :disabled="isFlexible"
-                                                @update:checked="selectedDate.selectItem(month)"
-                                            />
-                                        </div>
+                                <div class="grid grid-cols-1 xl:grid-cols-2 w-full">
+                                    <div class="mb-8">
+                                        <Checkbox
+                                            label="I'm flexible"
+                                            value="flexible"
+                                            class="pl-2"
+                                            @update:checked="setFlexibleDate"
+                                        />
+                                    </div>
+                                    <div>
+                                        <p class="mb-4">Or select a specific date</p>
+                                        <Calendar
+                                            :selectOtherMonths="true"
+                                            :minDate="minDate()"
+                                            inline :disabled="isFlexible"
+                                            @date-select="selectedDate.selectDate"
+                                        />
                                     </div>
                                 </div>
+                                <!-- <div class="mb-8">
+                                    <p class="mb-4">Or select the months in which you want to start your trip:</p>
+                                    <div class="grid grid-cols-2 gap-y-2 pl-2">
+                                        <Checkbox
+                                            v-for="(month, index) in getMonths()"
+                                            :key="index"
+                                            :label="month"
+                                            :value="month"
+                                            :disabled="isFlexible"
+                                            @update:checked="selectedDate.selectItems(month)"
+                                        />
+                                    </div>
+                                </div> -->
                             </TabPanel>
                             <TabPanel header="Duration">
                                 <p>Use the slider to set the length of your trip.</p>
@@ -479,24 +485,43 @@ const restrictions = [
                             </TabPanel>
                         </TabView>
                     </div>
-                    <div v-if="active == 6">
-                        <div v-for="(categoryValue, categoryName) in tripDetails.overallDetails.value" class="flex flex-col mb-3">
-                            <h4 class="capitalize">{{ categoryName }}</h4>
-                            <div v-if="categoryName != 'budget' && categoryName != 'duration'" class="flex gap-3">
-                                <div v-for="value in categoryValue.value">
-                                    <h4 class="font-semibold text-black">{{ value }}</h4>
+
+                    <!-- Final -->
+                    <div v-if="active == 6" class="flex flex-col gap-3">
+                        <div v-for="(categoryValue, category) in tripDetails.overallDetails.value">
+                            <h4 class="capitalize">{{ category }}</h4>
+                            <div v-if="category === 'budget'">
+                                <h3 v-for="value in categoryValue" class="font-semibold text-black">
+                                    RM{{ value.item.join(' - RM') }}
+                                </h3>
+                            </div>  
+                            <div v-else-if="category === 'duration'">
+                                <h3 v-for="value in categoryValue" class="font-semibold text-black">
+                                    {{ value.item.join(' - ') }} Days
+                                </h3>
+                            </div>
+                            <div v-else-if="category === 'date'">
+                                <h3 v-for="value in categoryValue" class="font-semibold text-black">
+                                    {{ dayjs(value).format('DD MMMM YYYY') }}
+                                </h3>
+                            </div>
+                            <div v-else>
+                                <div class="flex gap-6">
+                                    <h3 v-for="value in categoryValue" class="font-semibold text-black">{{ useFormatText(value) }}</h3>
                                 </div>
                             </div>
-                            <div v-else-if="categoryName == 'budget'" v-for="event in categoryValue.value" class="flex">
-                                <h4 class="font-semibold text-black">RM{{ event.item[0] }} - RM{{ event.item[1] }}</h4>
-                            </div>
-                            <div v-else-if="categoryName == 'duration'" v-for="event in categoryValue.value">
-                                <h4 class="font-semibold text-black">{{ event.item[0] }} - {{ event.item[1] }} Days</h4>
-                            </div>
                         </div>
-                        <Button label="Confirm" />
+                        <Textarea
+                            v-if="Object.keys(tripDetails.overallDetails.value).length != 0"
+                        />
+                        <Button
+                            label="Confirm"
+                            :disabled="Object.keys(tripDetails.overallDetails.value).length == 0"
+                            @click="submitForm"
+                        />
                     </div>
-                    <!-- Button -->
+
+                    <!-- Buttons -->
                     <div v-if="active != 0 && active != 6" class="flex flex-wrap justify-between mt-8">
                         <Button 
                             label="Previous" 
@@ -535,20 +560,33 @@ const restrictions = [
                 <h2 class="mb-4">My Trip</h2>
                 <div v-if="Object.keys(tripDetails.overallDetails.value).length != 0" class="flex flex-col gap-4">
                     <div 
-                        v-for="(categoryValue, categoryName) in tripDetails.overallDetails.value"
+                        v-for="(categoryValue, category) in tripDetails.overallDetails.value"
                         class="grid grid-cols-2"
                     >
-                        <h5 class="capitalize">{{ categoryName }}</h5>
-                        <div v-if="categoryName != 'budget' && categoryName != 'duration'">
-                            <div v-for="value in categoryValue.value">
-                                <h5 class="font-semibold text-black">{{ value }}</h5>
+                        <h5 class="capitalize">{{ category }}</h5>
+                        <div v-if="category === 'budget'" class="flex gap-2">
+                            <i class="pi pi-check-circle text-success"></i>
+                            <h5 v-for="value in categoryValue" class="font-semibold text-black">
+                                RM{{ value.item.join(' - RM') }}
+                            </h5>
+                        </div>  
+                        <div v-else-if="category === 'duration'" class="flex gap-2">
+                            <i class="pi pi-check-circle text-success"></i>
+                            <h5 v-for="value in categoryValue" class="font-semibold text-black">
+                                {{ value.item.join(' - ') }} Days
+                            </h5>
+                        </div>
+                        <div v-else-if="category === 'date'" class="flex gap-2">
+                            <i class="pi pi-check-circle text-success"></i>
+                            <h5 v-for="value in categoryValue" class="font-semibold text-black">
+                                {{ dayjs(value).format('DD MMMM YYYY') }}
+                            </h5>
+                        </div>
+                        <div v-else>
+                            <div v-for="value in categoryValue" class="flex items-start gap-2">
+                                <i class="pi pi-check-circle text-success"></i>
+                                <h5 class="font-semibold text-black">{{ useFormatText(value) }}</h5>
                             </div>
-                        </div>
-                        <div v-else-if="categoryName == 'budget'" v-for="event in categoryValue.value">
-                            <h5 class="font-semibold text-black">RM{{ event.item[0] }} - RM{{ event.item[1] }}</h5>
-                        </div>
-                        <div v-else-if="categoryName == 'duration'" v-for="event in categoryValue.value">
-                            <h5 class="font-semibold text-black">{{ event.item[0] }} - {{ event.item[1] }} Days</h5>
                         </div>
                     </div>
                 </div>
