@@ -68,11 +68,6 @@ const triggerBookmark = () => {
     });
 };
 
-const formatPricePerDay = (price) => {
-    price = Math.ceil(price / props.tour.duration);
-    return useFormatPrice(price);
-};
-
 const itemsListener = computed(() => {
     let index = props.items.findIndex(item => item.id === props.tour.id);
     return index != -1 ?  true : false;

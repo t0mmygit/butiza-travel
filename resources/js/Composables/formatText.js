@@ -1,5 +1,8 @@
 export function useFormatText(text, underscore = false) {
+    if (typeof text != 'string') return;
+
     var splits = text;
+
     if (underscore) {
         splits = text.split('_');
     } else {
