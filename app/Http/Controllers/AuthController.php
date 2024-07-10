@@ -2,14 +2,24 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\NewPartnerRegistered;
+use App\Http\Requests\Auth\LoginRequest;
+use App\Http\Requests\RegisterRequest;
 use App\Models\User;
+use App\Services\AuthService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller
 {
+    protected $authService;
+
+    public function __construct(AuthService $authService)
+    {
+        $this->authService = $authService;
+    }
+
     public function sendEmail(Request $request)
     {
         $request->validate([
@@ -21,50 +31,35 @@ class AuthController extends Controller
         return $user ? $user->email : '';
     }
 
-    public function sendPassword(Request $request): RedirectResponse
+    public function sendPassword(LoginRequest $request): RedirectResponse
     {
-        $credentials = $request->validate([
-            'email'     => 'required',
-            'password' => 'required|string'
-        ]);
+        $request->authenticate();
 
-        if (Auth::attempt($credentials)) {
-            $request->session()->regenerate();
+        $request->session()->regenerate();
             
-            return redirect()->intended('/');
-        }
-
-        return back()->withErrors([
-            'password' => 'The provided credentials do not match our records.', 
-        ])->onlyInput('password');
+        return redirect()->intended();
     }
 
-    public function sendUserDetail(Request $request)
+    public function store(RegisterRequest $request): RedirectResponse
     {
-        $request->validate([
-            'email'                 => 'required|string|email:rfc,dns|lowercase|unique:users',
-            'first_name'            => 'required|string',
-            'last_name'             => 'required|string',
-            'password'              => 'required|confirmed', 
-            // Password Rule for password
-            'password_confirmation' => 'required',
-        ]);
-
-        $user = User::create([
-            'name'     => $request->first_name. ' ' .$request->last_name,
-            'email'    => $request->email,
-            'password' => Hash::make($request->password)
-        ]);
+        $user = User::create($request->validated());
 
         Auth::login($user);
 
-        return redirect()->intended('/');
+        if ($user->role === config('constant.user_roles.partner')) {
+            event(new NewPartnerRegistered($user));
+        }
+
+        return $this->authService->redirectToRoleBasedPage($user->role);
     }
 
-    public function logout(Request $request): RedirectResponse
+    public function destroy(Request $request): RedirectResponse
     {
+        if ($request->user()->role === config('constant.user_roles.partner')) {
+            return redirect()->route('partner-login.create');
+        }
+
         Auth::guard('web')->logout();
-        // What is Auth::guard() anyway
 
         $request->session()->invalidate();
         $request->session()->regenerateToken();
