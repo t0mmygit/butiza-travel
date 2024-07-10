@@ -27,7 +27,7 @@ test('a partner can register successfully', function () {
         'email' => 'john.doe@example.com',
         'password' => 'Password@123',
         'password_confirmation' => 'Password@123',
-        'role' => 'operator'
+        'role' => config('constant.user_roles.partner'),
     ]);
     
     $this
