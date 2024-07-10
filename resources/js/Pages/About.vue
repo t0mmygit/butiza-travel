@@ -7,11 +7,11 @@ import NavLink from '@/Components/NavLink.vue';
 <template>
     <div class="bg-white h-20 shadow z-50 sticky top-0">
         <div class="flex items-center justify-between mx-auto h-full lg:w-5/6 xl:max-w-7xl">
-            <SvgLogo />
+            <ApplicationLogo />
 
             <div class="flex items-center gap-6">
                 <NavLink label="About Butiza Travel" :href="route('about')" :active="route().current('about')" />
-                <NavLink label="Collaboration" :href="route('collab')" :active="route().current('collab')" />
+                <NavLink label="Partner Programme" :href="route('partner.create')" :active="route().current('partner.create')" />
             </div>
             <!-- Content -->
         </div>

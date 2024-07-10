@@ -1,14 +1,9 @@
 
 <script setup>
-import NavLink from '@/Components/NavLink.vue';
-import RoundedButton from '@/Components/RoundedButton.vue';
 import ContactForm from '@/Components/Dialog/ContactForm.vue';
 
 import SplitButton from 'primevue/splitbutton';
 import Dialog from 'primevue/dialog';
-import IconField from 'primevue/iconfield';
-import InputIcon from 'primevue/inputicon';
-import InputText from 'primevue/inputtext';
 import Button from 'primevue/button';
 import Toast from 'primevue/toast';
 import { useToast } from 'primevue/usetoast';
@@ -20,6 +15,13 @@ const mask = ref(false);
 const modal = ref(false);
 const toast = useToast();
 const contactDialog = ref(false);
+
+defineProps({
+    partner: {
+        type: Boolean,
+        default: false,
+    }
+});
 
 const items = [
     {
@@ -49,23 +51,11 @@ const closeContactDialog = () => {
     <div class="bg-white h-20 shadow z-50 sticky top-0">
         <div class="flex items-center mx-auto h-full lg:w-5/6 xl:max-w-7xl">
             <div id="left" class="mr-auto">
-                <SvgLogo />
+                <ApplicationLogo />
             </div>
-            <!-- <IconField v-if="!route().current('home')" iconPosition="left">
-                <InputIcon class="pi pi-search" />
-                <InputText 
-                    placeholder="Search" 
-                    class="rounded-lg" 
-                    @focusin="mask = true" @focusout="mask = false"
-                />
-            </IconField> -->
-            <!-- <div class="flex gap-4 mx-auto">
-                <NavLink label="Home" :href="route('home')" :active="route().current('home')" />
-                <NavLink label="Explore" :href="route('explore.index')" :active="route().current('explore.index')" />
-                <NavLink label="Community" :href="route('community')" :active="route().current('community')" />
-            </div> -->
-
-            <div class="flex gap-3">
+            <div v-if="partner">
+            </div>
+            <div v-else class="flex gap-3">
                 <Button 
                     label="Explore" 
                     plain text rounded
@@ -104,7 +94,7 @@ const closeContactDialog = () => {
                 />
                 <SplitButton v-else 
                     :model="items" 
-                    :label="$page.props.auth.user.name" 
+                    :label="$page.props.auth.user.first_name" 
                     severity="secondary" rounded 
                     @click="$inertia.get(route('profile.account'))" 
                 />

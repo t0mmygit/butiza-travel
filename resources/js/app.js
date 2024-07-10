@@ -15,7 +15,7 @@ import PrimeVue from 'primevue/config';
 import ToastService from 'primevue/toastservice';
 import BadgeDirective from 'primevue/badgedirective';
 
-import SvgLogo from '@/Components/SvgLogo.vue';
+import ApplicationLogo from '@/Components/ApplicationLogo.vue';
 import ModalAuthenticate from '@/Components/Modal/ModalAuthentication.vue';
 
 const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
@@ -30,7 +30,7 @@ createInertiaApp({
             .use(PrimeVue)
             .use(ToastService)
             .directive('badge', BadgeDirective)
-            .component('SvgLogo', SvgLogo)
+            .component('ApplicationLogo', ApplicationLogo)
             .component('ModalAuthenticate', ModalAuthenticate)
             .mount(el); 
     },
