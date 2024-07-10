@@ -9,6 +9,9 @@ use App\Http\Controllers\CommunityController;
 use App\Http\Controllers\CustomerSupportController;
 use App\Http\Controllers\CustomizeController;
 use App\Http\Controllers\GroupTourController;
+use App\Http\Controllers\PartnerAuthenticationController;
+use App\Http\Controllers\PartnerController;
+use App\Http\Controllers\PartnerRequestController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\ReviewController;
@@ -24,10 +27,6 @@ Route::get('/about', function () {
     return Inertia::render('About');
 })->name('about');
 
-Route::get('/collaboration', function () {
-    return Inertia::render('Collab');
-})->name('collab');
-
 Route::get('/question', function () {
    return Inertia::render('Question'); 
 })->name('question');
@@ -42,19 +41,34 @@ Route::controller(CustomizeController::class)->group(function () {
     Route::post('/customize/store', 'store')->name('customize.store');
 });
 
+Route::controller(PartnerRequestController::class)->group(function () {
+    Route::get('/partner', 'create')->name('partner.create');
+    Route::post('/partner', 'store')->name('partner.store');
+});
+
+Route::get('/partner/login', [PartnerAuthenticationController::class, 'create'])
+    ->name('partner-login.create');
+Route::post('/partner/login', [PartnerAuthenticationController::class, 'store'])
+    ->name('partner-login.store');
+
+Route::controller(PartnerController::class)->group(function () {
+    Route::get('/partner/{partner}/account/create', 'create')
+        ->name('partner-account.create');
+
+    Route::middleware('auth.partner')->group(function () {
+        Route::get('/partner/account', 'index')->name('partner-account');
+    });
+});
+
 Route::controller(AuthController::class)->group(function () {
     Route::post('/send-email', 'sendEmail')->name('auth.email');
-    Route::post('/send-password', 'sendPassword')->name('auth.password');
-    Route::post('/send-detail', 'sendUserDetail')->name('signup.detail');
-    Route::delete('/logout', 'logout')->name('auth.destroy');
+    Route::post('/register', 'store')->name('signup.detail');
+    Route::delete('/logout', 'destroy')->name('auth.destroy');
 });
 
 Route::controller(TourController::class)->group(function () {
     Route::get('/reserve', 'showReserveForm')->name('tour.reserve');
-    // Route::get('/book/{availabilityId}', 'showBookingForm')->name('tour.book');
     Route::post('/submit-reservation', 'submitReservation')->name('tour.submit-reservation');
-    // Route::post('/validate-booking', 'validateBooking')->name('tour.validate-booking');
-    // Route::post('/submit-booking/{id}', 'storeBooking')->name('tour.store-booking');
 });
 
 Route::get('/profile/bookmark', [ProfileController::class, 'bookmark'])->name('profile.bookmark');

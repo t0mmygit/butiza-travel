@@ -16,6 +16,10 @@ return Application::configure(basePath: dirname(__DIR__))
             \Illuminate\Http\Middleware\AddLinkHeadersForPreloadedAssets::class,
         ]);
 
+        $middleware->alias([
+            'auth.partner' => \App\Http\Middleware\AuthenticatePartner::class
+        ]);
+
         //
     })
     ->withExceptions(function (Exceptions $exceptions) {
