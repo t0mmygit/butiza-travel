@@ -24,7 +24,7 @@ onMounted(() => {
 });
 
 const submitPassword = () => {
-    form.post(route('auth.password'), {
+    form.post(route('login'), {
         onSuccess: () => emit('close'),
         onError: (error) => console.error(error),
         onFinish: () => form.reset('password'),

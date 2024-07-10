@@ -32,8 +32,8 @@ const proxyChecked = computed({
 
 const classes = computed(() => 
     props.disabled 
-        ? 'whitespace-nowrap ml-6 text-gray-300'
-        : 'whitespace-nowrap ml-6'
+        ? 'whitespace-nowrap ml-3 text-neutral-300 text-sm'
+        : 'whitespace-nowrap ml-3 text-neutral-500 text-sm'
 );
 
 
@@ -46,7 +46,7 @@ const classes = computed(() =>
             :value="value"
             v-model="proxyChecked"
             :disabled="disabled"
-            class="rounded border-gray-300 text-indigo-600 shadow-sm focus:ring-indigo-500"
+            class="rounded border-gray-300 text-primary-600 shadow-sm focus:ring-primary-500"
         />
         <span :class="classes">{{ label }}</span>
     </label>
