@@ -68,6 +68,17 @@ const triggerBookmark = () => {
     });
 };
 
+const getTourPrice = () => {
+    var highestPrice = 0.0;
+    props.tour.packages.forEach(item => {
+        if (highestPrice < item.price) {
+            highestPrice = item.price;
+        }
+    });
+
+    return useFormatPrice(highestPrice);
+}
+
 const itemsListener = computed(() => {
     let index = props.items.findIndex(item => item.id === props.tour.id);
     return index != -1 ?  true : false;
@@ -146,7 +157,7 @@ const formatDestination = destinations => destinations.map(destination => destin
             <div class="grid grid-rows-2 min-w-max">
                 <div class="flex flex-col">
                     <span>From</span>
-                    <strong class="text-2xl">{{ useFormatPrice(tour.base_price) }}</strong>
+                    <strong class="text-2xl">{{ getTourPrice() }}</strong>
                     <span>Price per day</span>
                     <strong>RM{{ Math.ceil(tour.base_price / tour.duration) }}</strong>
                 </div>

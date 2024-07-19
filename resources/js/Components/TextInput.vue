@@ -1,6 +1,11 @@
 <script setup>
 import { onMounted, ref, computed } from 'vue';
 import Textarea from 'primevue/textarea';
+import InputText from 'primevue/inputtext';
+import InputNumber from 'primevue/inputnumber';
+import InputGroup from 'primevue/inputgroup';
+import InputGroupAddon from 'primevue/inputgroupaddon';
+import Dropdown from 'primevue/dropdown';
 
 const model = defineModel({
     type: [String, Number],
@@ -29,6 +34,15 @@ const props = defineProps({
     },
 });
 
+const selectedCountryCode = ref({
+    country: 'Malaysia',
+    code: '+60'
+});
+
+const phoneNumberCode = ref([
+    { country: 'Malaysia', code: '+60' }
+]);
+
 const input = ref(null);
 
 // const classes = computed(() => 
@@ -46,20 +60,40 @@ const classes = computed(() =>
 
 <template>
     <div class="flex flex-col flex-1">    
-        <label v-if="label" class="text-neutral-500 text-sm mb-1">{{ label }}
+        <label v-if="label" class="text-neutral-500 text-sm mb-2">{{ label }}
             <span v-if="required" class="text-error">*</span>
         </label>
-        <input v-if="type != 'textarea'"
+        <Textarea 
+            v-if="type === 'textarea'" 
+            v-model="model" 
+            :placeholder="placeholder"
+            :disabled="disabled"
+            :rows="5"
+        />
+        <InputGroup v-else-if="type === 'tel'">
+            <InputGroupAddon class="m-0 p-0">
+                <!-- Still in development -->
+                <Dropdown 
+                    v-model="selectedCountryCode" 
+                    :options="phoneNumberCode" 
+                    optionLabel="code"
+                    pt:root:class="border-none shadow-none rounded-r-none"
+                    pt:trigger:class="hidden"
+                />
+            </InputGroupAddon>
+            <InputNumber 
+                v-model="model"
+                :placeholder="placeholder"
+                :useGrouping="false"
+            />
+        </InputGroup>
+        <InputText 
+            v-else
+            v-model="model"
             :type="type"
             :placeholder="placeholder"
             :class="classes"
-            v-model="model"
             :disabled="disabled"
-        />
-        <Textarea v-else 
-            v-model="model" 
-            :disabled="disabled"
-            :rows="5"
         />
         <p class="text-error text-sm mt-2">{{ error }}</p>
     </div>

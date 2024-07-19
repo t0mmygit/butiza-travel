@@ -5,15 +5,9 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
-use App\Enums\BookingStatus;
-use App\Enums\GuideType;
-use App\Models\Activity;
 use App\Models\Tour;
 use App\Models\Reservation;
-use App\Models\Availability;
-use App\Models\Booking;
 use App\Models\ContactMethod;
-use App\Models\Destination;
 use App\Models\User;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -34,13 +28,14 @@ class TourController extends Controller
             'availabilities' => function ($query) {
                 $query->orderBy('departure_date', 'asc');
             },
-            'destinations', 
+            'bookmarks',
+            'destinations',
             'highlights',
             'itinerary.days', 
             'note.subjects.bulletPoints',
             'reviews.user',
             'reviews.tour',
-            'bookmarks',
+            'packages',
         ])->findOrFail($tourId);
 
         return Inertia::render('Tour/Index', [

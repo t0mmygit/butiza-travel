@@ -8,14 +8,11 @@ import DataTable from 'primevue/datatable';
 import Column from 'primevue/column';
 import Rating from 'primevue/rating';
 import MeterGroup from 'primevue/metergroup';
-import Image from 'primevue/image';
 import Galleria from 'primevue/galleria';
 import Button from 'primevue/button';
 
 import NavBar from '@/Components/NavBar.vue';
 import Footer from '@/Components/Footer.vue';
-// import Button from '@/Components/PrimaryButton.vue';
-import SecondaryButton from '@/Components/SecondaryButton.vue'
 import TourContent from '@/Components/Tour/TourContent.vue';
 import TourStepper from '@/Components/Tour/TourStepper.vue';
 import TourIconBox from '@/Components/Tour/TourIconBox.vue';
@@ -96,6 +93,17 @@ const tourDetails = ref([
         label: `Travel Intensity: ${useFormatText(props.tour.travel_intensity)}`
     },
 ]);
+
+const getHighestPackagePrice = () => {
+    var highestPrice = 0.0;
+    props.tour.packages.forEach(item => {
+        if (highestPrice < item.price) {
+            highestPrice = item.price;
+        }
+    });
+
+    return useFormatPrice(highestPrice);
+}
 
 const reserveTour = () => {
     try {
@@ -244,7 +252,7 @@ const getMeterValue = meterData => {
                         <div class="shadow-md outline outline-1 outline-primary-200 rounded-2xl p-4 h-fit">
                             <div class="flex flex-col justify-start w-full pb-3">
                                 <span class="text-sm">From</span>
-                                <strong class="text-xl">{{ useFormatPrice(tour.base_price) }}</strong>
+                                <strong class="text-xl">{{ getHighestPackagePrice() }}</strong>
                                 <small>Price per day</small>
                                 <small>{{ useFormatPrice(tour.base_price / tour.duration) }}</small>
                             </div>
@@ -307,14 +315,11 @@ const getMeterValue = meterData => {
             <TourContent id="detail" title="Details">
                 <div class="flex gap-4 mb-8">
                     <TourIconBox>
-                        <template #header>
-                            <i class="pi pi-map-marker"></i>
-                            <!-- <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-6">
-                                <path fill-rule="evenodd" d="M7.5 6a4.5 4.5 0 1 1 9 0 4.5 4.5 0 0 1-9 0ZM3.751 20.105a8.25 8.25 0 0 1 16.498 0 .75.75 0 0 1-.437.695A18.683 18.683 0 0 1 12 22.5c-2.786 0-5.433-.608-7.812-1.7a.75.75 0 0 1-.437-.695Z" clip-rule="evenodd" />
-                            </svg> -->
-                        </template>
                         <template #main>
-                            <h3 class="font-black">Pick-up Location</h3>
+                            <div class="flex gap-2 items-center">
+                                <i class="pi pi-map-marker"></i>
+                                <h3 class="font-black">Pick-up Location</h3>
+                            </div>
                             <span>{{ tour.pickup_location }}</span>
                         </template>
                     </TourIconBox>

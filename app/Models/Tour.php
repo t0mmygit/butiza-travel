@@ -13,6 +13,11 @@ class Tour extends Model
 {
     use HasFactory;
 
+    public function packages(): HasMany
+    {
+        return $this->hasMany(Package::class);
+    }
+
     public function itinerary(): HasOne
     {
         return $this->hasOne(Itinerary::class);
