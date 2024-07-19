@@ -32,7 +32,7 @@
             @apply cursor-pointer
         }
         ul {
-            @apply list-inside list-disc
+            @apply list-inside list-disc text-neutral-500
         }
     }
 }
