@@ -16,6 +16,7 @@ use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\TourController;
+use App\Http\Controllers\ValidateBookingController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -81,10 +82,11 @@ Route::post('/validate-payment', [PaymentController::class, 'validation'])->name
 Route::post('/customer-query', [CustomerSupportController::class, 'store'])->name('support.store');
 Route::delete('/bookmark/{bookmark}', [BookmarkController::class, 'destroy'])->name('bookmark.destroy');
 
+Route::post('/book/validate', ValidateBookingController::class)->name('booking.validate');
+
 Route::controller(BookingController::class)->group(function () {
     Route::get('/book/{availabilityId}', 'show')->name('booking.show');
     Route::post('/book/{id}', 'store')->name('booking.store');
-    Route::post('/book/validate', 'validate')->name('booking.validate');
     Route::patch('/profile/booking/{booking}', 'update')->name('booking.update');
 });
 
@@ -107,7 +109,6 @@ Route::middleware('auth')->group(function () {
     });
     
     Route::controller(ProfileController::class)->group(function () {
-        // Route::get('/profile', 'index')->name('profile.account');
         Route::get('/profile', 'index')->name('profile.account');
         Route::get('/profile/edit', 'edit')->name('profile.edit');
         Route::get('/profile/history', 'history')->name('profile.history');
