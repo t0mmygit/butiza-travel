@@ -33,7 +33,7 @@ const rootClass = () =>
             <h1 class="text-2xl">{{ title }}</h1>
         </header>
         <main class="col-start-3 col-span-4">
-            <div>
+            <div class="flex flex-col gap-8">
                 <slot />
             </div>
         </main>

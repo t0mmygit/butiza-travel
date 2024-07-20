@@ -34,22 +34,17 @@ const props = defineProps({
     },
 });
 
-const selectedCountryCode = ref({
+const selectedCountry = ref({
     country: 'Malaysia',
     code: '+60'
 });
 
-const phoneNumberCode = ref([
-    { country: 'Malaysia', code: '+60' }
+const countries = ref([
+    { name: 'Malaysia', code: '+60' }
 ]);
 
 const input = ref(null);
 
-// const classes = computed(() => 
-//     props.error
-//     ? 'border-red-400 focus:border-none rounded-md disabled:bg-neutral'
-//     : 'border-neutral-300 border focus:border-primary-100 rounded-md disabled:bg-neutral'
-// );
 const classes = computed(() => 
     props.error
     ? 'border-red-error rounded-md disabled:bg-neutral'
@@ -68,22 +63,37 @@ const classes = computed(() =>
             v-model="model" 
             :placeholder="placeholder"
             :disabled="disabled"
+            :invalid="error ? true : false"
             :rows="5"
         />
         <InputGroup v-else-if="type === 'tel'">
             <InputGroupAddon class="m-0 p-0">
                 <!-- Still in development -->
                 <Dropdown 
-                    v-model="selectedCountryCode" 
-                    :options="phoneNumberCode" 
+                    v-model="selectedCountry" 
+                    :options="countries" 
                     optionLabel="code"
+                    placeholder="Select a Country"
                     pt:root:class="border-none shadow-none rounded-r-none"
                     pt:trigger:class="hidden"
-                />
+                >
+                    <template #value="slotProps">
+                        <div v-if="slotProps.value">
+                            <div>{{ slotProps.value.code }}</div>
+                        </div>
+                        <div v-else>
+                            {{ slotProps.placeholder }}
+                        </div>
+                    </template>
+                    <template #option="slotProps">
+                        <div>{{ slotProps.option.name }} ({{ slotProps.option.code }})</div>
+                    </template>
+                </Dropdown>
             </InputGroupAddon>
             <InputNumber 
                 v-model="model"
                 :placeholder="placeholder"
+                :invalid="error ? true : false"
                 :useGrouping="false"
             />
         </InputGroup>
@@ -93,6 +103,7 @@ const classes = computed(() =>
             :type="type"
             :placeholder="placeholder"
             :class="classes"
+            :invalid="error ? true : false"
             :disabled="disabled"
         />
         <p class="text-error text-sm mt-2">{{ error }}</p>
