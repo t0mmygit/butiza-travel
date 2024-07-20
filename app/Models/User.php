@@ -64,6 +64,13 @@ class User extends Authenticatable
         return $this->hasMany(Bookmark::class);
     }
     
+    /**
+     * Retrieve the bookings associated with the user.
+     * Did not go with hasMany relationship to handle cases where 
+     * user booking is not a registered user.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
+    */
     public function bookings(): BelongsToMany
     {
         return $this->belongsToMany(Booking::class, 'user_bookings');
