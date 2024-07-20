@@ -78,7 +78,6 @@ Route::controller(TourController::class)->group(function () {
 
 Route::get('/profile/bookmark', [ProfileController::class, 'bookmark'])->name('profile.bookmark');
 Route::post('/bookmark/{tour}', [BookmarkController::class, 'store'])->name('bookmark.store');
-Route::post('/validate-payment', [PaymentController::class, 'validation'])->name('validate-payment');
 Route::post('/customer-query', [CustomerSupportController::class, 'store'])->name('support.store');
 Route::delete('/bookmark/{bookmark}', [BookmarkController::class, 'destroy'])->name('bookmark.destroy');
 
@@ -86,8 +85,13 @@ Route::post('/book/validate', ValidateBookingController::class)->name('booking.v
 
 Route::controller(BookingController::class)->group(function () {
     Route::get('/book/{availabilityId}', 'show')->name('booking.show');
-    Route::post('/book/{id}', 'store')->name('booking.store');
+    Route::post('/book/{availability}', 'store')->name('booking.store');
     Route::patch('/profile/booking/{booking}', 'update')->name('booking.update');
+});
+
+Route::controller(PaymentController::class)->group(function () {
+    Route::get('/payment/{id}', 'show')->name('payment.show');
+    Route::patch('/payment/{id}', 'update')->name('payment.update'); 
 });
 
 Route::controller(ReviewController::class)->group(function () {
