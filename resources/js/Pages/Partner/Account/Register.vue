@@ -1,5 +1,6 @@
 <script setup>
 import NavBar from '@/Components/NavBar.vue';
+import GuestLayout from '@/Layouts/GuestLayout.vue';
 import TextInput from '@/Components/TextInput.vue';
 import { useForm } from '@inertiajs/vue3';
 
@@ -23,35 +24,26 @@ const form = useForm({
 
 const submit = () => {
     form.post(route('signup.detail'), {
-        onSuccess: () => {
-            form.reset();
-            $inertia.get(route('partner-account'));
-        },
-        onError: () => {
-            form.reset('first_name', 'last_name', 'email');
-        },
+        onSuccess: () => form.reset(),
+        onError: () => form.reset('first_name', 'last_name', 'email'),
     });
 }
 
 </script>
 
 <template>
-    <NavBar />
-
-    <div class="mx-auto w-full lg:w-5/6 xl:max-w-7xl">
-        <div class="mx-auto lg:w-4/12 mt-16">
-            <form @submit.prevent="submit">
-                <div class="flex flex-col gap-4">
-                    <TextInput v-model="form.first_name" label="First Name" :error="form.errors.first_name" required />
-                    <TextInput v-model="form.last_name" label="Last Name" :error="form.errors.last_name" required />
-                    <TextInput v-model="form.email" label="Email Address" :error="form.errors.email" required />
-                    <TextInput v-model="form.password" label="Password" type="password" :error="form.errors.password" required />
-                    <TextInput v-model="form.password_confirmation" label="Confirm Password" type="password" :error="form.errors.confirm_password" required />
-                    <div class="flex justify-center">
-                        <Button type="submit" label="Register" class="w-full" />
-                    </div>
+    <GuestLayout>
+        <form @submit.prevent="submit">
+            <div class="flex flex-col gap-4 p-4">
+                <TextInput v-model="form.first_name" label="First Name" :error="form.errors.first_name" required />
+                <TextInput v-model="form.last_name" label="Last Name" :error="form.errors.last_name" required />
+                <TextInput v-model="form.email" label="Email Address" :error="form.errors.email" required />
+                <TextInput v-model="form.password" label="Password" type="password" :error="form.errors.password" required />
+                <TextInput v-model="form.password_confirmation" label="Confirm Password" type="password" :error="form.errors.confirm_password" required />
+                <div class="flex justify-center">
+                    <Button type="submit" label="Register" class="w-full" />
                 </div>
-            </form>
-        </div>
-    </div>    
+            </div>
+        </form>
+    </GuestLayout>
 </template>
