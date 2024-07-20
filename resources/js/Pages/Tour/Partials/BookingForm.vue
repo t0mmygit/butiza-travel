@@ -8,6 +8,7 @@ import InputNumber from 'primevue/inputnumber';
 import Avatar from 'primevue/avatar';
 import InlineMessage from 'primevue/inlinemessage';
 import Divider from 'primevue/divider';
+import Tag from 'primevue/tag';
 
 import { ref, computed, reactive } from 'vue';
 import { useForm } from '@inertiajs/vue3';
@@ -56,33 +57,24 @@ const tourDetails = [
     },
 ];
 
-const selectedPackage = ref(null);
-const selectedContactMethod = ref(null);
-
-const reactiveTourId = computed(() => props.tour.id);
-const reactiveContactMethod = computed(() => selectedContactMethod.value);
-
 const getContactMethodIcon = (iconName) => {
     const icon = contactIcons.find(icon => iconName.toLowerCase() in icon );
     return icon ? icon[iconName.toLowerCase()] : '';
 };
-const selectPackage = (packageId) => {
-    selectedPackage.value = packageId;
-    form.package_id = packageId;
-};
-const selectContactMethod = (contactMethodId) => selectedContactMethod.value = contactMethodId;
 
-const bookingValidation = () => {
-    form.post(route('booking.validate'), {
-        onSuccess: () => paymentSection.value = true,
+const setPackageId = (packageId) => form.package_id = packageId;
+const setContactMethodId = (contactMethodId) => form.contact_method_id = contactMethodId;
+
+const submit = () => {
+    form.post(route('booking.store', { availability: props.availability.id}), {
+        onSuccess: () => form.reset(),
         onError: (error) => console.error(error),
     });
 };
 
 const form = useForm({
-    tour_id: reactiveTourId,
     package_id: null,
-    contact_method: reactiveContactMethod,
+    contact_method_id: null,
     departure_date: props.availability.departure_date,
     finished_date: props.availability.finished_date,
     adult: null,
@@ -95,7 +87,7 @@ const form = useForm({
 });
 
 function getSelectedPackage() {
-    return props.tour.packages.find(item => item.id === selectedPackage.value);
+    return props.tour.packages.find(item => item.id === form.package_id);
 }
 
 function getNumberOfTraveller() {
@@ -138,13 +130,13 @@ const isFormValid = computed(() => {
         && form.last_name
         && form.email
         && form.phone_number
-        && form.contact_method
+        && form.contact_method_id
 });
 
 </script>
 
 <template>
-    <div class="flex w-full gap-6">
+    <div class="flex w-full gap-6 my-6">
         <div class="flex w-full">
             <!-- <div class="flex mt-3">
                 <Avatar icon="pi pi-user" class="bg-white mr-3" size="large" shape="circle" />
@@ -198,12 +190,15 @@ const isFormValid = computed(() => {
                             </template>
                             <Button
                                 v-for="item in tour.packages"
-                                :label="item.name"
                                 :key="item.id"
-                                @click="selectPackage(item.id)"
-                                plain :outlined="selectedPackage !== item.id"
-                                class="flex-1 text-left"
-                            />
+                                @click="setPackageId(item.id)"
+                                plain :outlined="form.package_id !== item.id"
+                                class="flex flex-1 justify-between"
+                            >
+                                <span>{{ item.name }}</span>
+                                <span>{{ useFormatPrice(item.price) }}</span>
+                            </Button>
+
                         </Form>
                         <!-- Traveller Details -->
                         <Form :index="3" title="Add traveller details">
@@ -234,8 +229,8 @@ const isFormValid = computed(() => {
                                         :key="method.id"
                                         :label="method.method_name"
                                         :icon="getContactMethodIcon(method.method_name)"
-                                        @click="selectContactMethod(method.id)"
-                                        plain :outlined="selectedContactMethod !== method.id"
+                                        @click="setContactMethodId(method.id)"
+                                        plain :outlined="form.contact_method_id !== method.id"
                                         class="flex-1"
                                     />
                                 </div>
@@ -261,15 +256,37 @@ const isFormValid = computed(() => {
                     </div>
                 </div>
             </Card>
+
+            <Card>
+                <h1>Package Details</h1>
+                <div v-if="isPackageSelected" class="flex flex-wrap gap-3">
+                    <Tag 
+                        v-for="activity in getSelectedPackage().activities" 
+                        :value="activity.name"
+                    />
+                </div>
+                <div v-else>
+                    <InlineMessage class="justify-start w-full" severity="secondary"> 
+                        <span>Please select a package.</span>
+                    </InlineMessage>
+                </div>
+            </Card>
+
             <Card>
                 <h1>Price Breakdown</h1>
-                <div v-if="!isNecessaryFieldsFilled" class="bg-primary-100 rounded-md py-3 px-4">
-                    <p>Please fill in the following:</p>
-                    <ul class="leading-tight">
-                        <li v-if="!isNumberOfTravellerFilled">Number of travellers</li>
-                        <li v-if="!isPackageSelected">Package type</li>
-                    </ul>
-                </div>
+                <InlineMessage 
+                    v-if="!isNecessaryFieldsFilled" 
+                    class="justify-start w-full" 
+                    severity="secondary"
+                    pt:icon:root="flex align-start"
+                >
+                    <div>
+                        <span>Please fill in the</span>
+                        <span v-if="!isNumberOfTravellerFilled"> number of travellers</span>
+                        <span v-if="!isNumberOfTravellerFilled && !isPackageSelected"> and </span> 
+                        <span v-if="!isPackageSelected"> package type</span>.
+                    </div>
+                </InlineMessage>
                 <div v-else>
                     <div class="flex flex-col gap-2">
                         <div class="flex justify-between">
@@ -300,7 +317,7 @@ const isFormValid = computed(() => {
                 label="Continue"
                 class="w-full justify-center" rounded
                 :disabled="!isFormValid || form.processing"
-                @click="bookingValidation"
+                @click="submit"
             />
         </div>
     </div>

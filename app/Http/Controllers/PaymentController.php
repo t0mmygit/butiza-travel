@@ -2,10 +2,32 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Booking;
+use App\Models\Payment;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Inertia\Inertia;
+use Inertia\Response;
 
 class PaymentController extends Controller
 {
+    public function show(int $id): Response
+    {
+        return Inertia::render('Payment', [
+            'payment' => Payment::with('booking.package.tour')->findOrFail($id),
+        ]);
+    }
+
+    public function update(Request $request, int $id): RedirectResponse
+    {
+        Payment::findOrFail($id)->update([
+            'method' => $request->method,
+            'status' => 'paid',
+        ]);
+
+        return redirect()->route('explore.index');
+    }
+
     public function validation(Request $request)
     {
         //Prototyping ONLY; refer proper validation for Payment Transaction

@@ -10,8 +10,8 @@ class Activity extends Model
 {
     use HasFactory;
 
-    public function tours(): BelongsToMany
+    public function packages(): BelongsToMany
     {
-        return $this->belongsToMany(Tour::class, 'tour_activities');
+        return $this->belongsToMany(Package::class, 'package_activities');
     }
 }

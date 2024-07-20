@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Enums\BookingStatus;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 
@@ -15,7 +16,7 @@ class Booking extends Model
     protected $guarded = [];
 
     protected $casts = [
-        'status' => BookingStatus::class
+        'trip_status' => BookingStatus::class
     ];
 
     public function user(): BelongsToMany
@@ -23,13 +24,18 @@ class Booking extends Model
         return $this->belongsToMany(User::class, 'user_bookings');
     }
 
-    public function tour(): HasOne
+    public function package(): BelongsTo
     {
-        return $this->hasOne(Tour::class, 'id');
+        return $this->belongsTo(Package::class);
     }
 
     public function contactMethod(): HasOne
     {
         return $this->hasOne(ContactMethod::class, 'id');
+    }
+
+    public function payment(): HasOne
+    {
+        return $this->hasOne(Payment::class);
     }
 }

@@ -210,6 +210,20 @@ const getMeterValue = meterData => {
     return rating.value[0].value !== undefined ? rating.value[0].value : 0;
 };
 
+const getPackageActivities = () => {
+    var activities = [];
+
+    props.tour.packages.forEach(item => {
+        item.activities.forEach(activity => {
+            if (!activities.find(a => a.name === activity.name)) { 
+                activities.push(activity);
+            }
+        });
+    });
+
+    return activities;
+}
+
 </script>
 
 <template>
@@ -261,7 +275,7 @@ const getMeterValue = meterData => {
                                     <Button label="Check Availability" class="w-full font-bold" rounded />
                                 </a>
                                 <Button v-else label="Reserve" @click="reserveTour" class="flex-1" rounded />
-                                <Button label="Customize This Tour" class="flex-1" text outlined rounded />
+                                <Button disabled label="Customize This Tour" class="flex-1" text outlined rounded />
                             </div>
                         </div>
 
@@ -313,7 +327,7 @@ const getMeterValue = meterData => {
 
             <!-- Details -->
             <TourContent id="detail" title="Details">
-                <div class="flex gap-4 mb-8">
+                <div class="flex gap-4">
                     <TourIconBox>
                         <template #main>
                             <div class="flex gap-2 items-center">
@@ -329,8 +343,8 @@ const getMeterValue = meterData => {
                     <p class="text-black text-justify">{{ tour.description }}</p>
                 </div>  
                 <TourTextBox label="Destinations" :value="tour.destinations" />
-                <TourTextBox label="Activities" :value="tour.activities" />
-                <div class="mt-8" v-if="tour.highlights.length != 0">
+                <TourTextBox label="Activities" :value="getPackageActivities()" />
+                <div v-if="tour.highlights.length != 0" class="flex flex-col gap-2">
                     <h2>Highlights</h2>
                     <ul class="list-none leading-relaxed">
                         <li v-for="highlight in tour.highlights" class="flex gap-3 items-center">
@@ -343,9 +357,7 @@ const getMeterValue = meterData => {
 
             <!-- Itinerary -->
             <TourContent v-if="tour.itinerary.days.length != 0" id="itinerary" title="Itinerary">
-                <TourStepper 
-                    :days="tour.itinerary.days"
-                />
+                <TourStepper :days="tour.itinerary.days" />
             </TourContent>
 
             <!-- Customize -->

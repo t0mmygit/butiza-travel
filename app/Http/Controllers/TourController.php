@@ -24,7 +24,6 @@ class TourController extends Controller
     public function show($tourId): Response
     {
         $tour = Tour::with([
-            'activities',
             'availabilities' => function ($query) {
                 $query->orderBy('departure_date', 'asc');
             },
@@ -35,7 +34,7 @@ class TourController extends Controller
             'note.subjects.bulletPoints',
             'reviews.user',
             'reviews.tour',
-            'packages',
+            'packages.activities',
         ])->findOrFail($tourId);
 
         return Inertia::render('Tour/Index', [

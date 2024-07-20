@@ -25,13 +25,7 @@ class Tour extends Model
 
     public function destinations(): BelongsToMany
     {
-        // This is referring to the imtermediate table; not directly to Destination table
         return $this->belongsToMany(Destination::class, 'tour_destinations');
-    }
-
-    public function activities(): BelongsToMany
-    {
-        return $this->belongsToMany(Activity::class, 'tour_activities');
     }
 
     public function availabilities(): BelongsToMany
@@ -58,14 +52,4 @@ class Tour extends Model
     {
         return $this->hasMany(Bookmark::class);
     }
-    // public function userBookmarks(): HasMany
-    // {
-    //     return $this->hasMany(UserBookmark::class);
-    // }
-
-    // public function guestBookmarks(): HasMany
-    // {
-    //     return $this->hasMany(GuestBookmark::class);
-    // }
-
 }

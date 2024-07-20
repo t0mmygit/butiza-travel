@@ -11,7 +11,7 @@ class BookingRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     public function attributes(): array
@@ -29,17 +29,17 @@ class BookingRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'tour_id'        => 'required|numeric',
-            'contact_method' => 'required|numeric',
-            'departure_date' => 'required|date',
-            'finished_date'  => 'required|date',
-            'adult'          => 'required_without:child|nullable|numeric|max:99',
-            'child'          => 'required_without:adult|nullable|numeric|max:99',
-            'note'           => 'string|nullable',
-            'first_name'     => 'required|string',
-            'last_name'      => 'required|string',
-            'email'          => 'required|string|email:rfc,dns|lowercase',
-            'phone_number'   => 'required|numeric',
+            'package_id'        => 'required|numeric',
+            'contact_method_id' => 'required|numeric',
+            'departure_date'    => 'required|date',
+            'finished_date'     => 'required|date',
+            'adult'             => 'required_without:child|nullable|numeric|max:99',
+            'child'             => 'required_without:adult|nullable|numeric|max:99',
+            'note'              => 'string|nullable',
+            'first_name'        => 'required|string',
+            'last_name'         => 'required|string',
+            'email'             => 'required|string|email:rfc,dns|lowercase',
+            'phone_number'      => 'required|numeric',
         ];
     }
 
