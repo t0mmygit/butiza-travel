@@ -17,7 +17,7 @@ class AuthService
     public function redirectToRoleBasedPage($role): RedirectResponse
     {
         return $role === config('constant.user_roles.partner')
-            ? redirect()->route('home')
-            : redirect()->intended();
+            ? redirect()->route('partner-account')
+            : redirect()->intended('home');
     }
 }
