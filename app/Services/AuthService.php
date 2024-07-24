@@ -6,18 +6,10 @@ use Illuminate\Http\RedirectResponse;
 
 class AuthService
 {
-    /**
-     * Create a new class instance.
-     */
-    public function __construct()
-    {
-        
-    }
-
-    public function redirectToRoleBasedPage($role): RedirectResponse
+    public function redirectToRoleBasedPage(string $role): RedirectResponse
     {
         return $role === config('constant.user_roles.partner')
-            ? redirect()->route('partner-account')
-            : redirect()->intended('home');
+            ? redirect(route('partner-login.create', absolute: false))
+            : redirect(route('home', absolute: false));   
     }
 }
