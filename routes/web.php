@@ -26,7 +26,7 @@ Route::get('/', function () {
 
 Route::get('/home', function () {
     return Inertia::render('Home'); 
-});
+})->name('home');
 
 Route::get('/about', function () {
     return Inertia::render('About');
@@ -46,27 +46,7 @@ Route::controller(CustomizeController::class)->group(function () {
     Route::post('/customize/store', 'store')->name('customize.store');
 });
 
-Route::controller(PartnerRequestController::class)->group(function () {
-    Route::get('/partner', 'create')->name('partner.create');
-    Route::post('/partner', 'store')->name('partner.store');
-});
-
-Route::get('/partner/login', [PartnerAuthenticationController::class, 'create'])
-    ->name('partner-login.create');
-Route::post('/partner/login', [PartnerAuthenticationController::class, 'store'])
-    ->name('partner-login.store');
-
-Route::controller(PartnerController::class)->group(function () {
-    Route::get('/partner/{partner}/account/create', 'create')
-        ->name('partner-account.create');
-
-    Route::middleware('auth.partner')->group(function () {
-        Route::get('/partner/account', 'index')->name('partner-account');
-    });
-});
-
 Route::controller(AuthController::class)->group(function () {
-    Route::post('/send-email', 'sendEmail')->name('auth.email');
     Route::post('/register', 'store')->name('signup.detail');
     Route::delete('/logout', 'destroy')->name('auth.destroy');
 });
@@ -80,8 +60,6 @@ Route::get('/profile/bookmark', [ProfileController::class, 'bookmark'])->name('p
 Route::post('/bookmark/{tour}', [BookmarkController::class, 'store'])->name('bookmark.store');
 Route::post('/customer-query', [CustomerSupportController::class, 'store'])->name('support.store');
 Route::delete('/bookmark/{bookmark}', [BookmarkController::class, 'destroy'])->name('bookmark.destroy');
-
-Route::post('/book/validate', ValidateBookingController::class)->name('booking.validate');
 
 Route::controller(BookingController::class)->group(function () {
     Route::get('/book/{availabilityId}', 'show')->name('booking.show');
@@ -97,7 +75,25 @@ Route::controller(PaymentController::class)->group(function () {
 Route::controller(ReviewController::class)->group(function () {
     Route::post('/profile/review/{tour}', 'store')->name('review.store');
 });
-// Route::patch('/profile/review/{review}')->name('review.update');
+
+Route::controller(PartnerRequestController::class)->group(function () {
+    Route::get('/partner', 'create')->name('partner.create');
+    Route::post('/partner', 'store')->name('partner.store');
+});
+
+Route::controller(PartnerController::class)->group(function () {
+    Route::get('/partner/account/create', 'create')->name('partner-account.create');
+    Route::post('/partner/account/create', 'store')->name('partner-account.store');
+
+    Route::middleware('partner')->group(function () {
+        Route::get('/partner/account', 'index')->name('partner-account');
+    });
+});
+
+Route::controller(PartnerAuthenticationController::class)->group(function () {
+    Route::get('/partner/login', 'create')->name('partner-login.create');
+    Route::post('/partner/login', 'store')->name('partner-login.store');
+});
 
 Route::middleware('auth')->group(function () {
     Route::controller(GroupTourController::class)->group(function () {
@@ -120,6 +116,6 @@ Route::middleware('auth')->group(function () {
         Route::patch('/profile', 'update')->name('profile.update');
         Route::delete('/profile', 'destroy')->name('profile.destroy');
     });
-}); 
+});
     
-// require __DIR__.'/auth.php';
+require __DIR__.'/auth.php';
