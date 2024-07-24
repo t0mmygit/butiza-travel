@@ -28,8 +28,6 @@ class RegisterRequest extends FormRequest
             'last_name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
             'password' => ['required', 'confirmed', Password::default()],
-            'role' => ['sometimes', 'nullable', 'string'],
-            // ROLE: Improvement can be made by adding ENUM validation based on user_role table
         ];
     }
 }
