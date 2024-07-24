@@ -25,7 +25,10 @@ class PartnerRequestService
             $validated = $request->validated();
             $validated['reference_code'] = $this->makeUniqueUUID();
 
-            $partner = Partner::create($validated);
+        // Use make() instead of create() to instantiate the model without persisting to the database.
+        // This allows us to defer storage until AFTER the user has created an account, preventing
+        // incomplete records in the database.
+        $partner = Partner::make($validated);
 
             return $partner;
         } catch (Exception $error) {
@@ -56,10 +59,5 @@ class PartnerRequestService
         } while (Partner::where('reference_code', $uuid)->exists());
         
         return (string) $uuid;
-    }
-
-    public function encryptUUID(string $uuid): string
-    {
-        return Crypt::encryptString($uuid);
     }
 }
