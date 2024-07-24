@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\Auth\LoginRequest;
+use App\Http\Requests\Auth\PartnerLoginRequest;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -19,9 +19,9 @@ class PartnerAuthenticationController extends Controller
         ]);
     }
 
-    public function store(LoginRequest $request): RedirectResponse
+    public function store(PartnerLoginRequest $request): RedirectResponse
     {
-        $request->authenticate(config('constant.user_roles.partner'));
+        $request->authenticate();
 
         $request->session()->regenerate();
 
