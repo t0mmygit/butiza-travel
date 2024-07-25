@@ -3,11 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Events\NewPartnerRegistered;
+use App\Http\Requests\PartnerCompanyRequest;
 use App\Http\Requests\PartnerRegisterRequest;
 use App\Models\Partner;
 use App\Models\User;
-use App\Services\PartnerService;
-use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
@@ -15,35 +14,45 @@ use Inertia\Response;
 
 class PartnerController extends Controller
 {
-    public function __construct(
-        public PartnerService $partnerService
-    ) {}
-
     public function index(): Response
     {
-        $partner = User::with('notifications')->where('id', Auth::id())->first();
+        $user = User::with(['notifications', 'partner'])->where('id', Auth::id())->first();
 
         return Inertia::render('Partner/Account/Index', [
-            'partner' => $partner,
-            'notifications' => $partner->notifications,
+            'user' => $user,
+            'notifications' => $user->notifications,
         ]);
     }
 
-    public function store(PartnerRegisterRequest $request): RedirectResponse
+    public function store(PartnerRegisterRequest $request): void
     {
-        $user = User::create($request->validated());
+        $user = User::create($request->only([
+            'first_name', 'last_name', 'email', 'phone_number', 'password', 'role'
+        ]));
 
         Auth::login($user);
 
         event(new NewPartnerRegistered($user));
 
-        return redirect()->route('partner-account');
+        // redirection occur in '/Partner/Account/Register.vue' on success.
     }
 
-    public function create(Request $request): RedirectResponse | Response
+    public function create(Request $request): Response
     {
+        // TODO: The 'checks' in service should be handled with middleware, Partner Service will no longer be necessary.
         return Inertia::render('Partner/Account/Register', [
-            'partner' => $this->partnerService->partner($request),
+            'partner' => $request->session()->get('partner'),
         ]);
+    }
+
+    public function update(PartnerCompanyRequest $request, Partner $partner)
+    {
+        $this->authorize('update', $partner);
+        
+        $partner->update($request->validated());
+
+        // event for notification
+
+        return back();
     }
 }

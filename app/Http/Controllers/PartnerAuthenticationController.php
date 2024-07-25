@@ -15,7 +15,7 @@ class PartnerAuthenticationController extends Controller
     {
         return Inertia::render('Partner/Account/Login', [
             'canResetPassword' => Route::has('password.request'),
-            'status' => session('status'),
+            'status' => auth()->user(),
         ]);
     }
 

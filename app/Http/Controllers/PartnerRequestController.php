@@ -3,8 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\PartnerFormRequest;
+use App\Models\Partner;
 use App\Services\PartnerRequestService;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -19,12 +21,14 @@ class PartnerRequestController extends Controller
         return Inertia::render('Partner/Index');
     }
 
-    public function store(PartnerFormRequest $request): RedirectResponse
+    public function store(Request $request): RedirectResponse
     {
-        $partner = $this->partnerRequestService->create($request);
+        $partner = new Partner;
+        $partner->fill($request->all());
 
-        $request->session()->put('partner', $partner->toArray());
+        $partner->user()->associate(auth()->user());
+        $partner->save();
 
-        return redirect()->route('partner-account.create');
+        return redirect(route('partner-account', absolute: false));
     }
 }

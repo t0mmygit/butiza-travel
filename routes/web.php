@@ -1,22 +1,7 @@
 <?php
 
-use App\Http\Controllers\ExploreController;
-use App\Http\Controllers\ProfileController;
-use App\Http\Controllers\AuthController;
-use App\Http\Controllers\BookmarkController;
-use App\Http\Controllers\BookingController;
-use App\Http\Controllers\CommunityController;
-use App\Http\Controllers\CustomerSupportController;
-use App\Http\Controllers\CustomizeController;
-use App\Http\Controllers\GroupTourController;
-use App\Http\Controllers\PartnerAuthenticationController;
-use App\Http\Controllers\PartnerController;
-use App\Http\Controllers\PartnerRequestController;
-use App\Http\Controllers\PaymentController;
-use App\Http\Controllers\PostController;
-use App\Http\Controllers\ReviewController;
-use App\Http\Controllers\TourController;
-use App\Http\Controllers\ValidateBookingController;
+namespace App\Http\Controllers;
+
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -81,12 +66,16 @@ Route::controller(PartnerRequestController::class)->group(function () {
     Route::post('/partner', 'store')->name('partner.store');
 });
 
+Route::post('/partner/validate', PartnerRequestValidationController::class)
+    ->name('partner.validate');
+
 Route::controller(PartnerController::class)->group(function () {
     Route::get('/partner/account/create', 'create')->name('partner-account.create');
     Route::post('/partner/account/create', 'store')->name('partner-account.store');
 
     Route::middleware('partner')->group(function () {
         Route::get('/partner/account', 'index')->name('partner-account');
+        Route::patch('/partner/account/{partner}', 'update')->name('partner-account.update');
     });
 });
 

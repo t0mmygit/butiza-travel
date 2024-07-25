@@ -35,33 +35,35 @@ const submit = () => {
     <GuestLayout>
         <Head title="Log in" />
 
-        <h1 class="mb-4 font-medium text-center">
+        <h1 class="mb-2 font-medium text-center">
             Login as Partner
         </h1>
 
-        <span v-if="status" class="text-center text-success-600">
-            {{ status }}
-        </span>
+        <p class="mb-4 text-success-600 text-center">
+            You are logged in.
+        </p>
 
-        <form @submit.prevent="submit">
+        <form v-if="!status" @submit.prevent="submit">
             <div class="flex flex-col gap-4">
                 <TextInput
                     v-model="form.email"
-                    type="email"
-                    class="mt-1 block w-full"
-                    required
-                    autofocus
                     label="Email"
+                    type="email"
+                    name="email"
+                    autofocus
+                    required
                     :error="form.errors.email"
+                    class="mt-1 block w-full"
                 />
                 <TextInput
                     v-model="form.password"
-                    type="password"
-                    class="mt-1 block w-full"
-                    required
-                    autofocus
                     label="Password"
+                    type="password"
+                    name="password"
+                    autofocus
+                    required
                     :error="form.errors.password"
+                    class="mt-1 block w-full"
                 />
             </div>
 
@@ -83,6 +85,7 @@ const submit = () => {
 
             <div class="flex flex-col w-full items-center justify-center mt-8 gap-2">
                 <Button 
+                    dusk="login-button"
                     label="Log in"
                     type="submit"
                     class="w-full" 
@@ -98,5 +101,12 @@ const submit = () => {
                 />
             </div>
         </form>
+        <div class="flex justify-center"> 
+            <Button 
+                label="To Partner Account" 
+                text outlined 
+                @click="$inertia.get(route('partner-account'))"
+            />
+        </div>
     </GuestLayout>
 </template>

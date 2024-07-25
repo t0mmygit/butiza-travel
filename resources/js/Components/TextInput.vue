@@ -32,6 +32,9 @@ const props = defineProps({
     required: {
         type: Boolean,
     },
+    name: {
+        type: String
+    },
 });
 
 const selectedCountry = ref({
@@ -63,6 +66,7 @@ const classes = computed(() =>
             v-model="model" 
             :placeholder="placeholder"
             :disabled="disabled"
+            :name="name"
             :invalid="error ? true : false"
             :rows="5"
         />
@@ -90,17 +94,27 @@ const classes = computed(() =>
                     </template>
                 </Dropdown>
             </InputGroupAddon>
-            <InputNumber 
+            <!-- <InputNumber 
                 v-model="model"
+                :name="name"
                 :placeholder="placeholder"
                 :invalid="error ? true : false"
                 :useGrouping="false"
+                :disabled="disabled"
+            /> -->
+            <InputText 
+                v-model="model"
+                :name="name"
+                :placeholder="placeholder"
+                :invalid="error ? true : false"
+                :disabled="disabled"
             />
         </InputGroup>
         <InputText 
             v-else
             v-model="model"
             :type="type"
+            :name="name"
             :placeholder="placeholder"
             :class="classes"
             :invalid="error ? true : false"
