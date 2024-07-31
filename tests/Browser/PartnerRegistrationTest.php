@@ -1,10 +1,7 @@
 <?php
 
-use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Illuminate\Support\Sleep;
 use Laravel\Dusk\Browser;
-
-// uses(DatabaseMigrations::class);
 
 test('a partner can visit the partner request page.', function () {
     $this->browse(function (Browser $browser) {
