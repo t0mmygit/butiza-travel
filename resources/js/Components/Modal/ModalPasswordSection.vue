@@ -36,7 +36,7 @@ const submitPassword = () => {
 <template>
     <div class="flex flex-col justify-center items-center p-6 mb-6">
         <div class="flex lg:justify-center lg:col-start-2 mb-4">
-            <SvgLogo />
+            <ApplicationLogo />
         </div>
         <h2 class="font-bold text-2xl mb-2">Welcome Back</h2>
         <p class="mb-6">Enter your password</p>
@@ -48,7 +48,7 @@ const submitPassword = () => {
                     :feedback="false" toggleMask 
                     :invalid="form.errors.password != null ? true : false"
                 />
-                <InputError :message="form.errors.password" class="mt-2" />
+                <InputError :message="form.errors.password || form.errors.email" class="mt-2" />
             </div>
             <Button
                 type="submit"

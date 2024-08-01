@@ -29,4 +29,10 @@ return [
             'message' => 'Duis eiusmod voluptate anim aute laborum nisi reprehenderit deserunt ut qui pariatur cupidatat ea cupidatat.',
         ]
     ],
+
+    'authorize' => [
+        'github' => 'github',
+        'facebook' => 'facebook',
+        'google' => 'google',
+    ],
 ];

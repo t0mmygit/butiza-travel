@@ -1,11 +1,11 @@
 <script setup>
 import Button from 'primevue/button';
-import InputText from 'primevue/inputtext';
-import InputError from '@/Components/InputError.vue';
-import InputGroup from 'primevue/inputgroup';
-import InputGroupAddon from 'primevue/inputgroupaddon';
+import TextInput from '@/Components/TextInput.vue';
+import Divider from 'primevue/divider'; 
+
 import axios from 'axios';
 import { computed, ref } from 'vue';
+import { router } from '@inertiajs/vue3';
 
 const emit = defineEmits(['confirm', 'password']);
 
@@ -17,8 +17,8 @@ const form = ref({
 
 const error = computed(() => errorMessage.value);
 
-const submitForm = () => {
-    axios.post(route('auth.email', form.value))
+const submit = () => {
+    axios.post(route('email.validate', form.value))
         .then(response => {
             if (!response.data) emit('confirm', form.value.email);
             else emit('password', form.value.email);
@@ -28,55 +28,63 @@ const submitForm = () => {
             errorMessage.value = error.response.data.message;
             console.error(error);
         });
-}
+};
+
+const openAuthorize = (provider) => {
+    window.location.href = route('auth.redirect', { provider: provider });
+};
 
 </script>
 
 <template>
-    <div class="flex flex-col justify-center items-center p-6 mb-6">
+    <div class="flex flex-col p-6 mx-auto">
         <div class="flex lg:justify-center lg:col-start-2 mb-4">
-            <SvgLogo />
+            <ApplicationLogo />
         </div>
-        <h2 class="font-bold text-2xl mb-2">Sign in or create an account</h2>
-        <p class="mb-6">Access member savings & community.</p>
-        <form @submit.prevent="submitForm">
-            <InputGroup class="group max-w-xs">
-                <InputGroupAddon class="group-hover:border-primary group-focus:border-primary group-active:border-primary">
-                    <i class="pi pi-envelope"></i>
-                </InputGroupAddon>
-                <InputText
+        <div class="flex flex-col text-center gap-2 mb-4">
+            <h2 class="font-bold text-2xl">Sign in or create an account</h2>
+            <p>Access member savings & community.</p>
+        </div>
+        <div class="flex flex-col justify-center max-w-sm mx-auto">
+            <form @submit.prevent="submit">
+                <TextInput
                     v-model="form.email"
                     type="email"
                     placeholder="Email Address"
-                    class="group-hover:border-primary group-focus:border-primary group-active:border-primary transition-none"
+                    icon="pi pi-envelope"
+                    :error="error"
+                    required
                 />
                 <Button
-                    type="submit"
-                    label="Confirm"
-                    class="bg-primary border-primary"
+                    label="Submit"
+                    class="mt-2 w-full"
                 />
-            </InputGroup>
-            <InputError :message="error" class="mt-2" />
-        </form>
-        <div class="my-6">or</div>
-        <div class="flex flex-col gap-4">
-            <Button 
-                label="Continue with Facebook" 
-                icon="pi pi-facebook"
-                plain text raised 
-                class="shadow-none text-base outline outline-1 outline-gray-300 rounded hover:outline-primary hover:bg-white"
-            />
-            <Button
-                label="Continue with Google"
-                icon="pi pi-google"
-                plain text raised
-                class="shadow-none text-base outline outline-1 outline-gray-300 rounded hover:outline-primary hover:bg-white"
-            />
+            </form>
+            <Divider class="my-8">or</Divider>
+            <div class="flex gap-4 justify-center mb-6">
+                <Button
+                    icon="pi pi-facebook"
+                    text plain rounded outlined
+                    @click="openAuthorize('facebook')"
+                    disabled
+                />
+                <Button
+                    icon="pi pi-google"
+                    text plain rounded outlined
+                    @click="openAuthorize('google')"
+                    disabled
+                />
+                <Button
+                    icon="pi pi-github"
+                    text plain rounded outlined
+                    @click="openAuthorize('github')"
+                />
+            </div>
+            <small class="text-gray-500 text-center">
+                By signing in, you are agreeing to our <br>
+                <a href="#" class="underline">Privacy Policy</a>, and
+                <a href="#" class="underline">Terms of Use</a>.
+            </small>
         </div>
-        <small class="text-gray-500 text-center mt-12">
-            By signing in, you are agreeing to our <br> 
-            <a href="#" class="underline">Privacy Policy</a>, and 
-            <a href="#" class="underline">Terms of Use</a>.
-        </small>
     </div>
 </template>

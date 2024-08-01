@@ -5,7 +5,7 @@ import Button from 'primevue/button';
 <template>
     <div class="flex flex-col justify-center items-center p-6 mb-6">
         <div class="flex lg:justify-center lg:col-start-2 mb-4">
-            <SvgLogo />
+            <ApplicationLogo />
         </div>
         <h2 class="font-bold text-2xl mb-2">Create or join a group tour</h2>
         <p class="mb-6">Discover group tours worldwide.</p>

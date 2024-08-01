@@ -21,9 +21,14 @@ Route::get('/question', function () {
    return Inertia::render('Question'); 
 })->name('question');
 
-Route::resource('/explore', ExploreController::class)->only(['index', 'show']);
 Route::get('/community', [CommunityController::class, 'index'])->name('community');
 
+Route::controller(UploadController::class)->group(function () {
+    Route::post('/upload', 'store')->name('upload.store');
+    Route::delete('/upload/{path}', 'destroy')->name('upload.destroy');
+});
+
+Route::resource('/explore', ExploreController::class)->only(['index', 'show']);
 Route::resource('tour', TourController::class)->only(['index', 'show']);
 
 Route::controller(CustomizeController::class)->group(function () {
@@ -32,7 +37,7 @@ Route::controller(CustomizeController::class)->group(function () {
 });
 
 Route::controller(AuthController::class)->group(function () {
-    Route::post('/register', 'store')->name('signup.detail');
+    Route::post('/register/user', 'store')->name('auth.store');
     Route::delete('/logout', 'destroy')->name('auth.destroy');
 });
 

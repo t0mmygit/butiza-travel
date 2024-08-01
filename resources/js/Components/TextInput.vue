@@ -1,8 +1,7 @@
 <script setup>
-import { onMounted, ref, computed } from 'vue';
+import { ref, computed } from 'vue';
 import Textarea from 'primevue/textarea';
 import InputText from 'primevue/inputtext';
-import InputNumber from 'primevue/inputnumber';
 import InputGroup from 'primevue/inputgroup';
 import InputGroupAddon from 'primevue/inputgroupaddon';
 import Dropdown from 'primevue/dropdown';
@@ -31,10 +30,14 @@ const props = defineProps({
     },
     required: {
         type: Boolean,
+        default: false,
     },
     name: {
         type: String
     },
+    icon: {
+        type: String,
+    }
 });
 
 const selectedCountry = ref({
@@ -48,10 +51,12 @@ const countries = ref([
 
 const input = ref(null);
 
+const isFocused = ref(false);
+
 const classes = computed(() => 
     props.error
-    ? 'border-red-error rounded-md disabled:bg-neutral'
-    : 'border-neutral-300 border rounded-md disabled:bg-neutral'
+    ? 'border-red-error rounded-md disabled:bg-neutral transition-none'
+    : 'border-neutral-300 border rounded-md disabled:bg-neutral transition-none'
 );
 
 </script>
@@ -73,6 +78,7 @@ const classes = computed(() =>
         <InputGroup v-else-if="type === 'tel'">
             <InputGroupAddon class="m-0 p-0">
                 <!-- Still in development -->
+                <!-- Dropdown for country selection -->
                 <Dropdown 
                     v-model="selectedCountry" 
                     :options="countries" 
@@ -94,14 +100,6 @@ const classes = computed(() =>
                     </template>
                 </Dropdown>
             </InputGroupAddon>
-            <!-- <InputNumber 
-                v-model="model"
-                :name="name"
-                :placeholder="placeholder"
-                :invalid="error ? true : false"
-                :useGrouping="false"
-                :disabled="disabled"
-            /> -->
             <InputText 
                 v-model="model"
                 :name="name"
@@ -110,16 +108,22 @@ const classes = computed(() =>
                 :disabled="disabled"
             />
         </InputGroup>
-        <InputText 
-            v-else
-            v-model="model"
-            :type="type"
-            :name="name"
-            :placeholder="placeholder"
-            :class="classes"
-            :invalid="error ? true : false"
-            :disabled="disabled"
-        />
+        <InputGroup v-else>
+            <InputGroupAddon v-if="icon" ref="input" :class="{'border-primary': isFocused}">
+                <i :class="icon"></i>
+            </InputGroupAddon>
+            <InputText 
+                v-model="model"
+                :type="type"
+                :name="name"
+                :placeholder="placeholder"
+                :class="[classes, { 'rounded-l-none': icon }]"
+                :invalid="error ? true : false"
+                :disabled="disabled"
+                @focus="isFocused = true"
+                @blur="isFocused = false"
+            />    
+        </InputGroup>
         <p class="text-error text-sm mt-2">{{ error }}</p>
     </div>
 </template>
