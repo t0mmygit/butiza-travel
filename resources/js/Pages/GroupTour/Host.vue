@@ -52,7 +52,7 @@ const form = useForm({
     <MarginLayout>
         <div class="bg-white h-fit shadow py-6">
             <div class="max-w-sm lg:max-w-full lg:mx-16 flex items-center relative">
-                <SvgLogo />
+                <ApplicationLogo />
             </div>
         </div>
 

@@ -176,7 +176,7 @@ window.addEventListener('scroll', onScroll);
                 <div v-if="$page.props.auth.user">
                     <div class="flex justify-center items-center mb-4 pl-2 py-3 cursor-pointer" @click="route('profile.account')">
                         <Avatar icon="pi pi-user" class="mr-2" shape="circle" />
-                        <h2>{{ $page.props.auth.user.name }}</h2>
+                        <h2>{{ $page.props.auth.user.first_name + ' ' + $page.props.auth.user.last_name }}</h2>
                     </div>
                     <nav class="flex flex-col gap-1">
                         <Button

@@ -32,6 +32,7 @@ const form = useForm({
 });
 
 const preview = ref(form.ssm_path);
+const file = ref(null);
 
 const saveChanges = () => {
     form.patch(route('partner-account.update', { partner: props.user.partner.id }), {
@@ -76,7 +77,7 @@ const onChange = async (event) => {
 
     form.ssm_path = data.path;
 
-    showPreview(file);
+    // showPreview(file);
 }
 
 const showPreview = (file) => {
@@ -168,7 +169,7 @@ const formChanged = computed(() => {
                                             >
                                                 Upload File
                                             </span>
-                                            <small>Supported file types: JPG, JPEG, PNG, PDF</small>
+                                            <small>Supported file type: PDF</small>
                                             <input type="file" ref="fileInput" @change="onChange" accept="image/*" hidden />
                                         </div>
                                         <div v-else class="relative">
@@ -182,7 +183,7 @@ const formChanged = computed(() => {
                                             </div>
                                             <div class="flex justify-center">
                                                 <!-- <img :src="preview" class="max-w-96" /> -->
-                                                <img :src="preview" class="max-w-96" />
+                                                <span>{{ file }}</span>
                                             </div>
                                         </div>
                                      </div>

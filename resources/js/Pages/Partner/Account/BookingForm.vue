@@ -44,7 +44,6 @@ const minDate = computed(() => {
 });
 
 const requiredFieldsFilled = computed(() => {
-    console.log(form);
     return (
         selectedTour.value != null &&
         form.package_id != null &&
@@ -71,8 +70,6 @@ const proceed = () => {
 </script>
 
 <template>
-
-    {{ partner }}
 
     <CustomSectionCard index="1" title="Tour Selection">
         <Dropdown

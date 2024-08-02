@@ -252,7 +252,7 @@ const submitForm = () => {
     <MarginLayout>
         <div id="stepper" class="bg-white h-fit shadow py-6">
             <div class="w-11/12 lg:max-w-full lg:mx-16 flex items-center relative mx-auto">
-                <SvgLogo />
+                <ApplicationLogo />
                 <Steps 
                     v-model:activeStep="active" 
                     :model="items" 
