@@ -1,17 +1,16 @@
 <script setup>
-import Form from '@/Pages/Tour/Partials/Form.vue';
+import CustomSectionCard from '@/Components/CustomSectionCard.vue';
 import Card from '@/Components/Card.vue';
 import TextInput from '@/Components/TextInput.vue';
 
 import Button from 'primevue/button';
 import InputNumber from 'primevue/inputnumber';
-import Avatar from 'primevue/avatar';
 import InlineMessage from 'primevue/inlinemessage';
 import Divider from 'primevue/divider';
 import Tag from 'primevue/tag';
 
-import { ref, computed, reactive } from 'vue';
-import { useForm } from '@inertiajs/vue3';
+import { computed } from 'vue';
+import { useForm, usePage } from '@inertiajs/vue3';
 
 import dayjs from 'dayjs';
 import { useFormatText } from '@/Composables/formatText';
@@ -31,6 +30,8 @@ const props = defineProps({
         required: true
     },
 });
+
+const page = usePage();
 
 const contactIcons = [
     { call: 'pi pi-phone' },
@@ -54,7 +55,7 @@ const tourDetails = [
     {
         header: 'Guide Type',
         info: useFormatText(props.tour.guide_type),
-    },
+    },  
 ];
 
 const getContactMethodIcon = (iconName) => {
@@ -80,10 +81,10 @@ const form = useForm({
     adult: null,
     child: null,
     note: null,
-    first_name: null,
-    last_name: null,
-    email: null,
-    phone_number: null
+    first_name: page.props.auth.user?.first_name ?? null,
+    last_name: page.props.auth.user?.last_name ?? null,
+    email: page.props.auth.user?.email ?? null,
+    phone_number: page.props.auth.user?.phone_number ?? null,
 });
 
 function getSelectedPackage() {
@@ -95,7 +96,7 @@ function getNumberOfTraveller() {
 }
 
 function getDiscount() {
-    // 
+    // TODO: get the discount
 }
 
 const hasDiscount = computed(() => {
@@ -138,15 +139,11 @@ const isFormValid = computed(() => {
 <template>
     <div class="flex w-full gap-6 my-6">
         <div class="flex w-full">
-            <!-- <div class="flex mt-3">
-                <Avatar icon="pi pi-user" class="bg-white mr-3" size="large" shape="circle" />
-                <div class="bg-white translate-y-full translate-x-1/2 origin-center rotate-45 size-4 z-50"></div>
-            </div> -->
             <div class="mx-auto grow max-w-full">
                 <form>
                     <div class="flex flex-col gap-6">
                         <!-- Number of travellers -->
-                        <Form :index="1" title="How many are travelling?" :error="form.errors.adult || form.errors.child">
+                        <CustomSectionCard :index="1" title="How many are travelling?" :error="form.errors.adult || form.errors.child">
                             <template #subtitle>
                                 <p>Please select a minimum of {{ tour.min_pax }} travellers.</p>
                             </template>
@@ -182,9 +179,9 @@ const isFormValid = computed(() => {
                                     </template>
                                 </InputNumber>
                             </div>
-                        </Form>
+                        </CustomSectionCard>
                         <!-- Package -->
-                        <Form :index="2" title="Choose a package">
+                        <CustomSectionCard index="2" title="Choose a package">
                             <template #subtitle>
                                 <p>Please choose a package.</p>
                             </template>
@@ -199,9 +196,9 @@ const isFormValid = computed(() => {
                                 <span>{{ useFormatPrice(item.price) }}</span>
                             </Button>
 
-                        </Form>
+                        </CustomSectionCard>
                         <!-- Traveller Details -->
-                        <Form :index="3" title="Add traveller details">
+                        <CustomSectionCard :index="3" title="Add traveller details">
                             <template #subtitle>
                                 <InlineMessage severity="info" class="mb-4">
                                     This traveller will serve as the contact person for the booking.
@@ -209,17 +206,42 @@ const isFormValid = computed(() => {
                             </template>
                             <div class="flex flex-col gap-2">
                                 <div class="flex gap-6">
-                                    <TextInput v-model="form.first_name" label="First Name" :error="form.errors.first_name" required />
-                                    <TextInput v-model="form.last_name" label="Last Name" :error="form.errors.last_name" required />
+                                    <TextInput 
+                                        v-model="form.first_name" 
+                                        label="First Name" 
+                                        :error="form.errors.first_name" 
+                                        :disabled="$page.props.auth.user?.first_name != null"
+                                        required
+                                    />
+                                    <TextInput 
+                                        v-model="form.last_name" 
+                                        label="Last Name" 
+                                        :error="form.errors.last_name" 
+                                        :disabled="$page.props.auth.user?.last_name != null"
+                                        required 
+                                    />
                                 </div>
                                 <div class="flex gap-6">
-                                    <TextInput v-model="form.email" label="Email Address" :error="form.errors.email" required />
-                                    <TextInput v-model="form.phone_number" label="Phone Number" type="tel" :error="form.errors.phone_number" required />
+                                    <TextInput 
+                                        v-model="form.email" 
+                                        label="Email Address" 
+                                        :error="form.errors.email" 
+                                        :disabled="$page.props.auth.user?.email != null"
+                                        required
+                                    />
+                                    <TextInput 
+                                        v-model="form.phone_number" 
+                                        label="Phone Number" 
+                                        type="tel" 
+                                        :error="form.errors.phone_number" 
+                                        :disabled="$page.props.auth.user?.phone_number != null"
+                                        required
+                                    />
                                 </div>
                             </div>
-                        </Form>
+                        </CustomSectionCard>
                         <!-- Additional Details -->
-                        <Form :index="4" title="Additional details" :error="form.errors.contact_method">
+                        <CustomSectionCard :index="4" title="Additional details" :error="form.errors.contact_method">
                             <TextInput v-model="form.note" label="Special Requests / Questions" type="textarea" />
                             <div class="flex flex-col gap-2">
                                 <h5>How should we contact you?</h5>
@@ -235,7 +257,7 @@ const isFormValid = computed(() => {
                                     />
                                 </div>
                             </div>
-                        </Form>
+                        </CustomSectionCard>
                     </div>
                 </form>
             </div>

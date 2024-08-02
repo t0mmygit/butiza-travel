@@ -94,17 +94,6 @@ const tourDetails = ref([
     },
 ]);
 
-const getHighestPackagePrice = () => {
-    var highestPrice = 0.0;
-    props.tour.packages.forEach(item => {
-        if (highestPrice < item.price) {
-            highestPrice = item.price;
-        }
-    });
-
-    return useFormatPrice(highestPrice);
-}
-
 const reserveTour = () => {
     try {
         form.get(route('tour.reserve'));
@@ -210,6 +199,21 @@ const getMeterValue = meterData => {
     return rating.value[0].value !== undefined ? rating.value[0].value : 0;
 };
 
+const getLowestPackagePrice = () => {
+    var lowestPrice = props.tour.packages[0].price;
+    props.tour.packages.forEach(item => {
+        if (lowestPrice > item.price) {
+            lowestPrice = item.price;
+        }
+    });
+
+    return lowestPrice;
+};
+
+const getPricePerDay = () => {
+    return getLowestPackagePrice() / props.tour.duration;
+};
+
 const getPackageActivities = () => {
     var activities = [];
 
@@ -266,9 +270,9 @@ const getPackageActivities = () => {
                         <div class="shadow-md outline outline-1 outline-primary-200 rounded-2xl p-4 h-fit">
                             <div class="flex flex-col justify-start w-full pb-3">
                                 <span class="text-sm">From</span>
-                                <strong class="text-xl">{{ getHighestPackagePrice() }}</strong>
+                                <strong class="text-xl">{{ useFormatPrice(getLowestPackagePrice()) }}</strong>
                                 <small>Price per day</small>
-                                <small>{{ useFormatPrice(tour.base_price / tour.duration) }}</small>
+                                <small>{{ useFormatPrice(getPricePerDay()) }}</small>
                             </div>
                             <div class="flex flex-col gap-3 lg:min-w-[300px]">
                                 <a v-if="tour.availabilities.length > 1" href="#available" class="flex-1">
