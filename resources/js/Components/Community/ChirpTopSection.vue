@@ -30,7 +30,7 @@ function tags(type) {
             <!-- <div class="flex items-center cursor-pointer" @click="$inertia.get(route('profile.account'))"> -->
             <div class="flex items-center cursor-pointer">
                 <Avatar icon="pi pi-user" class="mr-2" shape="circle" />
-                <h3>{{ post.user.name }}</h3>
+                <h3>{{ post.user.first_name + ' ' + post.user.last_name }}</h3>
             </div>
             <!-- <Avatar icon="pi pi-user" class="mr-2" shape="circle" />
             <h3>{{ post.user.name }}</h3> -->

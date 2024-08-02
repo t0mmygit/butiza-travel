@@ -68,15 +68,19 @@ const triggerBookmark = () => {
     });
 };
 
-const getTourPrice = () => {
-    var highestPrice = 0.0;
+const getLowestPackagePrice = () => {
+    var lowestPrice = props.tour.packages[0].price;
     props.tour.packages.forEach(item => {
-        if (highestPrice < item.price) {
-            highestPrice = item.price;
+        if (lowestPrice > item.price) {
+            lowestPrice = item.price;
         }
     });
 
-    return useFormatPrice(highestPrice);
+    return lowestPrice;
+};
+
+const getPricePerDay = () => {
+    return getLowestPackagePrice() / props.tour.duration;
 }
 
 const itemsListener = computed(() => {
@@ -133,7 +137,7 @@ const formatDestination = destinations => destinations.map(destination => destin
                     <dd>up to {{ tour.max_age }} years olds</dd>
                 </dl>
 
-                <div id="additional" class="flex gap-10 pr-4">
+                <div id="additional" class="flex justify-between pr-4">
                     <div>
                         <h3 class="font-bold">Guide Type</h3>
                         <span>{{ useFormatText(tour.guide_type) }}</span>
@@ -142,10 +146,10 @@ const formatDestination = destinations => destinations.map(destination => destin
                         <h3 class="font-bold">Travel Intensity</h3>
                         <span>{{ useFormatText(tour.travel_intensity) }}</span>
                     </div>
-                    <div>
+                    <!-- <div>
                         <h3 class="font-bold">Lodging Level</h3>
                         <span>Excellent</span>
-                    </div>
+                    </div> -->
                     <div>
                         <h3 class="font-bold">Durations</h3>
                         <span>{{ tour.duration > 1 ? `${tour.duration} Days` : `${tour.duration} Day` }}</span>
@@ -157,9 +161,9 @@ const formatDestination = destinations => destinations.map(destination => destin
             <div class="grid grid-rows-2 min-w-max">
                 <div class="flex flex-col">
                     <span>From</span>
-                    <strong class="text-2xl">{{ getTourPrice() }}</strong>
+                    <strong class="text-2xl">{{ useFormatPrice(getLowestPackagePrice()) }}</strong>
                     <span>Price per day</span>
-                    <strong>RM{{ Math.ceil(tour.base_price / tour.duration) }}</strong>
+                    <strong>{{ useFormatPrice(getPricePerDay()) }}</strong>
                 </div>
                 <div class="flex flex-col place-self-end gap-2">
                     <PrimaryButton @click="viewTour">

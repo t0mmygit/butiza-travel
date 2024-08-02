@@ -9,7 +9,7 @@ import Toast from 'primevue/toast';
 import { useToast } from 'primevue/usetoast';
 
 import { ref } from 'vue';
-import { router } from '@inertiajs/vue3';
+import { router, usePage } from '@inertiajs/vue3';
 
 const mask = ref(false);
 const modal = ref(false);
@@ -38,6 +38,16 @@ const closeContactDialog = () => {
     contactDialog.value = false;
     toast.add({ severity: 'success', summary: 'Message Successfully Submitted', detail: 'Thank you for reaching out! We will get back to you as soon as possible.', life: 3000 });
 };
+
+const directToUserAccount = () => {
+    if (usePage().props.auth.user.role === 'customer') {
+        router.get(route('profile.account'));
+    }
+
+    if (usePage().props.auth.user.role === 'partner') {
+        router.get(route('partner-account'));
+    }
+}
 
 </script>
 
@@ -96,7 +106,7 @@ const closeContactDialog = () => {
                     :model="items" 
                     :label="$page.props.auth.user.first_name" 
                     severity="secondary" rounded 
-                    @click="$inertia.get(route('profile.account'))" 
+                    @click="directToUserAccount" 
                 />
             </div>
         </div>

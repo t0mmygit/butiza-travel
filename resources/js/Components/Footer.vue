@@ -16,7 +16,7 @@ const contactDialog = ref(false);
     <footer class="bg-white w-full h-fit pt-8">
         <div class="mx-auto h-full w-5/6 xl:max-w-7xl">
             <!-- Top Section -->
-            <section class="flex items-center place-content-start justify-between">
+            <section class="flex justify-between">
                 <div id="section-1">
                     <ApplicationLogo />
                     <h3 class="text-lg font-bold">Travel Malaysia With Us!</h3>
@@ -31,8 +31,8 @@ const contactDialog = ref(false);
                     <h3 class="text-lg font-bold mb-2">Butiza Travel</h3>
                     <ul class="list-none font-medium text-gray-800 cursor-pointer">
                         <li @click="$inertia.get(route('about'))">About Us</li>
-                        <li @click="$inertia.get(route('partner'))">Partner Programme</li>
-                        <li>Why Group Tour</li>
+                        <li @click="$inertia.get(route('partner.create'))">Partner Programme</li>
+                        <li @click="$inertia.get(route('question'))">Why Group Tour</li>
                     </ul>
                 </div>
                 <div id="section-3">
