@@ -9,9 +9,7 @@ use App\Models\Availability;
 use App\Models\Booking;
 use App\Models\ContactMethod;
 use App\Models\Tour;
-use App\Models\User;
 use App\Services\BookingService;
-use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 
 class BookingController extends Controller
@@ -39,18 +37,14 @@ class BookingController extends Controller
         return Inertia::render('Tour/Book', [
             'tour'            => Tour::with('packages.activities')->findOrFail($request->tour_id),
             'availability'    => Availability::findOrFail($availabilityId),
-            'contact_methods' => ContactMethod::all()
+            'contact_methods' => ContactMethod::all(),
         ]);
     }
 
     public function store(BookingRequest $request, Availability $availability)
     {
-        $booking = $this->bookingService->store($request->validated());
+        $parameter = $this->bookingService->store($request->validated(), $availability);
 
-        $payment = $this->bookingService->associateBookingWithPayment();
-
-        $this->bookingService->updateAvailabilitySlot($availability->id);
-
-        return redirect()->route('payment.show', ['id' => $payment->id]);    
+        return redirect()->route('payment.show', ['id' => $parameter]);    
     }
 }
