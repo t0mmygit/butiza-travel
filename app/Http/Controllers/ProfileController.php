@@ -89,8 +89,9 @@ class ProfileController extends Controller
 
         // Might Need Pagination
         $bookings = Booking::where('email', $user->email)->with([
-            'tour.destinations',
-            'tour.itineraries.days'
+            'package.tour.destinations',
+            'package.tour.itinerary.days',
+            'payment',
         ])->get();
 
         $statuses = array_map(function($status) {
