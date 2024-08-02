@@ -1,5 +1,6 @@
     <script setup>
 import { useFormatPrice } from '@/Composables/formatPrice';
+import { useFormatText } from '@/Composables/formatText';
 import { router } from '@inertiajs/vue3';
 import { ref } from 'vue';
 import dayjs from 'dayjs';
@@ -33,7 +34,7 @@ const selectedBooking = ref(null);
 const bookingDetails = [
     {
         title: 'Tour ID',
-        value: (booking) => booking.tour.id,
+        value: (booking) => booking.package.tour.id,
     },
     {
         title: 'Departure Date',
@@ -41,21 +42,25 @@ const bookingDetails = [
     },
     {
         title: 'Guide Type',
-        value: (booking) => booking.guide_type != null ? booking.guide_type : 'No Guide Type Yet.'
+        value: (booking) => booking.package.tour.guide_type != null ? useFormatText(booking.package.tour.guide_type) : 'No Guide Type Yet.'
     },
     {
         title: 'Duration',
-        value: (booking) => `${booking.tour.day} Days`,
+        value: (booking) => `${booking.package.tour.duration} Days`,
     },
     {
         title: 'Number of Passengers',
-        value: (booking) => booking.passenger,
+        value: (booking) => booking.adult + booking.child,
     },
     {
         title: 'Destinations',
-        value: (booking) => formatDestination(booking.tour.destinations),
+        value: (booking) => formatDestination(booking.package.tour.destinations),
     },
 ];
+
+function getTotalPassenger(booking) {
+    return booking.adult + booking.child;
+}
 
 function review(bookingData) {
     var array = [];
@@ -128,21 +133,22 @@ const formatDestination = destinations => destinations.map(destination => destin
             <template #body="{ data }">
                 <span 
                     class="hover:underline cursor-pointer"
-                    @click="$inertia.get(route('tour.show', { tour: data.tour.id }))"
-                >{{ data.tour.name }}
+                    @click="$inertia.get(route('tour.show', { tour: data.package.tour.id }))"
+                >{{ data.package.tour.name }}
                 </span>
             </template>
         </Column>
         <Column header="Total Price">
             <template #body="{ data }">
-                <span>{{ useFormatPrice(data.passenger * data.tour.base_price) }}</span>
+                <!-- <span>{{ useFormatPrice(getTotalPassenger()) }}</span> -->
+                 <span>{{ useFormatPrice(getTotalPassenger(data) * data.package.price) }}</span>
             </template>
         </Column>
         <Column header="Status">
             <template #body="{ data }"> 
                 <Tag 
-                    :severity="getBookingSeverity(data.status)" 
-                    :value="getBookingValue(data.status)" 
+                    :severity="getBookingSeverity(data.trip_status)" 
+                    :value="getBookingValue(data.trip_status)" 
                 />
             </template>
         </Column>
@@ -171,16 +177,20 @@ const formatDestination = destinations => destinations.map(destination => destin
                         </div>
                     </div>
                     <Divider />
-                    <div class="flex flex-col">
+                    <!-- <div class="flex flex-col">
                         <strong class="mb-4">Itinerary</strong>
-                        <div v-for="day in slotProps.data.tour.itineraries.days" class="flex flex-col">
+                        <div v-for="day in slotProps.data.package.tour.itinerary.days" class="flex flex-col">
                             <span><strong>Day {{ day.day_number }}</strong> {{ day.day_title }}</span>
                         </div>
                     </div>
-                    <Divider />
+                    <Divider /> -->
                     <div class="flex flex-col">
                         <strong class="mb-4">Payment Details</strong>
-                        <span>No Payment Info</span>
+                        <span v-if="slotProps.data.payment != null">
+                            <span></span>
+                            <span>{{ slotProps.data.payment.status }}</span>
+                        </span>
+                        <span v-else>No Payment Info.</span>
                     </div>
                 </div>
             </div>

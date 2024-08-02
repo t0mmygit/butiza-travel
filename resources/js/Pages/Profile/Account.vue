@@ -36,7 +36,7 @@ const stats = [
                 <div class="flex flex-col items-center p-4 sm:p-6 bg-white shadow sm:rounded-lg">
                     <div class="flex flex-col items-center mb-6">
                         <Avatar icon="pi pi-user" size="xlarge" shape="circle" class="size-40 mb-2" />
-                        <h1>{{ user.name }}</h1>
+                        <h1>{{ user.first_name + ' ' + user.last_name }}</h1>
                         <span class="text-sm mb-2">Joined since <strong>{{ dayjs(user.created_at).format('DD MMMM YYYY') }}</strong></span>
                         <p class="text-center">{{ user.biography ? user.biography : "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua." }}</p>
                     </div>
