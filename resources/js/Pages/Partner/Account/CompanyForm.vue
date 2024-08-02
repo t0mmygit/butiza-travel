@@ -1,5 +1,6 @@
 <script setup>
 import TextInput from '@/Components/TextInput.vue';
+import Card from '@/Components/Card.vue';
 import { useForm } from '@inertiajs/vue3';
 
 import Button from 'primevue/button';
@@ -11,7 +12,8 @@ import { useToast } from 'primevue/usetoast';
 
 const toast = useToast();
 
-import { computed } from 'vue';
+import { computed, ref } from 'vue';
+import axios from 'axios';
 
 const props = defineProps({
     user: {
@@ -29,6 +31,8 @@ const form = useForm({
     ssm_path: props.user.partner.ssm_path ?? '',
 });
 
+const preview = ref(form.ssm_path);
+
 const saveChanges = () => {
     form.patch(route('partner-account.update', { partner: props.user.partner.id }), {
         preserveScroll: true,
@@ -36,13 +40,70 @@ const saveChanges = () => {
             toast.add({ severity: 'success', summary: 'Success', detail: 'Company information updated', life: 3000 });
             form.clearErrors();
         },
-        onError: (error) => console.error(error),
+        onError: (error) => {
+            console.log(error);
+            toast.add({ severity: 'error', summary: 'Error', detail: 'Failed to update company information', life: 3000 });
+        },
     });
+};
+
+const onUpload = async (file) => {
+    const formData = new FormData();
+    formData.append('file', file);
+
+    try {
+        const response = await axios.post(route('upload.store'), formData, {
+            headers: {
+                'Content-Type': 'multipart/form-data',
+            }
+        });
+
+        return response;
+    } catch (error) {
+        if (error.response && error.response.status === 422) {
+            console.error('Validation Failed:', error.response.data.errors);
+        } else {
+            console.error('Error:', error.response ? error.response.data : error.message);
+        }
+        throw error;
+    }
+};
+
+const onChange = async (event) => {
+    const file = event.target.files[0];
+
+    const { data } = await onUpload(file);
+
+    form.ssm_path = data.path;
+
+    showPreview(file);
+}
+
+const showPreview = (file) => {
+    const reader = new FileReader();
+    reader.onload = (event) => {
+        preview.value = event.target.result;
+    };
+    reader.readAsDataURL(file);
+}
+
+const removePreview = () => {
+    // [1] Send request to remove temporary file using the path
+    axios.delete(route('upload.destroy'), { path: form.ssm_path })
+        .then(response => {
+            console.log(response);
+            preview.value = null;
+        })
+        .catch(error => {
+            console.error(error);
+        })
+    // [Alternative] How do I reset preview.value with [1] method only
+    // Does props update itself if we send [1] request?
 }
 
 const formChanged = computed(() => {
     return (
-        form.business_name !== props.user.partner.business_name ||
+    form.business_name !== props.user.partner.business_name ||
         form.website !== props.user.partner.website ||
         form.country !== props.user.partner.country ||
         form.city !== props.user.partner.city ||
@@ -95,14 +156,37 @@ const formChanged = computed(() => {
                                     v-model="form.registration_number"
                                     label="Registration Number"
                                     :error="form.errors.registration_number"
-                                    :disabled="form.registration_number"
+                                    :disabled="user.partner.registration_number != null"
                                 />
-                                <label class="text-neutral-500 text-sm">SSM</label>
-                                <FileUpload>
-                                    <template #empty>
-                                        <p>Drag and drop files here to upload.</p>
-                                    </template>
-                                </FileUpload>
+                                <label  class="text-neutral-500 text-sm">SSM (Optional)</label>
+                                <div id="CustomFileUpload" class="outline outline-1 outline-neutral-300 rounded-md"> 
+                                     <div class="">
+                                        <div v-if="!preview" class="flex flex-col text-center p-4">
+                                            <span
+                                                @click="$refs.fileInput.click()"
+                                                class="text-primary font-semibold text-lg cursor-pointer"
+                                            >
+                                                Upload File
+                                            </span>
+                                            <small>Supported file types: JPG, JPEG, PNG, PDF</small>
+                                            <input type="file" ref="fileInput" @change="onChange" accept="image/*" hidden />
+                                        </div>
+                                        <div v-else class="relative">
+                                            <div class="absolute p-3 right-0">
+                                                <Button
+                                                    icon="pi pi-times" 
+                                                    severity="danger" 
+                                                    outlined rounded 
+                                                    @click="removePreview()"
+                                                />
+                                            </div>
+                                            <div class="flex justify-center">
+                                                <!-- <img :src="preview" class="max-w-96" /> -->
+                                                <img :src="preview" class="max-w-96" />
+                                            </div>
+                                        </div>
+                                     </div>
+                                 </div>
                                 <InputError :message="form.errors.ssm_path" />
                             </div>
                         </div>

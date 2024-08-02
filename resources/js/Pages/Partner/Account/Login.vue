@@ -13,7 +13,8 @@ defineProps({
         type: Boolean,
     },
     status: {
-        type: String,
+        type: Boolean,
+        required: true,
     },
 });
 
@@ -39,7 +40,7 @@ const submit = () => {
             Login as Partner
         </h1>
 
-        <p class="mb-4 text-success-600 text-center">
+        <p v-if="status " class="mb-4 text-success-600 text-center">
             You are logged in.
         </p>
 
@@ -101,10 +102,11 @@ const submit = () => {
                 />
             </div>
         </form>
-        <div class="flex justify-center"> 
+        <div v-if="status" class="flex justify-center"> 
             <Button 
                 label="To Partner Account" 
                 text outlined 
+                class="w-full text-sm"
                 @click="$inertia.get(route('partner-account'))"
             />
         </div>

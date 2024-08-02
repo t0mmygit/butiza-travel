@@ -3,9 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Events\NewPartnerRegistered;
-use App\Http\Requests\PartnerCompanyRequest;
+use App\Http\Requests\PartnerCompanyUpdateRequest;
 use App\Http\Requests\PartnerRegisterRequest;
 use App\Models\Partner;
+use App\Models\Tour;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -16,11 +17,12 @@ class PartnerController extends Controller
 {
     public function index(): Response
     {
-        $user = User::with(['notifications', 'partner'])->where('id', Auth::id())->first();
+        $user = User::with(['notifications', 'partner.settings'])->where('id', Auth::id())->first();
 
         return Inertia::render('Partner/Account/Index', [
             'user' => $user,
             'notifications' => $user->notifications,
+            'tours' => Tour::with('packages.activities')->get(),
         ]);
     }
 
@@ -45,7 +47,7 @@ class PartnerController extends Controller
         ]);
     }
 
-    public function update(PartnerCompanyRequest $request, Partner $partner)
+    public function update(PartnerCompanyUpdateRequest $request, Partner $partner)
     {
         $this->authorize('update', $partner);
         

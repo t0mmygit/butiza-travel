@@ -74,6 +74,11 @@ Route::controller(PartnerRequestController::class)->group(function () {
 Route::post('/partner/validate', PartnerRequestValidationController::class)
     ->name('partner.validate');
 
+Route::controller(PartnerAuthenticationController::class)->group(function () {
+    Route::get('/partner/login', 'create')->name('partner-login.create');
+    Route::post('/partner/login', 'store')->name('partner-login.store');
+});
+
 Route::controller(PartnerController::class)->group(function () {
     Route::get('/partner/account/create', 'create')->name('partner-account.create');
     Route::post('/partner/account/create', 'store')->name('partner-account.store');
@@ -84,10 +89,9 @@ Route::controller(PartnerController::class)->group(function () {
     });
 });
 
-Route::controller(PartnerAuthenticationController::class)->group(function () {
-    Route::get('/partner/login', 'create')->name('partner-login.create');
-    Route::post('/partner/login', 'store')->name('partner-login.store');
-});
+Route::post('partner/account/booking', [PartnerBookingController::class, 'store'])
+            ->name('partner-account-booking.store')
+            ->middleware('partner');
 
 Route::middleware('auth')->group(function () {
     Route::controller(GroupTourController::class)->group(function () {

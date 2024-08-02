@@ -58,8 +58,8 @@ class IfUserIsPartnerAndAuthenticated implements AuthenticatesRequests
         return auth()->user()->role === config('constant.user_roles.partner');
     }
 
-    protected function redirectTo()
+    protected function redirectTo(): string
     {
-        return redirect(route('partner-account.create', absolute: false));
+        return route('partner-login.create');
     }
 }
