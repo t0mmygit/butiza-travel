@@ -12,7 +12,6 @@ import MarginLayout from '@/Layouts/MarginLayout.vue';
 import Button from '@/Components/PrimaryButton.vue';
 import SecondaryButton from '@/Components/SecondaryButton.vue';
 
-// PrimeVue 
 import Slider from 'primevue/slider';
 import Toast from 'primevue/toast';
 import { useToast } from 'primevue/usetoast';
@@ -39,6 +38,10 @@ const selectedHostTour = ref(null);
 if (props.mode == "1") hostMode.value = true;
 else hostMode.value = false; 
 
+function customToast(severity, summary, detail, life = 3000) {
+    toast.add({ severity: severity, summary: summary, detail: detail, life: life })
+}
+
 const showToast = (action) => {
     console.log(action);
     switch(action) {
@@ -47,7 +50,7 @@ const showToast = (action) => {
         case 'bookmark':
             toast.add({ severity: 'success', summary: 'Bookmark Added', detail: 'You have successfully added a bookmark.', life: 3000 })
     }
-}
+};
 
 // Emit event for HorizontalCard Component 
 const addCompareTour = (tour) => {
@@ -61,7 +64,7 @@ const addCompareTour = (tour) => {
 const removeCompareTour = (tour) => {
     const index = items.value.findIndex(item => item.id === tour.id);
     if (index != -1) items.value.splice(index, 1);
-    else console.log("Tour ID not found!");
+    else customToast('warn', 'Something went wrong!', `Tour #${tour.id} could not be found.`);
 }
 
 // Emit event for HorizontalCard Component
@@ -127,12 +130,6 @@ const travelIntensity = {
     column: 'travel_intensity',
     value: ['relaxed', 'moderate', 'adventurous']   
 };
-
-const formatReadable = (text) => {
-    return text.split('_')
-            .map(part => part.charAt(0).toUpperCase() + part.slice(1))
-            .join(' ')
-}
 
 </script>
 
@@ -210,7 +207,7 @@ const formatReadable = (text) => {
                 </div>
             </div>
             <div id="content" class="col-span-6">
-                <div id="column" class="h-fit">
+                <div class="h-fit">
                     <div id="box">
                         <HorizontalCard
                             v-for="tour in filteredTours"
