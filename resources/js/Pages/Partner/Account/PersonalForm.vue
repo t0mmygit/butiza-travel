@@ -25,15 +25,6 @@ const form = useForm({
     phone_number: props.user.phone_number ?? '',
 });
 
-const formChanged = computed(() => {
-    return (
-        form.first_name !== props.user.first_name ||
-        form.last_name !== props.user.last_name ||
-        form.email !== props.user.email ||
-        form.phone_number !== (props.user.phone_number ?? '')
-    );
-});
-
 const saveChanges = () => {
     form.patch(route('user.update', { user: props.user.id }), {
         preserveScroll: true,
@@ -89,7 +80,7 @@ const saveChanges = () => {
                             label="Save Changes" 
                             type="submit"
                             class="mt-4"
-                            :disabled="!formChanged"
+                            :disabled="!form.isDirty || form.processing"
                         />
                     </div>
                 </form>

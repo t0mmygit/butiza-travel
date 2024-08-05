@@ -12,7 +12,7 @@ const props = defineProps({
 </script>
 
 <template>
-    <h1>Booking History</h1>
+    <h1 class="mb-4">Booking History</h1>
     <div class="bg-white shadow rounded sm:rounded-md">
         <DataTable :value="bookings">
             <Column field="id" header="Booking No." />

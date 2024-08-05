@@ -1,11 +1,10 @@
 <script setup>
 import TextInput from '@/Components/TextInput.vue';
-import Card from '@/Components/Card.vue';
 import { useForm } from '@inertiajs/vue3';
 
 import Button from 'primevue/button';
 import Divider from 'primevue/divider';
-import FileUpload from 'primevue/fileupload';
+import InputNumber from 'primevue/inputnumber';
 import InputError from '@/Components/InputError.vue';
 import Toast from 'primevue/toast';
 import { useToast } from 'primevue/usetoast';
@@ -153,7 +152,8 @@ const formChanged = computed(() => {
                         />
                         <div class="col-span-2 flex flex-col gap-4">
                             <div class="flex flex-col gap-2">
-                                <TextInput 
+                                <!-- Changes required only allow numbers -->
+                                <TextInput
                                     v-model="form.registration_number"
                                     label="Registration Number"
                                     :error="form.errors.registration_number"

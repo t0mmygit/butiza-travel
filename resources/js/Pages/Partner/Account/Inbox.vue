@@ -46,7 +46,7 @@ const viewNotification = notificationId => selectedNotification.value = props.no
             </div>
             <Divider />
             <div>{{ selectedNotification.data.subject }}</div>
-            <div  class="text-justify" v-html="formattedNotificationMessage(selectedNotification.data.message)"></div>
+            <div  class="text-justify" v-html="formattedNotificationMessage(selectedNotification.data.body)"></div>
         </div>
     </Modal>
 
@@ -65,7 +65,7 @@ const viewNotification = notificationId => selectedNotification.value = props.no
                         <span>{{ dayjs(notification?.created_at).fromNow() }}</span>
                     </div>
                 </div>
-                <span class="line-clamp-1">{{ notification.data?.message }}</span>
+                <span class="line-clamp-1">{{ notification.data?.body }}</span>
             </div>
         </div>
     </div>

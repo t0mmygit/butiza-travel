@@ -71,109 +71,101 @@ const proceed = () => {
 
 <template>
 
-    <CustomSectionCard index="1" title="Tour Selection">
-        <Dropdown
-            v-model="selectedTour"
-            :options="tours"
-            optionLabel="name"
-            placeholder="Select a tour"
-            @change="form.reset()"
-        />
-    </CustomSectionCard>
-
-    <CustomSectionCard index="2" title="Date Selection">
-        <Calendar
-            v-model="form.departure_date"
-            :minDate="minDate"
-            showIcon
-            iconDisplay="input"
-            placeholder="Select departure date"
-            :disabled="!selectedTour"
-            @date-select="setFinishedDate"
-        />
-    </CustomSectionCard>
-
-    <CustomSectionCard index="3" title="Package Selection">
-        <Dropdown
-            v-model="form.package_id"
-            :options="packages"
-            optionLabel="name"
-            optionValue="id"
-            placeholder="Select a package"
-            :disabled="!selectedTour"
-        />
-    </CustomSectionCard>
-    
-    <CustomSectionCard index="4" title="Number of Travellers">
-        <template #subtitle>
-            <p v-if="selectedTour">Please select a minimum of {{ selectedTour?.min_pax }} travellers.</p>
-        </template>
-        <div class="bg-white relative px-6 py-3 flex items-center justify-between rounded-md outline outline-1 outline-neutral-300">
-            <h2>Adult</h2>
-            <InputNumber
-                v-model="form.adult"
-                showButtons buttonLayout="horizontal"
-                :min="0" :max="99" placeholder="0"
-                :invalid="form.errors.adult != null ? true : false"
-                :disabled="!selectedTour"
-            >
-                <template #incrementbuttonicon>
-                    <span class="pi pi-plus"></span>
+    <main>
+        <div class="flex flex-col gap-4 mb-4">
+            <CustomSectionCard index="1" title="Tour Selection">
+                <Dropdown
+                    v-model="selectedTour"
+                    :options="tours"
+                    optionLabel="name"
+                    placeholder="Select a tour"
+                    @change="form.reset()"
+                />
+            </CustomSectionCard>
+            <CustomSectionCard index="2" title="Date Selection">
+                <Calendar
+                    v-model="form.departure_date"
+                    :minDate="minDate"
+                    showIcon
+                    iconDisplay="input"
+                    placeholder="Select departure date"
+                    :disabled="!selectedTour"
+                    @date-select="setFinishedDate"
+                />
+            </CustomSectionCard>
+            <CustomSectionCard index="3" title="Package Selection">
+                <Dropdown
+                    v-model="form.package_id"
+                    :options="packages"
+                    optionLabel="name"
+                    optionValue="id"
+                    placeholder="Select a package"
+                    :disabled="!selectedTour"
+                />
+            </CustomSectionCard>
+        
+            <CustomSectionCard index="4" title="Number of Travellers">
+                <template #subtitle>
+                    <p v-if="selectedTour">Please select a minimum of {{ selectedTour?.min_pax }} travellers.</p>
                 </template>
-                <template #decrementbuttonicon>
-                    <span class="pi pi-minus"></span>
-                </template>
-            </InputNumber>
-        </div>
-        <div class="bg-white relative px-6 py-3 flex items-center justify-between rounded-md outline outline-1 outline-neutral-300">
-            <div>
-                <h2>Child</h2>
-                <small>Age of under 18</small>
-            </div>
-            <InputNumber
-                v-model="form.child"
-                showButtons buttonLayout="horizontal"
-                :min="0" :max="99" placeholder="0"
-                :invalid="form.errors.child != null ? true : false"
-                :disabled="!selectedTour || form.adult < 1"
-            >
-                <template #incrementbuttonicon>
-                    <span class="pi pi-plus"></span>
-                </template>
-                <template #decrementbuttonicon>
-                    <span class="pi pi-minus"></span>
-                </template>
-            </InputNumber>
-        </div>
-    </CustomSectionCard>
-
-    <CustomSectionCard index="5" title="Note">
-        <TextInput 
-            v-model="form.note" 
-            type="textarea"
-            label="Special Requests / Questions" 
-            :disabled="!selectedTour"
-        />
-    </CustomSectionCard>
-
-    <!-- <div class="flex gap-4">
-        <Panel header="Details" class="flex-1">
-            <div class="flex flex-col gap-3">
-                <div v-for="detail in details"  class="">
-                    <h3>{{ detail.label }}</h3>
-                    <p>{{ detail.value }}</p>
+                <div class="bg-white relative px-6 py-3 flex items-center justify-between rounded-md outline outline-1 outline-neutral-300">
+                    <h2>Adult</h2>
+                    <InputNumber
+                        v-model="form.adult"
+                        showButtons buttonLayout="horizontal"
+                        :min="0" :max="99" placeholder="0"
+                        :invalid="form.errors.adult != null ? true : false"
+                        :disabled="!selectedTour"
+                    >
+                        <template #incrementbuttonicon>
+                            <span class="pi pi-plus"></span>
+                        </template>
+                        <template #decrementbuttonicon>
+                            <span class="pi pi-minus"></span>
+                        </template>
+                    </InputNumber>
                 </div>
-            </div>
-        </Panel>
-        <Panel header="Price"  class="flex-1">
-            
-        </Panel>
-    </div> -->
+                <div class="bg-white relative px-6 py-3 flex items-center justify-between rounded-md outline outline-1 outline-neutral-300">
+                    <div>
+                        <h2>Child</h2>
+                        <small>Age of under 18</small>
+                    </div>
+                    <InputNumber
+                        v-model="form.child"
+                        showButtons buttonLayout="horizontal"
+                        :min="0" :max="99" placeholder="0"
+                        :invalid="form.errors.child != null ? true : false"
+                        :disabled="!selectedTour || form.adult < 1"
+                    >
+                        <template #incrementbuttonicon>
+                            <span class="pi pi-plus"></span>
+                        </template>
+                        <template #decrementbuttonicon>
+                            <span class="pi pi-minus"></span>
+                        </template>
+                    </InputNumber>
+                </div>
+            </CustomSectionCard>
+            <CustomSectionCard index="5" title="Note">
+                <TextInput
+                    v-model="form.note"
+                    type="textarea"
+                    label="Special Requests / Questions"
+                    :disabled="!selectedTour"
+                />
+            </CustomSectionCard>
+        </div>
+        <div class="flex justify-end">
+            <Button
+                label="Proceed with Payment"
+                @click="proceed"
+                :disabled="!requiredFieldsFilled"
+            />
+        </div>
+    </main>
 
-    <Button
-        label="Proceed with Payment"
-        @click="proceed"
-        :disabled="!requiredFieldsFilled"
-    />
+    <section>
+        
+    </section>
 
 </template>

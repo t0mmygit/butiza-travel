@@ -90,23 +90,32 @@ const isVerificationRejected = () => props.user.partner.verification_status === 
 <template>
     <NavBar partner />
 
-    <div class="min-h-full">
+    <div class="min-h-full mb-3">
         <div class="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
             <div class="mb-4">
                 <InlineMessage v-if="isVerificationStatusPending() && !isRequiredCredentialsFilled()" severity="warn" class="flex justify-start min-w-full">
                     Your partner account is unverified. Please update your 
-                    <a @click="sectionIndex = 1" class="underline">Registration Number</a> and <a @click="sectionIndex = 1" class="underline">SSM</a> 
+                    <a @click="sectionIndex = 'Account'" class="underline">Registration Number</a> 
                     to start the verification process.
                 </InlineMessage>
                 <InlineMessage v-if="isVerificationStatusPending() && isRequiredCredentialsFilled()" severity="info" class="flex justify-start min-w-full">
                     Please wait for your partner account to be verified.
                 </InlineMessage>
-                <InlineMessage v-if="isVerificationRejected()" severity="danger" class="flex justify-start min-w-full">
+                <InlineMessage v-if="isVerificationRejected()" severity="error" class="flex justify-start min-w-full">
                     Your partner account has been rejected. Please read the rejection reason in your inbox or email.
                 </InlineMessage>
             </div>
             <div class="flex gap-6">
                 <aside>
+                    <div 
+                        v-if="isVerificationStatusApproved() && user.partner.discount_id != null"
+                        class="bg-primary-100 mb-4 outline outline-1 outline-primary rounded-md" 
+                    >
+                        <div class="flex flex-col px-3 py-4">
+                            <h3>{{ user.partner.discount.type }}</h3>
+                            <span>Enjoy {{ user.partner.discount.percentage }}% off</span>
+                        </div>
+                    </div>
                     <Menu 
                         :model="items"
                         class="sticky top-24"
