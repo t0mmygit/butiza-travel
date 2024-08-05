@@ -21,5 +21,10 @@ class PartnerSettings extends Model
     public function partner(): BelongsTo
     {
         return $this->belongsTo(Partner::class);
-    } 
+    }
+    
+    public function contactMethod(): BelongsTo
+    {
+        return $this->belongsTo(ContactMethod::class);
+    }
 }

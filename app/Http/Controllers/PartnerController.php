@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Events\NewPartnerRegistered;
 use App\Http\Requests\PartnerCompanyUpdateRequest;
 use App\Http\Requests\PartnerRegisterRequest;
+use App\Models\ContactMethod;
 use App\Models\Partner;
 use App\Models\Tour;
 use App\Models\User;
@@ -17,12 +18,18 @@ class PartnerController extends Controller
 {
     public function index(): Response
     {
-        $user = User::with(['notifications', 'partner.settings'])->where('id', Auth::id())->first();
+        $user = User::with([
+            'bookings.package.tour',
+            'notifications',
+            'partner.discount',
+            'partner.settings.contactMethod',
+        ])->where('id', Auth::id())->first();
 
         return Inertia::render('Partner/Account/Index', [
             'user' => $user,
             'notifications' => $user->notifications,
             'tours' => Tour::with('packages.activities')->get(),
+            'contactMethods' => ContactMethod::all(),
         ]);
     }
 

@@ -89,9 +89,13 @@ Route::controller(PartnerController::class)->group(function () {
     });
 });
 
-Route::post('partner/account/booking', [PartnerBookingController::class, 'store'])
-            ->name('partner-account-booking.store')
-            ->middleware('partner');
+Route::middleware('partner')->group(function () {
+    Route::post('partner/account/booking', [PartnerBookingController::class, 'store'])
+                ->name('partner-account-booking.store');
+
+    Route::patch('partner/preference/{partner}', [PartnerPreferenceController::class, 'update'])
+                ->name('partner-preference.update');
+});
 
 Route::middleware('auth')->group(function () {
     Route::controller(GroupTourController::class)->group(function () {

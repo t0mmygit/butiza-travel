@@ -33,6 +33,11 @@ class Partner extends Model
         return $this->belongsTo(User::class);
     }
 
+    public function discount(): BelongsTo
+    {
+        return $this->belongsTo(Discount::class);
+    }
+
     public function settings(): HasOne
     {
         return $this->hasOne(PartnerSettings::class);
