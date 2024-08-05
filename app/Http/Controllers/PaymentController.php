@@ -4,18 +4,29 @@ namespace App\Http\Controllers;
 
 use App\Models\Booking;
 use App\Models\Payment;
+use Illuminate\Contracts\Encryption\DecryptException;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Crypt;
 use Inertia\Inertia;
 use Inertia\Response;
 
 class PaymentController extends Controller
 {
-    public function show(int $id): Response
+    public function show(Request $request, string $id): Response
     {
-        return Inertia::render('Payment', [
-            'payment' => Payment::with('booking.package.tour')->findOrFail($id),
-        ]);
+        try {
+            $query = Crypt::decryptString($id);
+
+            return Inertia::render('Payment', [
+                'payment' => Payment::with('booking.package.tour')->findOrFail($query),
+            ]);
+        } catch (DecryptException $e) {
+            return back()->with([
+                'message' => 'Unable to proceed with payment!',
+                'error' => $e->getMessage(),
+            ]);
+        }
     }
 
     public function update(Request $request, int $id): RedirectResponse
