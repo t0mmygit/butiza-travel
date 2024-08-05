@@ -13,9 +13,9 @@ class PartnerBookingService
         protected Booking $booking
     ) {}
 
-    public function store(array $date): string
+    public function store(array $data): string
     {
-        $this->booking = Booking::create($date);
+        $this->booking = Booking::create($data);
 
         $this->attachUserToBooking();
 

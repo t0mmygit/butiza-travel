@@ -32,7 +32,9 @@ class PartnerBookingRequest extends BookingRequest
 
     public function passedValidation(): void
     {
-        $this->merge([parent::passedValidation(),
+        parent::passedValidation();
+
+        $this->merge([
             'first_name'   => auth()->user()->first_name,
             'last_name'    => auth()->user()->last_name,
             'email'        => auth()->user()->email,

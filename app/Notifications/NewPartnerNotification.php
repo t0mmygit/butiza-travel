@@ -43,7 +43,7 @@ class NewPartnerNotification extends Notification
 
         return [
             'subject' => $notification->subject,
-            'message' => $notification->message,
+            'body'    => $notification->message,
         ];
     }
 }
