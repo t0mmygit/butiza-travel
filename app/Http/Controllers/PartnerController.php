@@ -23,13 +23,15 @@ class PartnerController extends Controller
             'notifications',
             'partner.discount',
             'partner.settings.contactMethod',
-        ])->where('id', Auth::id())->first();
+        ])->findOrFail(Auth::id());
 
+        // TODO: Does eager loading, only load the required data when requested
         return Inertia::render('Partner/Account/Index', [
             'user' => $user,
             'notifications' => $user->notifications,
-            'tours' => Tour::with('packages.activities')->get(),
+            'tours' => Tour::with('packages')->get(),
             'contactMethods' => ContactMethod::all(),
+            'flash' => session()->only(['status', 'message']),
         ]);
     }
 

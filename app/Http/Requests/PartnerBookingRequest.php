@@ -20,18 +20,21 @@ class PartnerBookingRequest extends BookingRequest
     public function rules(): array
     {
         return [
-            'package_id'        => 'required|numeric',
-            'contact_method_id' => 'required|numeric',
-            'departure_date'    => 'required|date',
-            'finished_date'     => 'required|date',
-            'adult'             => 'required_without:child|nullable|numeric|max:99',
-            'child'             => 'required_without:adult|nullable|numeric|max:99',
-            'note'              => 'string|nullable',
+            'package_id'        => ['required', 'exists:packages,id'],
+            'contact_method_id' => ['required', 'exists:contact_methods,id'],
+            'discount_id'       => ['required', 'exists:discounts,id'], 
+            'departure_date'    => ['required', 'date'],
+            'finished_date'     => ['required', 'date', 'after:departure_date'],
+            'adult'             => ['required', 'numeric', 'max:99'],
+            'child'             => ['required_with:adult', 'nullable', 'numeric', 'max:99'],
+            'note'              => ['string', 'nullable'],
+            'amount'            => ['required', 'decimal:0,2'],
         ];
     }
 
     public function passedValidation(): void
     {
+        // NOTE: date is formatted in the parent class
         parent::passedValidation();
 
         $this->merge([

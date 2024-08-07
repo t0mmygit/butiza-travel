@@ -1,17 +1,17 @@
 <script setup>
 import TextInput from '@/Components/TextInput.vue';
+import NumberInput from '@/Components/NumberInput.vue';
 import { useForm } from '@inertiajs/vue3';
 
 import Button from 'primevue/button';
 import Divider from 'primevue/divider';
-import InputNumber from 'primevue/inputnumber';
 import InputError from '@/Components/InputError.vue';
 import Toast from 'primevue/toast';
 import { useToast } from 'primevue/usetoast';
 
 const toast = useToast();
 
-import { computed, ref } from 'vue';
+import { ref } from 'vue';
 import axios from 'axios';
 
 const props = defineProps({
@@ -26,8 +26,8 @@ const form = useForm({
     website: props.user.partner.website,
     country: props.user.partner.country,
     city: props.user.partner.city,
-    registration_number: props.user.partner.registration_number ?? '',
-    ssm_path: props.user.partner.ssm_path ?? '',
+    registration_number: props.user.partner.registration_number ?? null,
+    ssm_path: props.user.partner.ssm_path ?? null,
 });
 
 const preview = ref(form.ssm_path);
@@ -101,17 +101,6 @@ const removePreview = () => {
     // Does props update itself if we send [1] request?
 }
 
-const formChanged = computed(() => {
-    return (
-    form.business_name !== props.user.partner.business_name ||
-        form.website !== props.user.partner.website ||
-        form.country !== props.user.partner.country ||
-        form.city !== props.user.partner.city ||
-        form.registration_number !== (props.user.partner.registration_number ?? '') ||
-        form.ssm_path !== (props.user.partner.ssm_path ?? '')
-    );
-});
-
 </script>
 
 <template>
@@ -151,43 +140,48 @@ const formChanged = computed(() => {
                             required
                         />
                         <div class="col-span-2 flex flex-col gap-4">
-                            <div class="flex flex-col gap-2">
+                            <div class="flex flex-col gap-6">
                                 <!-- Changes required only allow numbers -->
-                                <TextInput
+                                <NumberInput
                                     v-model="form.registration_number"
                                     label="Registration Number"
-                                    :error="form.errors.registration_number"
+                                    placeholder="New Registration Number"
+                                    :error="form.errors?.registration_number"
                                     :disabled="user.partner.registration_number != null"
+                                    :useGrouping="false"
+                                    required
                                 />
-                                <label  class="text-neutral-500 text-sm">SSM (Optional)</label>
-                                <div id="CustomFileUpload" class="outline outline-1 outline-neutral-300 rounded-md"> 
-                                     <div class="">
-                                        <div v-if="!preview" class="flex flex-col text-center p-4">
-                                            <span
-                                                @click="$refs.fileInput.click()"
-                                                class="text-primary font-semibold text-lg cursor-pointer"
-                                            >
-                                                Upload File
-                                            </span>
-                                            <small>Supported file type: PDF</small>
-                                            <input type="file" ref="fileInput" @change="onChange" accept="image/*" hidden />
-                                        </div>
-                                        <div v-else class="relative">
-                                            <div class="absolute p-3 right-0">
-                                                <Button
-                                                    icon="pi pi-times" 
-                                                    severity="danger" 
-                                                    outlined rounded 
-                                                    @click="removePreview()"
-                                                />
+                                <div class="flex flex-col gap-2">
+                                    <label  class="text-neutral-500 text-sm">SSM (Optional)</label>
+                                    <div id="CustomFileUpload" class="outline outline-1 outline-neutral-300 rounded-md">
+                                         <div class="">
+                                            <div v-if="!preview" class="flex flex-col text-center p-4">
+                                                <span
+                                                    @click="$refs.fileInput.click()"
+                                                    class="text-primary font-semibold text-lg cursor-pointer"
+                                                >
+                                                    Upload File
+                                                </span>
+                                                <small>Supported file type: PDF</small>
+                                                <input type="file" ref="fileInput" @change="onChange" accept="image/*" hidden />
                                             </div>
-                                            <div class="flex justify-center">
-                                                <!-- <img :src="preview" class="max-w-96" /> -->
-                                                <span>{{ file }}</span>
+                                            <div v-else class="relative">
+                                                <div class="absolute p-3 right-0">
+                                                    <Button
+                                                        icon="pi pi-times"
+                                                        severity="danger"
+                                                        outlined rounded
+                                                        @click="removePreview()"
+                                                    />
+                                                </div>
+                                                <div class="flex justify-center">
+                                                    <!-- <img :src="preview" class="max-w-96" /> -->
+                                                    <span>{{ file }}</span>
+                                                </div>
                                             </div>
-                                        </div>
+                                         </div>
                                      </div>
-                                 </div>
+                                </div>
                                 <InputError :message="form.errors.ssm_path" />
                             </div>
                         </div>
@@ -197,7 +191,7 @@ const formChanged = computed(() => {
                             label="Save Changes"
                             type="submit"
                             class="mt-4"
-                            :disabled="!formChanged"
+                            :disabled="!form.isDirty || form.processing"
                         />
                     </div>
                 </form>

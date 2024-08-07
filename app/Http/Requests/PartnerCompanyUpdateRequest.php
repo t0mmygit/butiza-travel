@@ -28,6 +28,12 @@ class PartnerCompanyUpdateRequest extends FormRequest
                 'ssm_path' => $newPath,
             ]);
         }
+
+        if ($this->has('registration_number')) {
+            $this->merge([
+                'registration_number' => (string) $this->input('registration_number'),
+            ]);
+        }
     }
 
     /**
@@ -38,12 +44,12 @@ class PartnerCompanyUpdateRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'business_name' => ['required', 'string'],
-            'website' => ['required', 'string','url:http,https'],
-            'country' => ['required', 'string', 'alpha:ascii'],
-            'city' => ['required', 'string','alpha:ascii'],
-            'registration_number' => ['sometimes', 'nullable','string', 'alpha_num:ascii'],
-            'ssm_path' => ['sometimes', 'nullable', 'string'],
+            'business_name'       => ['required', 'string'],
+            'website'             => ['required', 'string','url:http,https'],
+            'country'             => ['required', 'string', 'alpha:ascii'],
+            'city'                => ['required', 'string','alpha:ascii'],
+            'registration_number' => ['sometimes', 'nullable', 'string'],
+            'ssm_path'            => ['sometimes', 'nullable', 'string'],
         ];
     }
 }

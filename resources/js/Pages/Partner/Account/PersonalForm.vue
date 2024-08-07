@@ -1,13 +1,12 @@
 <script setup>
 import TextInput from '@/Components/TextInput.vue';
+import PhoneInput from '@/Components/PhoneInput.vue';
 import { useForm } from '@inertiajs/vue3';
 
 import Button from 'primevue/button';
 import Divider from 'primevue/divider';
 import Toast from 'primevue/toast';
 import { useToast } from 'primevue/usetoast';
-
-import { computed } from 'vue';
 
 const props = defineProps({
     user: {
@@ -39,6 +38,7 @@ const saveChanges = () => {
 </script>
 
 <template>
+    <Toast />
     <div class="flex flex-col gap-8">
         <div class="border border-neutral-300 rounded-md p-4">
             <main>
@@ -67,11 +67,11 @@ const saveChanges = () => {
                             :error="form.errors.email"
                             required
                         />
-                        <TextInput
+                        <PhoneInput
                             v-model="form.phone_number"
-                            type="tel"
                             label="Phone Number"
-                            :error="form.errors.phone_number"
+                            :error="form.errors?.phone_number"
+                            :useGrouping="false"
                             required
                         />
                     </div>

@@ -6,11 +6,13 @@ import PersonalForm from '@/Pages/Partner/Account/PersonalForm.vue';
 import CompanyForm from '@/Pages/Partner/Account/CompanyForm.vue';
 import PreferenceForm from '@/Pages/Partner/Account/PreferenceForm.vue';
 import BookingHistory from '@/Pages/Partner/Account/BookingHistory.vue';
+import Toast from 'primevue/toast';
+import { useToast } from 'primevue/usetoast';
 
 import Menu from 'primevue/menu';
 import InlineMessage from 'primevue/inlinemessage';
 
-import { ref } from 'vue';
+import { onMounted, ref } from 'vue';
 import { router } from '@inertiajs/vue3';
 
 const props = defineProps({
@@ -27,10 +29,25 @@ const props = defineProps({
     contactMethods: {
         tyoe: Object,
         required: true,
+    },
+    flash: {
+        type: Object,
     }
 });
 
+const toast = useToast();
 const sectionIndex = ref('Inbox');
+
+onMounted(() => {
+    if (props.flash?.status != null || props.flash?.message != null) {
+        toast.add({ 
+            severity: props.flash.status, 
+            summary: props.flash.status, 
+            detail: props.flash.message, 
+            life: 3000 
+        });
+    }
+});
 
 const items = ref([
     {
@@ -88,8 +105,9 @@ const isVerificationRejected = () => props.user.partner.verification_status === 
 </script>
 
 <template>
+    <Toast class="z-50" />
     <NavBar partner />
-
+    
     <div class="min-h-full mb-3">
         <div class="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
             <div class="mb-4">

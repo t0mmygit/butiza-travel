@@ -1,11 +1,14 @@
 <script setup>
+import TourDetailsPanel from './TourDetailsPanel.vue';
+import PriceBreakdownPanel from './PriceBreakdownPanel.vue';
+
 import CustomSectionCard from '@/Components/CustomSectionCard.vue';
 import TextInput from '@/Components/TextInput.vue';
 import Button from 'primevue/button';
 import Calendar from 'primevue/calendar';
 import Dropdown from 'primevue/dropdown';
 import InputNumber from 'primevue/inputnumber';
-import Panel from 'primevue/panel';
+
 import { useForm } from '@inertiajs/vue3';
 import { computed, ref, watch } from 'vue';
 import dayjs from 'dayjs';
@@ -26,11 +29,13 @@ const selectedTour = ref(null);
 const form = useForm({
     package_id: null,
     contact_method_id: props.partner.settings?.contact_method_id,
+    discount_id: props.partner.discount?.id,
     departure_date: null,
     finished_date: null,
     adult: 0,
     child: 0,
     note: null,
+    amount: 0,
 });
 
 const packages = computed(() => selectedTour.value?.packages);
@@ -40,26 +45,49 @@ const minDate = computed(() => {
     let month = today.getMonth();
     let year = today.getFullYear();
     let date = today.getDate();
+
     return new Date(year, month, date);
 });
 
 const requiredFieldsFilled = computed(() => {
+    const totalTravellers = form.adult + form.child;
+
     return (
         selectedTour.value != null &&
         form.package_id != null &&
         form.departure_date != null &&
         form.finished_date != null &&
-        getNumberOfTraveller() >= selectedTour.value?.min_pax
+        (totalTravellers >= selectedTour.value?.min_pax)
     )
 });
 
-function getNumberOfTraveller() {
-    return form.adult + form.child;
+const getNumberOfTravellers = computed(() => form.adult + form.child);
+
+const selectedPackage = computed(() => 
+    form.package_id != null
+        ? packages.value.find(item => item.id === form.package_id)
+        : null
+);
+
+function resetForm() {
+    form.reset(
+        'package_id', 
+        'departure_date', 
+        'finished_date', 
+        'adult', 
+        'child', 
+        'note',
+        'amount',
+    );
 }
 
 function setFinishedDate(date) {
     form.finished_date = dayjs(date).add(selectedTour.value?.duration, 'day').toDate();
-};
+}
+
+const handleAmountUpdate = (amount) => {
+    form.amount = amount;
+}
 
 const proceed = () => {
     form.post(route('partner-account-booking.store'), {
@@ -67,10 +95,15 @@ const proceed = () => {
     });
 };
 
+watch(() => form.adult, (newValue) => {
+    if (newValue < 1) {
+        form.reset('child');
+    }
+});
+
 </script>
 
 <template>
-
     <main>
         <div class="flex flex-col gap-4 mb-4">
             <CustomSectionCard index="1" title="Tour Selection">
@@ -79,9 +112,10 @@ const proceed = () => {
                     :options="tours"
                     optionLabel="name"
                     placeholder="Select a tour"
-                    @change="form.reset()"
+                    @change="resetForm"
                 />
             </CustomSectionCard>
+
             <CustomSectionCard index="2" title="Date Selection">
                 <Calendar
                     v-model="form.departure_date"
@@ -93,6 +127,7 @@ const proceed = () => {
                     @date-select="setFinishedDate"
                 />
             </CustomSectionCard>
+
             <CustomSectionCard index="3" title="Package Selection">
                 <Dropdown
                     v-model="form.package_id"
@@ -154,18 +189,30 @@ const proceed = () => {
                     :disabled="!selectedTour"
                 />
             </CustomSectionCard>
+
+            <div class="flex gap-4">
+                <TourDetailsPanel
+                    :tour="selectedTour"
+                    :tour-package="selectedPackage"
+                    :departure-date="form.departure_date"
+                    :finished-date="form.finished_date"
+                    :travellers="getNumberOfTravellers"
+                />
+                <PriceBreakdownPanel
+                    :min-traveller="selectedTour?.min_pax"
+                    :tour-package="selectedPackage"
+                    :travellers="getNumberOfTravellers"
+                    :discount="partner.discount"
+                    @update:amount="handleAmountUpdate"
+                />
+            </div>
         </div>
         <div class="flex justify-end">
             <Button
                 label="Proceed with Payment"
                 @click="proceed"
-                :disabled="!requiredFieldsFilled"
+                :disabled="!requiredFieldsFilled || form.processing"
             />
         </div>
     </main>
-
-    <section>
-        
-    </section>
-
 </template>

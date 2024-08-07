@@ -13,8 +13,12 @@ const props = defineProps({
 
 <template>
     <h1 class="mb-4">Booking History</h1>
-    <div class="bg-white shadow rounded sm:rounded-md">
-        <DataTable :value="bookings">
+    <div class="bg-white border border-surfaceBorder rounded sm:rounded-md">
+        <DataTable
+            :value="bookings"
+            paginator :rows="5" :rowsPerPageOptions="[5, 10, 15]"
+            class="rounded sm:rounded-md"
+        >
             <Column field="id" header="Booking No." />
             <Column field="package.tour.name" header="Tour Name" />
             <Column header="Status">
