@@ -2,6 +2,7 @@
 import CustomSectionCard from '@/Components/CustomSectionCard.vue';
 import Card from '@/Components/Card.vue';
 import TextInput from '@/Components/TextInput.vue';
+import PhoneInput from '@/Components/PhoneInput.vue';
 
 import Button from 'primevue/button';
 import InputNumber from 'primevue/inputnumber';
@@ -229,10 +230,9 @@ const isFormValid = computed(() => {
                                         :disabled="$page.props.auth.user?.email != null"
                                         required
                                     />
-                                    <TextInput 
+                                    <PhoneInput
                                         v-model="form.phone_number" 
                                         label="Phone Number" 
-                                        type="tel" 
                                         :error="form.errors.phone_number" 
                                         :disabled="$page.props.auth.user?.phone_number != null"
                                         required
