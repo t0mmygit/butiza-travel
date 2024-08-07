@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Booking;
 use App\Models\Payment;
+use App\Services\PaymentService;
 use Illuminate\Contracts\Encryption\DecryptException;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -13,44 +14,35 @@ use Inertia\Response;
 
 class PaymentController extends Controller
 {
+    public function __construct(
+        protected PaymentService $paymentService
+    ) {}
+
     public function show(Request $request, string $id): Response
     {
-        try {
-            $query = Crypt::decryptString($id);
+        // There was a plan to use $request to fetch the payment type...
+        // IDEA: Polymorphism to for the payment type
+        $payment = $this->paymentService->getPayment($id);
 
-            return Inertia::render('Payment', [
-                'payment' => Payment::with('booking.package.tour')->findOrFail($query),
-            ]);
-        } catch (DecryptException $e) {
-            return back()->with([
-                'message' => 'Unable to proceed with payment!',
-                'error' => $e->getMessage(),
-            ]);
-        }
+        return Inertia::render('Payment', [
+            'payment' => $payment,
+        ]);
     }
 
-    public function update(Request $request, int $id): RedirectResponse
+    public function update(Request $request, Payment $payment): RedirectResponse
     {
-        Payment::findOrFail($id)->update([
+        // AUTHORIZATION: Check if user is authorized to update the payment
+
+        // TODO: Check if payment is already paid
+        // TODO: Validate payment details
+
+        $payment->update([
             'method' => $request->method,
             'status' => 'paid',
         ]);
 
-        return redirect()->route('explore.index');
-    }
+        // TODO: Event for notification, inbox message, administration notification
 
-    public function validation(Request $request)
-    {
-        //Prototyping ONLY; refer proper validation for Payment Transaction
-        $request->validate([
-            'cardholder_name' => 'required|string|uppercase',
-            'card_number' => 'required|string',
-            'card_month' => 'required|numeric|min:1|max:12',
-            'card_year' => 'required|numeric',
-            'card_cvv' => 'required|numeric',
-            'billing_address' => 'required|alpha_num',
-            'postal_code' => 'required|numeric',
-            'terms' => 'required'
-        ]);
+        return $this->paymentService->redirectAfterPayment();
     }
 }

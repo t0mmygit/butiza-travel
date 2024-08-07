@@ -3,6 +3,8 @@ import TextInput from '@/Components/TextInput.vue';
 import Button from 'primevue/button';
 import { useFormatPrice } from '@/Composables/formatPrice';
 import { router, useForm, usePage } from '@inertiajs/vue3';
+import Toast from 'primevue/toast';
+import { useToast } from 'primevue/usetoast';
 
 const props = defineProps({
     payment: {
@@ -10,26 +12,34 @@ const props = defineProps({
     }
 });
 
+
 const paymentMethod = [
     { label: 'Card', value: 'card' },
     { label: 'Paypal', value: 'paypal' },
 ];
 
+const toast = useToast();
+
+const form = useForm({
+    method: null,
+});
+
 const submit = () => {
+    // TODO: Encrypt the payment ID
     router.patch(route('payment.update', { id: props.payment.id }), {
-        onSuccess: () => router.get(route('explore.index')),
-        onError: (error) => console.error(error),
+        onSuccess: () => console.log('Success!'),
+        onError: (error) => handleToast('error', 'Error', `Failed to update payment method. ${error.response.data.message}`),
         onFinish: () => form.reset(),
     });
+};
+
+const handleToast = (severity, summary, detail, life = 3000) => {
+    toast.add({ severity: severity, summary: summary, detail: detail, life: life })
 };
 
 const selectMethod = (method) => {
     form.method = method;
 };
-
-const form = useForm({
-    method: null,
-});
 
 const getTourName = () => {
     return props.payment.booking.package.tour.name;
@@ -42,6 +52,7 @@ const getPaymentPackagePrice = () => {
 </script>
 
 <template>
+    <Toast />
     <main class="flex flex-row w-screen h-screen">
         <section class="bg-neutral-200 flex h-full p-16">
             <div class="flex flex-col">

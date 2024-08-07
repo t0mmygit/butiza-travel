@@ -59,7 +59,7 @@ Route::controller(BookingController::class)->group(function () {
 
 Route::controller(PaymentController::class)->group(function () {
     Route::get('/payment/{id}', 'show')->name('payment.show');
-    Route::patch('/payment/{id}', 'update')->name('payment.update'); 
+    Route::patch('/payment/{payment}', 'update')->name('payment.update'); 
 });
 
 Route::controller(ReviewController::class)->group(function () {

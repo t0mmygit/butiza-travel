@@ -30,6 +30,15 @@ return [
         ]
     ],
 
+    'toast' => [
+        'success' => 'success',
+        'error' => 'danger',
+        'warn' => 'warning',
+        'info' => 'info',
+        'secondary' => 'secondary',
+        'constrast' => 'constrast',
+    ],
+
     'authorize' => [
         'github' => 'github',
         'facebook' => 'facebook',
