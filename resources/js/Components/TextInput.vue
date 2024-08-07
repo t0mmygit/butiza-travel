@@ -4,7 +4,6 @@ import Textarea from 'primevue/textarea';
 import InputText from 'primevue/inputtext';
 import InputGroup from 'primevue/inputgroup';
 import InputGroupAddon from 'primevue/inputgroupaddon';
-import Dropdown from 'primevue/dropdown';
 
 const model = defineModel({
     type: [String, Number],
@@ -40,23 +39,14 @@ const props = defineProps({
     }
 });
 
-const selectedCountry = ref({
-    country: 'Malaysia',
-    code: '+60'
-});
-
-const countries = ref([
-    { name: 'Malaysia', code: '+60' }
-]);
-
 const input = ref(null);
 
 const isFocused = ref(false);
 
 const classes = computed(() => 
     props.error
-    ? 'border-red-error rounded-md disabled:bg-neutral transition-none'
-    : 'border-neutral-300 border rounded-md disabled:bg-neutral transition-none'
+    ? 'border-red-error rounded-md transition-none'
+    : 'border-neutral-300 border rounded-md transition-none'
 );
 
 </script>
@@ -74,40 +64,8 @@ const classes = computed(() =>
             :name="name"
             :invalid="error ? true : false"
             :rows="5"
+            :required="required"
         />
-        <InputGroup v-else-if="type === 'tel'">
-            <InputGroupAddon class="m-0 p-0">
-                <!-- Still in development -->
-                <!-- Dropdown for country selection -->
-                <Dropdown 
-                    v-model="selectedCountry" 
-                    :options="countries" 
-                    optionLabel="code"
-                    placeholder="Select a Country"
-                    pt:root:class="border-none shadow-none rounded-r-none"
-                    pt:trigger:class="hidden"
-                >
-                    <template #value="slotProps">
-                        <div v-if="slotProps.value">
-                            <div>{{ slotProps.value.code }}</div>
-                        </div>
-                        <div v-else>
-                            {{ slotProps.placeholder }}
-                        </div>
-                    </template>
-                    <template #option="slotProps">
-                        <div>{{ slotProps.option.name }} ({{ slotProps.option.code }})</div>
-                    </template>
-                </Dropdown>
-            </InputGroupAddon>
-            <InputText 
-                v-model="model"
-                :name="name"
-                :placeholder="placeholder"
-                :invalid="error ? true : false"
-                :disabled="disabled"
-            />
-        </InputGroup>
         <InputGroup v-else>
             <InputGroupAddon v-if="icon" ref="input" :class="{'border-primary': isFocused}">
                 <i :class="icon"></i>
@@ -122,6 +80,7 @@ const classes = computed(() =>
                 :disabled="disabled"
                 @focus="isFocused = true"
                 @blur="isFocused = false"
+                :required="required"
             />    
         </InputGroup>
         <p class="text-error text-sm mt-2">{{ error }}</p>
