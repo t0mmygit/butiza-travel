@@ -16,7 +16,7 @@ const modal = ref(false);
 const toast = useToast();
 const contactDialog = ref(false);
 
-defineProps({
+const props = defineProps({
     partner: {
         type: Boolean,
         default: false,
@@ -30,7 +30,7 @@ const items = [
     },
     {
         label: 'Log Out',
-        command: () => router.delete(route('auth.destroy')),
+        command: () => router.delete(route('logout')),
     }
 ];
 
@@ -40,13 +40,14 @@ const closeContactDialog = () => {
 };
 
 const directToUserAccount = () => {
-    if (usePage().props.auth.user.role === 'customer') {
-        router.get(route('profile.account'));
-    }
-
-    if (usePage().props.auth.user.role === 'partner') {
-        router.get(route('partner-account'));
-    }
+    // if (usePage().props.auth.user.role === 'customer') {
+    // }
+    
+    // if (usePage().props.auth.user.role === 'partner') {
+    //     router.get(route('partner-account'));
+    // }
+    // TODO: Get user role to direct respective route
+    router.get(route('profile.account'));
 }
 
 </script>

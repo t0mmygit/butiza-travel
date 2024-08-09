@@ -1,9 +1,7 @@
 <script setup>
 import Button from 'primevue/button';
-import InputError from '@/Components/InputError.vue';
-import Password from 'primevue/password';
+import PasswordInput from '@/Components/PasswordInput.vue';
 import { useForm } from '@inertiajs/vue3';
-import { onMounted } from 'vue';
 
 const emit = defineEmits(['close']);
 
@@ -15,18 +13,13 @@ const props = defineProps({
 });
 
 const form = useForm({
-    email: null,
+    email: props.email,
     password: null,
-});
-
-onMounted(() => {
-    form.email = props.email;
 });
 
 const submitPassword = () => {
     form.post(route('login'), {
         onSuccess: () => emit('close'),
-        onError: (error) => console.error(error),
         onFinish: () => form.reset('password'),
     })
 }
@@ -41,18 +34,17 @@ const submitPassword = () => {
         <h2 class="font-bold text-2xl mb-2">Welcome Back</h2>
         <p class="mb-6">Enter your password</p>
         <form @submit.prevent="submitPassword">
-            <div class="mb-4">
-                <Password 
-                    v-model="form.password" 
-                    placeholder="Password" 
-                    :feedback="false" toggleMask 
-                    :invalid="form.errors.password != null ? true : false"
-                />
-                <InputError :message="form.errors.password || form.errors.email" class="mt-2" />
-            </div>
+            <PasswordInput
+                v-model="form.password"
+                placeholder="Password"
+                :error="form.errors.password"
+                required
+                class="mb-4"
+            />
             <Button
                 type="submit"
                 label="Confirm"
+                :disabled="form.processing"
                 class="bg-primary border-primary w-full"
             />
         </form>

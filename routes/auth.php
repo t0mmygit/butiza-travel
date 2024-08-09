@@ -3,13 +3,13 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\UserController;
+use Illuminate\Auth\Events\Registered;
+use Illuminate\Auth\Middleware\Authenticate;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware('guest')->group(function () {
-    Route::get('register', [RegisteredUserController::class, 'create'])
+    Route::post('register', [RegisteredUserController::class, 'store'])
                 ->name('register');
-
-    Route::post('register', [RegisteredUserController::class, 'store']);
 
     Route::post('email/validate', ValidateEmailController::class)
                 ->name('email.validate');
@@ -18,6 +18,12 @@ Route::middleware('guest')->group(function () {
                 ->name('login');
 
     Route::post('login', [AuthenticatedSessionController::class, 'store']);
+
+    // Route::get('login/partner', [PartnerAuthenticationController::class, 'create'])
+    //             ->name('partner-login.create');
+
+    // Route::post('login/partner', [PartnerAuthenticationController::class, 'store'])
+    //             ->name('partner-login.store');
 
     Route::get('forgot-password', [PasswordResetLinkController::class, 'create'])
                 ->name('password.request');
@@ -62,6 +68,6 @@ Route::middleware('auth')->group(function () {
     Route::put('password', [PasswordController::class, 'update'])
                 ->name('password.update');
 
-    Route::post('logout', [AuthenticatedSessionController::class, 'destroy'])
+    Route::delete('logout', [AuthenticatedSessionController::class, 'destroy'])
                 ->name('logout');
 });

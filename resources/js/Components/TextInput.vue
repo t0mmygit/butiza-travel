@@ -6,7 +6,7 @@ import InputGroup from 'primevue/inputgroup';
 import InputGroupAddon from 'primevue/inputgroupaddon';
 
 const model = defineModel({
-    type: [String, Number],
+    type: String,
 });
 
 const props = defineProps({
@@ -15,38 +15,36 @@ const props = defineProps({
         default: 'text'
     },
     label: {
-        type: String
+        type: String,
+    },
+    name: {
+        type: String,
     },
     error: {
-        type: String
+        type: [String, null],
     },
     placeholder: {
-        type: String
+        type: String,
     },
     disabled: {
         type: Boolean,
-        default: false
+        default: false,
     },
     required: {
         type: Boolean,
         default: false,
-    },
-    name: {
-        type: String
     },
     icon: {
         type: String,
     }
 });
 
-const input = ref(null);
-
 const isFocused = ref(false);
 
 const classes = computed(() => 
     props.error
     ? 'border-red-error rounded-md transition-none'
-    : 'border-neutral-300 border rounded-md transition-none'
+    : 'group-focus:border-primary border-neutral-300 border rounded-md transition-none'
 );
 
 </script>
@@ -66,20 +64,17 @@ const classes = computed(() =>
             :rows="5"
             :required="required"
         />
-        <InputGroup v-else>
-            <InputGroupAddon v-if="icon" ref="input" :class="{'border-primary': isFocused}">
+        <InputGroup v-else class="group">
+            <InputGroupAddon v-if="icon" class="group-focus:border-primary">
                 <i :class="icon"></i>
             </InputGroupAddon>
             <InputText 
                 v-model="model"
-                :type="type"
                 :name="name"
                 :placeholder="placeholder"
                 :class="[classes, { 'rounded-l-none': icon }]"
                 :invalid="error ? true : false"
                 :disabled="disabled"
-                @focus="isFocused = true"
-                @blur="isFocused = false"
                 :required="required"
             />    
         </InputGroup>

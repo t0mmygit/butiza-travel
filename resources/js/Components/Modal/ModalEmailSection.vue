@@ -5,7 +5,6 @@ import Divider from 'primevue/divider';
 
 import axios from 'axios';
 import { computed, ref } from 'vue';
-import { router } from '@inertiajs/vue3';
 
 const emit = defineEmits(['confirm', 'password']);
 
@@ -57,6 +56,8 @@ const openAuthorize = (provider) => {
                 />
                 <Button
                     label="Submit"
+                    type="submit"
+                    :disabled="form.processing"
                     class="mt-2 w-full"
                 />
             </form>
