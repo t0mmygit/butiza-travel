@@ -11,15 +11,13 @@ use App\Models\ContactMethod;
 use App\Models\Tour;
 use App\Services\BookingService;
 use Inertia\Inertia;
+use Inertia\Response;
 
 class BookingController extends Controller
 {
-    protected $bookingService;
-
-    public function __construct(BookingService $bookingService)
-    {
-        $this->bookingService = $bookingService;
-    }
+    public function __construct(
+        protected BookingService $bookingService
+    ) {}
 
     public function update(Booking $booking): RedirectResponse
     {
@@ -32,19 +30,20 @@ class BookingController extends Controller
         return redirect()->route('profile.history');
     }
 
-    public function show(Request $request, $availabilityId)
+    public function show(Request $request, $availabilityId): Response
     {   
         return Inertia::render('Tour/Book', [
             'tour'            => Tour::with('packages.activities')->findOrFail($request->tour_id),
             'availability'    => Availability::findOrFail($availabilityId),
             'contact_methods' => ContactMethod::all(),
-        ]);
+            'flash'           => session()->only(['status', 'message']),
+         ]);
     }
 
     public function store(BookingRequest $request, Availability $availability)
     {
-        $parameter = $this->bookingService->store($request->validated(), $availability);
+        $paymentId = $this->bookingService->store($request->validated(), $availability);
 
-        return redirect()->route('payment.show', ['id' => $parameter]);    
+        return redirect(route('payment.show', ['id' => $paymentId], absolute: true));    
     }
 }

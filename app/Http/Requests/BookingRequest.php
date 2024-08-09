@@ -29,17 +29,19 @@ class BookingRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'package_id'        => 'required|numeric',
-            'contact_method_id' => 'required|numeric',
-            'departure_date'    => 'required|date',
-            'finished_date'     => 'required|date',
-            'adult'             => 'required_without:child|nullable|numeric|max:99',
-            'child'             => 'required_without:adult|nullable|numeric|max:99',
-            'note'              => 'string|nullable',
-            'first_name'        => 'required|string',
-            'last_name'         => 'required|string',
-            'email'             => 'required|string|email:rfc,dns|lowercase',
-            'phone_number'      => 'required|numeric',
+            'package_id'        => ['required', 'exists:packages,id'],
+            'contact_method_id' => ['required', 'exists:contact_methods,id'],
+            'discount_id'       => ['sometimes', 'nullable', 'exists:discounts,id'], 
+            'departure_date'    => ['required', 'date'],
+            'finished_date'     => ['required', 'date', 'after:departure_date'],
+            'adult'             => ['required_with:child', 'numeric', 'max:99'],
+            'child'             => ['sometimes', 'nullable', 'numeric', 'max:99'],
+            'note'              => ['string', 'nullable'],
+            'first_name'        => ['required', 'string'],
+            'last_name'         => ['required', 'string'],
+            'email'             => ['required', 'string', 'email:rfc,dns|lowercase'],
+            'phone_number'      => ['required', 'string'],
+            'amount'            => ['required', 'decimal:0,2'],
         ];
     }
 
@@ -49,6 +51,13 @@ class BookingRequest extends FormRequest
             'adult.required_without' => 'The traveller field is required.',
             'child.required_without' => 'The traveller field is required.',
         ];
+    }
+
+    protected function prepareForValidation(): void
+    {
+        $this->merge([
+            'phone_number' => (string) $this->phone_number,
+        ]);
     }
 
     protected function passedValidation(): void

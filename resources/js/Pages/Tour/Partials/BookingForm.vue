@@ -9,8 +9,10 @@ import InputNumber from 'primevue/inputnumber';
 import InlineMessage from 'primevue/inlinemessage';
 import Divider from 'primevue/divider';
 import Tag from 'primevue/tag';
+import Toast from 'primevue/toast';
+import { useToast } from 'primevue/usetoast';
 
-import { computed } from 'vue';
+import { computed, watch } from 'vue';
 import { useForm, usePage } from '@inertiajs/vue3';
 
 import dayjs from 'dayjs';
@@ -30,9 +32,13 @@ const props = defineProps({
         type: Object,
         required: true
     },
+    flash: {
+        type: Object,
+    }
 });
 
 const page = usePage();
+const toast = useToast();
 
 const contactIcons = [
     { call: 'pi pi-phone' },
@@ -59,24 +65,21 @@ const tourDetails = [
     },  
 ];
 
-const getContactMethodIcon = (iconName) => {
-    const icon = contactIcons.find(icon => iconName.toLowerCase() in icon );
-    return icon ? icon[iconName.toLowerCase()] : '';
-};
-
-const setPackageId = (packageId) => form.package_id = packageId;
-const setContactMethodId = (contactMethodId) => form.contact_method_id = contactMethodId;
-
 const submit = () => {
     form.post(route('booking.store', { availability: props.availability.id}), {
+        preserveScroll: true,
         onSuccess: () => form.reset(),
-        onError: (error) => console.error(error),
+        onError: (error) => {
+            console.error(error);
+            toast.add({ severity: 'error', summary: 'Error', detail: 'Please fill in all required fields correctly.', life: 3000 });
+        },
     });
 };
 
 const form = useForm({
     package_id: null,
     contact_method_id: null,
+    discount_id: props.tour.discount?.id ?? null,
     departure_date: props.availability.departure_date,
     finished_date: props.availability.finished_date,
     adult: null,
@@ -86,59 +89,67 @@ const form = useForm({
     last_name: page.props.auth.user?.last_name ?? null,
     email: page.props.auth.user?.email ?? null,
     phone_number: page.props.auth.user?.phone_number ?? null,
+    amount: 0,
 });
-
-function getSelectedPackage() {
-    return props.tour.packages.find(item => item.id === form.package_id);
-}
-
-function getNumberOfTraveller() {
-    return form.adult + form.child;
-}
 
 function getDiscount() {
     // TODO: get the discount
+    return null;
 }
 
-const hasDiscount = computed(() => {
-    // return props.tour.discount;
-    return false;
-});
+const getContactMethodIcon = (iconName) => {
+    const icon = contactIcons.find(icon => iconName.toLowerCase() in icon );
+    return icon ? icon[iconName.toLowerCase()] : '';
+};
 
-const getSelectedPackagePrice = computed(() => {
-    return useFormatPrice(getSelectedPackage().price);
-});
+const setPackageId = (packageId) => form.package_id = packageId;
+const setContactMethodId = (contactMethodId) => form.contact_method_id = contactMethodId;
 
-const getTotalPrice = computed(() => {
-    var total = getSelectedPackage().price * getNumberOfTraveller();
-    return useFormatPrice(total);
-});
+const hasDiscount = computed(() => false);
 
-const isNumberOfTravellerFilled = computed(() => {
-    return getNumberOfTraveller() >= props.tour.min_pax;
-});
+const calculateTotalPrice = computed(() => parseSelectedPackagePrice.value * getNumberOfTraveller.value);
 
-const isPackageSelected = computed(() => {
-    return form.package_id != null;
-});
+const getNumberOfTraveller = computed(() => form.adult + form.child);
 
-const isNecessaryFieldsFilled = computed(() => {
-    return isNumberOfTravellerFilled.value && isPackageSelected.value;
-});
+const getSelectedPackage = computed(() => props.tour.packages.find(item => item.id === form.package_id));
+const parseSelectedPackagePrice = computed(() => parseFloat(getSelectedPackage.value?.price));
+const getSelectedPackagePrice = computed(() => useFormatPrice(parseSelectedPackagePrice));
+
+const getTotalPrice = computed(() => useFormatPrice(calculateTotalPrice));
+
+const isPackageSelected = computed(() => form.package_id != null);
+const isNumberOfTravellerFilled = computed(() => getNumberOfTraveller.value >= props.tour.min_pax);
+const isNecessaryFieldsFilled = computed(() => isNumberOfTravellerFilled.value && isPackageSelected.value);
 
 const isFormValid = computed(() => {
-    return (form.adult || form.child)
-        && form.first_name
-        && form.last_name
-        && form.email
-        && form.phone_number
-        && form.contact_method_id
+    const totalTravellers = form.adult + form.child;
+
+    return (
+        form.package_id != null &&
+        form.first_name &&
+        form.last_name && 
+        form.email &&
+        form.phone_number != null &&
+        form.contact_method_id != null &&
+        (totalTravellers >= props.tour.min_pax)
+    )
+});
+
+watch(calculateTotalPrice, (newValue) => {
+    form.amount = newValue;
+});
+
+watch(() => form.adult, (newValue) => {
+    if (newValue < 1) {
+        form.reset('child');
+    }
 });
 
 </script>
 
 <template>
     <div class="flex w-full gap-6 my-6">
+        <Toast />
         <div class="flex w-full">
             <div class="mx-auto grow max-w-full">
                 <form>
@@ -165,12 +176,16 @@ const isFormValid = computed(() => {
                                 </InputNumber>
                             </div>
                             <div class="bg-white relative px-6 py-3 flex items-center justify-between rounded-md outline outline-1 outline-neutral-300">
-                                <h2>Child</h2>
+                                <div>
+                                    <h2>Child</h2>
+                                    <small>Age of under 18</small>
+                                </div>
                                 <InputNumber
                                     v-model="form.child"
                                     showButtons buttonLayout="horizontal"
                                     :min="0" :max="99" placeholder="0"
                                     :invalid="form.errors.child != null ? true : false"
+                                    :disabled="form.adult < 1"
                                 >
                                     <template #incrementbuttonicon>
                                         <span class="pi pi-plus"></span>
@@ -283,7 +298,7 @@ const isFormValid = computed(() => {
                 <h1>Package Details</h1>
                 <div v-if="isPackageSelected" class="flex flex-wrap gap-3">
                     <Tag 
-                        v-for="activity in getSelectedPackage().activities" 
+                        v-for="activity in getSelectedPackage.activities" 
                         :value="activity.name"
                     />
                 </div>
@@ -312,12 +327,12 @@ const isFormValid = computed(() => {
                 <div v-else>
                     <div class="flex flex-col gap-2">
                         <div class="flex justify-between">
-                            <span>{{ getSelectedPackage().name }}</span>
+                            <span>{{ getSelectedPackage.name }}</span>
                             <span>{{ getSelectedPackagePrice }}</span>
                         </div>
                         <div class="flex justify-between">
                             <small>
-                                {{ getNumberOfTraveller() }}
+                                {{ getNumberOfTraveller }}
                                 Travellers x
                                 {{ getSelectedPackagePrice }}
                             </small>

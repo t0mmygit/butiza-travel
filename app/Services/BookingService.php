@@ -6,8 +6,10 @@ use App\Models\Availability;
 use App\Models\Booking;
 use App\Models\Payment;
 use App\Models\User;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Crypt;
+use Illuminate\Support\Facades\DB;
 
 class BookingService
 {
@@ -15,28 +17,52 @@ class BookingService
      * Create a new class instance.
      */
     public function __construct(
-        public Booking $booking, 
-        public Payment $payment
+        protected Booking $booking, 
     ) { }
 
-    public function store(array $data, Availability $availability): string
+    public function store(array $validatedData, Availability $availability): string 
     {
-        $this->booking = Booking::create($data);
+        $bookingData = $this->filterValidatedData($validatedData);
+        $amount = $validatedData['amount'];
 
-        $this->attachUserToBooking();
-        
-        $this->updateAvailabilitySlot($availability->id);
+        try {
+            DB::beginTransaction();
 
-        return $this->associateBookingWithPayment();
+            $this->booking = Booking::create($bookingData);
+
+            $this->attachUserToBooking();
+
+            $this->updateAvailabilitySlot($availability->id);
+
+            $payment = $this->associateBookingWithPayment($amount);
+
+            $this->associateUserWithPayment($payment);
+
+            DB::commit();
+
+            return Crypt::encryptString($payment->id);
+        } catch (\Exception $exception) {
+            DB::rollBack();
+
+            return back()->with([
+                'status' => config('constant.toast.error'),
+                'message' => 'Unable to proceed with payment! ' . $exception->getMessage(),
+            ]);
+        }
     }
 
-    public function updateAvailabilitySlot(int $availabilityId): void
+    private function filterValidatedData(array $data): array
     {
-        $availability = Availability::find($availabilityId);
-        $availability->increment('occupied_slot');
+        return Arr::except($data, 'amount'); 
+    }
+
+    private function updateAvailabilitySlot(int $availabilityId): void
+    {
+        // TODO: Handle exceptions if availability is not found
+        Availability::findOrFail($availabilityId)->increment('occupied_slot');
     }
     
-    public function attachUserToBooking(): void
+    private function attachUserToBooking(): void
     {   
         if (! Auth::check()) return;
         
@@ -44,21 +70,19 @@ class BookingService
         $user->bookings()->attach($this->booking->id);
     }
 
-    public function associateBookingWithPayment(): string
+    private function associateBookingWithPayment(float $amount): Payment
     {
-        $this->payment->booking()->associate($this->booking->id);
-        $this->payment->save();
+        $payment = new Payment();
 
-        return encrypt($this->payment->id);
+        $payment->booking()->associate($this->booking->id);
+        $payment->fill(['amount' => $amount]);
+        $payment->save();
+
+        return $payment;
     }
 
-    public function isUserEmailExist(string $email): bool
+    private function associateUserWithPayment(Payment $payment): void
     {
-        return User::where('email', $email)->exists();
-    }
-
-    public function encrypt(string $id): string 
-    {
-        return Crypt::encryptString($id);
+        $payment->user()->attach(Auth::id());
     }
 }
