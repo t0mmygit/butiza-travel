@@ -25,7 +25,6 @@ onMounted(() => {
 
         slides.forEach(slide => slide.classList.add('hidden'));
         slides[slideIndex++].classList.remove('hidden');
-        console.log(slideIndex);
     }, 3000);
 
     onBeforeUnmount(() => {
