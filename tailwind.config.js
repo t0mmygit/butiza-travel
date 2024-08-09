@@ -17,11 +17,13 @@ export default {
             fontFamily: {
                 sans: ['Figtree', ...defaultTheme.fontFamily.sans],
             },
+            // Theme from node_modules\primevue\resources\themes\aura-light-indigo\theme.css
             colors: {
                 primary: {
                     ...colors.indigo,
-                    DEFAULT: colors.indigo['500']
+                    DEFAULT: 'var(--primary-color)',
                 },
+                secondary: 'var(--text-color-secondary)',
                 neutral: {
                     ...colors.gray,
                     DEFAULT: colors.gray['100']
@@ -34,6 +36,9 @@ export default {
                     ...colors.emerald,
                     DEFAULT: colors.emerald['600']
                 },
+                surfaceHover: 'var(--surface-hover)',
+                surfaceBorder: 'var(--surface-border)',
+                surfaceCard: 'var(--surface-card)',
             }
         },
     },
