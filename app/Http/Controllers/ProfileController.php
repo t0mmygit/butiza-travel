@@ -82,41 +82,10 @@ class ProfileController extends Controller
         return Redirect::to('/');
     }
 
-    // NOTE: NEED MODIFICATION
-    public function history(Request $request): Response
-    {
-        $user = $request->user();
-
-        // Might Need Pagination
-        $bookings = Booking::where('email', $user->email)->with([
-            'package.tour.destinations',
-            'package.tour.itinerary.days',
-            'payment',
-        ])->get();
-
-        $statuses = array_map(function($status) {
-            return [
-                'name' => $status,
-                'value' => $status->getValue(),
-                'severity' => $status->getSeverity(),
-            ];
-        }, BookingStatus::cases());
-
-        // Might Need Pagination
-        $reviews = Review::where('user_id', $user->id)->get();
-        $reservations = Reservation::where('email', $user->email)->with('tour')->get();
-
-        return Inertia::render('Profile/History', [
-            'bookings' => $bookings,
-            'bookingStatuses' => $statuses,
-            'reviews' => $reviews, 
-            'reservations' => $reservations,
-            'payments' => null,
-        ]);
-    } 
-
+    // TODO: Moved to its own Controller
     public function bookmark(Request $request): Response
     {
+        // Could be improved
         if (Auth::check()) {
             $user = $request->user()->id;
         } else {
@@ -135,6 +104,7 @@ class ProfileController extends Controller
         ]);
     }
 
+    // TODO: Moved to its own Controller
     public function review(Request $request): Response
     {
         $user = $request->user();

@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Payment extends Model
 {
@@ -16,6 +17,11 @@ class Payment extends Model
         'method',
         'status',
     ];
+
+    public function user(): BelongsToMany
+    {
+        return $this->belongsToMany(User::class, 'user_payments');
+    }
 
     public function booking(): BelongsTo
     {

@@ -3,9 +3,9 @@
 namespace App\Services;
 
 use App\Models\Payment;
-use Barryvdh\Debugbar\Facades\Debugbar;
 use Illuminate\Contracts\Encryption\DecryptException;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Crypt;
 
@@ -42,32 +42,44 @@ class PaymentService
 
     public function redirectAfterPayment(): RedirectResponse
     {
-        // dd('Redirecting after payment...');
-        // TODO: Handle exception they are none of the conditions
         if (! Auth::check()) {
-            return to_route(route: 'explore.index')->with([
+            $this->defaultRedirect();
+        }
+
+        $roles = $this->getCurrentAuthenticatedUserRole();
+
+        if ( $roles->contains(config('constant.role.customer')) ) {
+            return to_route('profile.history')->with([
                 'status' => config('constant.toast.success'),
                 'message' => 'Payment Successful!',
             ]);
         }
 
-        if (Auth::user()->role === config('constant.user_roles.customer')) {
-            return to_route(route: 'profile.history')->with([
+        if ( $roles->contains(config('constant.role.partner')) ) {
+            return to_route('partner-account')->with([
                 'status' => config('constant.toast.success'),
                 'message' => 'Payment Successful!',
             ]);
         }
 
-        if (Auth::user()->role === config('constant.user_roles.partner')) {
-            return to_route(route: 'partner-account')->with([
-                'status' => config('constant.toast.success'),
-                'message' => 'Payment Successful!',
-            ]);
-        }
+        $this->defaultRedirect();
     }
 
-    protected function decrypt(string $encryptedId): string
+    private function getCurrentAuthenticatedUserRole(): Collection
+    {
+        return Auth::user()->getRoleNames();
+    }
+
+    private function decrypt(string $encryptedId): string
     {
         return Crypt::decryptString($encryptedId);
+    }
+
+    private function defaultRedirect(string $status = null, string $message = null): RedirectResponse
+    {
+        return to_route('explore.index')->with([
+            'status' => $status ?? config('constant.toast.success'),
+            'message' => $message ?? 'Payment Successful!',
+        ]);
     }
 }

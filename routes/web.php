@@ -36,11 +36,6 @@ Route::controller(CustomizeController::class)->group(function () {
     Route::post('/customize/store', 'store')->name('customize.store');
 });
 
-Route::controller(AuthController::class)->group(function () {
-    Route::post('/register/user', 'store')->name('auth.store');
-    Route::delete('/logout', 'destroy')->name('auth.destroy');
-});
-
 Route::controller(TourController::class)->group(function () {
     Route::get('/reserve', 'showReserveForm')->name('tour.reserve');
     Route::post('/submit-reservation', 'submitReservation')->name('tour.submit-reservation');
@@ -74,27 +69,22 @@ Route::controller(PartnerRequestController::class)->group(function () {
 Route::post('/partner/validate', PartnerRequestValidationController::class)
     ->name('partner.validate');
 
-Route::controller(PartnerAuthenticationController::class)->group(function () {
-    Route::get('/partner/login', 'create')->name('partner-login.create');
-    Route::post('/partner/login', 'store')->name('partner-login.store');
-});
-
 Route::controller(PartnerController::class)->group(function () {
     Route::get('/partner/account/create', 'create')->name('partner-account.create');
     Route::post('/partner/account/create', 'store')->name('partner-account.store');
-
-    Route::middleware('partner')->group(function () {
-        Route::get('/partner/account', 'index')->name('partner-account');
-        Route::patch('/partner/account/{partner}', 'update')->name('partner-account.update');
-    });
 });
 
 Route::middleware('partner')->group(function () {
+    Route::controller(PartnerController::class)->group(function () {
+        Route::get('/partner/account', 'index')->name('partner-account');
+        Route::patch('partner/account/{partner}', 'update')->name('partner-account.update');
+    });
+
     Route::post('partner/account/booking', [PartnerBookingController::class, 'store'])
-                ->name('partner-account-booking.store');
+            ->name('partner-account-booking.store');
 
     Route::patch('partner/preference/{partner}', [PartnerPreferenceController::class, 'update'])
-                ->name('partner-preference.update');
+            ->name('partner-preference.update');
 });
 
 Route::middleware('auth')->group(function () {
@@ -111,13 +101,17 @@ Route::middleware('auth')->group(function () {
     });
     
     Route::controller(ProfileController::class)->group(function () {
-        Route::get('/profile', 'index')->name('profile.account');
-        Route::get('/profile/edit', 'edit')->name('profile.edit');
-        Route::get('/profile/history', 'history')->name('profile.history');
-        Route::get('/profile/review', 'review')->name('profile.review');
-        Route::patch('/profile', 'update')->name('profile.update');
-        Route::delete('/profile', 'destroy')->name('profile.destroy');
+        Route::get('profile', 'index')->name('profile.account');
+        Route::get('profile/edit', 'edit')->name('profile.edit');
+
+        Route::get('profile/review', 'review')->name('profile.review');
+        Route::patch('profile', 'update')->name('profile.update');
+        Route::delete('profile', 'destroy')->name('profile.destroy');
     });
+
+    Route::get('profile/history/{model?}', [ProfileHistoryController::class, 'index'])
+        ->name('profile.history')
+        ->where('model', 'booking|reservation|payment');
 });
     
 require __DIR__.'/auth.php';
