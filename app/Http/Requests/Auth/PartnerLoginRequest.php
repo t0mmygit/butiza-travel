@@ -3,6 +3,7 @@
 namespace App\Http\Requests\Auth;
 
 use App\Http\Requests\Auth\LoginRequest;
+use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Validation\ValidationException;
@@ -13,8 +14,9 @@ class PartnerLoginRequest extends LoginRequest
     {
         $this->ensureIsNotRateLimited();
 
-        if (! Auth::attempt($this->only('email', 'password') + ['role' => $this->role()], $this->boolean('remember'))) {
-        // if (! Auth::attempt($this->only('email', 'password'), $this->boolean('remember'))) {
+        if (! Auth::attempt($this->only('email', 'password'), 
+            $this->boolean('remember')) && (! $this->isPartner() )
+        ) {
             RateLimiter::hit($this->throttleKey());
 
             throw ValidationException::withMessages([
@@ -25,8 +27,10 @@ class PartnerLoginRequest extends LoginRequest
         RateLimiter::clear($this->throttleKey());
     }
 
-    protected function role(): string
+    protected function isPartner(): bool
     {
-        return config('constant.user_roles.partner');
+        $user = User::findOrFail(Auth::id());
+
+        return $user->hasRole(config('constant.role.partner'));
     }
 }

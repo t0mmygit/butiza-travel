@@ -6,6 +6,7 @@ use App\Models\Booking;
 use App\Models\Payment;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
 
@@ -34,7 +35,7 @@ class PartnerBookingService
         } catch (\Exception $exception) {
             DB::rollBack();
 
-            throw $exception;
+            // Handle exception!
 
             return back()->with([
                 'message' => 'Unable to proceed with payment!',
@@ -43,7 +44,7 @@ class PartnerBookingService
         }
     }
 
-    protected function filterRequestData(Request $request): array
+    private function filterRequestData(Request $request): array
     {
         return $request->only([
             'package_id',
@@ -61,13 +62,15 @@ class PartnerBookingService
         ]);
     }
 
-    protected function attachUserToBooking(): void
+    private function attachUserToBooking(): void
     {
+        if (! Auth::check()) return;
+
         $user = User::where('email', $this->booking->email)->firstOrFail();
         $user->bookings()->attach($this->booking->id);
     }
 
-    protected function associateBookingWithPayment(float $amount): Payment
+    private function associateBookingWithPayment(float $amount): Payment
     {
         $payment = new Payment();
 

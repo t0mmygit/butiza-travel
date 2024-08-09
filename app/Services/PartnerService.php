@@ -28,7 +28,7 @@ class PartnerService
 
     protected function handleAuthenticatedUser(Request $request): RedirectResponse
     {
-        if (Auth::user()->role == config('constant.user_roles.partner')) {
+        if (Auth::user()->role == config('constant.role.partner')) {
             return redirect()->route('partner-account');
         }
         

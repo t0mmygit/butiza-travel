@@ -9,7 +9,7 @@ class PartnerBookingRequest extends BookingRequest
      */
     public function authorize(): bool
     {
-        return auth()->check() && auth()->user()->role === config('constant.user_roles.partner');
+        return auth()->check() && auth()->user()->role === config('constant.role.partner');
     }
 
     /**

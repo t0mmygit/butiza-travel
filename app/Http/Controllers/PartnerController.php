@@ -41,6 +41,8 @@ class PartnerController extends Controller
             'first_name', 'last_name', 'email', 'phone_number', 'password', 'role'
         ]));
 
+        $user->assignRole(config('constant.role.partner'));
+
         Auth::login($user);
 
         event(new NewPartnerRegistered($user));

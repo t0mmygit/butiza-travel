@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Models\User;
 use Closure;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Contracts\Auth\Factory as Auth;
@@ -55,7 +56,7 @@ class IfUserIsPartnerAndAuthenticated implements AuthenticatesRequests
 
     protected function isPartner(): bool
     {
-        return auth()->user()->role === config('constant.user_roles.partner');
+        return auth()->user()->hasRole(config('constant.role.partner'));
     }
 
     protected function redirectTo(): string
