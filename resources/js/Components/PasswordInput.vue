@@ -31,7 +31,7 @@ const props = defineProps({
 </script>
 
 <template>
-    <div class="flex flex-col flex-1">
+    <div class="flex flex-col">
         <label v-if="label" class="text-neutral-500 text-sm mb-2">{{ label }}
             <span v-if="required" class="text-error">*</span>
         </label>
@@ -42,6 +42,7 @@ const props = defineProps({
             :disabled="disabled"
             :required="required"
             :feedback=false
+            pt:input:root:class="w-full" 
         />
         <p class="text-error text-sm mt-2">{{ error }}</p>
     </div>

@@ -1,8 +1,9 @@
 <script setup>
 import InputNumber from 'primevue/inputnumber';
+import InputText from 'primevue/inputtext';
 
 const model = defineModel({
-    type: [Number, String],
+    type: String,
 });
 
 const props = defineProps({
@@ -39,14 +40,16 @@ const props = defineProps({
             {{ label }}
             <span v-if="required" class="text-error">*</span>
         </label> 
-        <InputNumber
+        <InputText
             v-model="model"
             :name="name"
             :placeholder="placeholder"
             :invalid="error ? true : false"
             :disabled="disabled"
-            :useGrouping="useGrouping"
             :required="required"
+            onkeypress="return /[0-9]/i.test(event.key)"
+            
         />
+        <p class="text-error text-sm mt-2">{{ error }}</p>
     </div>
 </template>

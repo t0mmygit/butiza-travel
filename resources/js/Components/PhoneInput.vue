@@ -3,10 +3,11 @@ import InputGroup from 'primevue/inputgroup';
 import InputGroupAddon from 'primevue/inputgroupaddon';
 import Dropdown from 'primevue/dropdown';
 import InputNumber from 'primevue/inputnumber';
+import InputText from 'primevue/inputtext';
 import { ref } from 'vue';
 
 const model = defineModel({
-    type: [String, Number],
+    type: String,
 });
 
 const props = defineProps({
@@ -81,13 +82,14 @@ const countries = ref([
                     </template>
                 </Dropdown>
             </InputGroupAddon>
-            <InputNumber
+            <InputText
                 v-model="model"
                 :name="name"
                 :placeholder="placeholder"
-                :invalid="error ? true : false"
+                :invalud="error ? true : false"
                 :disabled="disabled"
-                :useGrouping="useGrouping"
+                :required="required"
+                onkeypress="return /[0-9]/i.test(event.key)"
             />
         </InputGroup>
         <p class="text-error text-sm mt-2">{{ error }}</p>
