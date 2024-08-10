@@ -88,7 +88,7 @@ const items = ref([
     {
         label: 'Logout',
         icon: 'pi pi-sign-out',
-        command: () => { router.post(route('logout')); },
+        command: () => { router.delete(route('logout')); },
     }
 ]);
 

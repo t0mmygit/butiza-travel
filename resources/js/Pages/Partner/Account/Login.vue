@@ -2,6 +2,7 @@
 import GuestLayout from '@/Layouts/GuestLayout.vue';
 
 import TextInput from '@/Components/TextInput.vue';
+import PasswordInput from '@/Components/PasswordInput.vue';
 import Checkbox from '@/Components/Checkbox.vue';
 
 import Button from 'primevue/button';
@@ -54,17 +55,12 @@ const submit = () => {
                     autofocus
                     required
                     :error="form.errors.email"
-                    class="mt-1 block w-full"
                 />
-                <TextInput
+                <PasswordInput
                     v-model="form.password"
                     label="Password"
-                    type="password"
-                    name="password"
-                    autofocus
                     required
                     :error="form.errors.password"
-                    class="mt-1 block w-full"
                 />
             </div>
 
