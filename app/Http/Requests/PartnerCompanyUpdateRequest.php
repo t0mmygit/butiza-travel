@@ -48,7 +48,7 @@ class PartnerCompanyUpdateRequest extends FormRequest
             'website'             => ['required', 'string','url:http,https'],
             'country'             => ['required', 'string', 'alpha:ascii'],
             'city'                => ['required', 'string','alpha:ascii'],
-            'registration_number' => ['sometimes', 'nullable', 'string'],
+            'registration_number' => ['sometimes', 'nullable', 'string', 'min:12', 'max:12'],
             'ssm_path'            => ['sometimes', 'nullable', 'string'],
         ];
     }
