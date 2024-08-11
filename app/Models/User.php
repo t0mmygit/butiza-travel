@@ -15,11 +15,6 @@ class User extends Authenticatable
 {
     use HasFactory, Notifiable, HasRoles;
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array<int, string>
-     */
     protected $fillable = [
         'first_name',
         'last_name',
@@ -29,21 +24,11 @@ class User extends Authenticatable
         'is_social_auth',
     ];
 
-    /**
-     * The attributes that should be hidden for serialization.
-     *
-     * @var array<int, string>
-     */
     protected $hidden = [
         'password',
         'remember_token',
     ];
 
-    /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
     protected function casts(): array
     {
         return [
@@ -69,10 +54,8 @@ class User extends Authenticatable
     
     /**
      * Retrieve the bookings associated with the user.
-     * Did not go with hasMany relationship to handle cases where 
-     * user booking is not a registered user.
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
+     * Why not use hasMany instead? To answer:
+     * It to handle cases where user booking is not a registered user.
     */
     public function bookings(): BelongsToMany
     {
