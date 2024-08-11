@@ -16,12 +16,11 @@ class NewPartnerNotification extends Notification
     /**
      * Create a new notification instance.
      */
-    public function __construct() 
-    {
+    public function __construct(
         // 
-    }
+    ) {}
 
-    public function databaseType(object $notifiable): string
+    public function databaseType(): string
     {
         return 'new_partner';
     }
