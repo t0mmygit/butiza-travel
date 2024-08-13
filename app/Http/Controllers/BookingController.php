@@ -32,8 +32,14 @@ class BookingController extends Controller
 
     public function show(Request $request, $availabilityId): Response
     {   
+        $tour = Tour::with([
+                    'packages.activities',
+                    'pickupLocation'
+                ])
+                ->findOrFail($request->tour_id);
+
         return Inertia::render('Tour/Book', [
-            'tour'            => Tour::with('packages.activities')->findOrFail($request->tour_id),
+            'tour'            => $tour,
             'availability'    => Availability::findOrFail($availabilityId),
             'contact_methods' => ContactMethod::all(),
             'flash'           => session()->only(['status', 'message']),

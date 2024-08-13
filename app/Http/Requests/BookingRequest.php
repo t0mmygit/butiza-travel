@@ -29,19 +29,20 @@ class BookingRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'package_id'        => ['required', 'exists:packages,id'],
-            'contact_method_id' => ['required', 'exists:contact_methods,id'],
-            'discount_id'       => ['sometimes', 'nullable', 'exists:discounts,id'], 
-            'departure_date'    => ['required', 'date'],
-            'finished_date'     => ['required', 'date', 'after:departure_date'],
-            'adult'             => ['required_with:child', 'numeric', 'max:99'],
-            'child'             => ['sometimes', 'nullable', 'numeric', 'max:99'],
-            'note'              => ['string', 'nullable'],
-            'first_name'        => ['required', 'string'],
-            'last_name'         => ['required', 'string'],
-            'email'             => ['required', 'string', 'email:rfc,dns|lowercase'],
-            'phone_number'      => ['required', 'string'],
-            'amount'            => ['required', 'decimal:0,2'],
+            'package_id'         => ['required', 'exists:packages,id'],
+            'contact_method_id'  => ['required', 'exists:contact_methods,id'],
+            'discount_id'        => ['sometimes', 'nullable', 'exists:discounts,id'],
+            'pickup_location_id' => ['required', 'exists:pickup_locations,id'],
+            'departure_date'     => ['required', 'date'],
+            'finished_date'      => ['required', 'date', 'after:departure_date'],
+            'adult'              => ['required_with:child', 'numeric', 'max:99'],
+            'child'              => ['sometimes', 'nullable', 'numeric', 'max:99'],
+            'note'               => ['string', 'nullable'],
+            'first_name'         => ['required', 'string'],
+            'last_name'          => ['required', 'string'],
+            'email'              => ['required', 'string', 'email:rfc,dns|lowercase'],
+            'phone_number'       => ['required', 'string'],
+            'amount'             => ['required', 'decimal:0,2'],
         ];
     }
 

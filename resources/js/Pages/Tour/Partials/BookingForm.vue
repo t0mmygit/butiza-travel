@@ -80,6 +80,7 @@ const form = useForm({
     package_id: null,
     contact_method_id: null,
     discount_id: props.tour.discount?.id ?? null,
+    pickup_location_id: null,
     departure_date: props.availability.departure_date,
     finished_date: props.availability.finished_date,
     adult: null,
@@ -103,6 +104,8 @@ const getContactMethodIcon = (iconName) => {
 };
 
 const setPackageId = (packageId) => form.package_id = packageId;
+const setPickupLocationId = (pickUpLocationId) => form.pickup_location_id = pickUpLocationId;
+
 const setContactMethodId = (contactMethodId) => form.contact_method_id = contactMethodId;
 
 const hasDiscount = computed(() => false);
@@ -126,6 +129,7 @@ const isFormValid = computed(() => {
 
     return (
         form.package_id != null &&
+        form.pickup_location_id != null &&
         form.first_name &&
         form.last_name && 
         form.email &&
@@ -196,6 +200,7 @@ watch(() => form.adult, (newValue) => {
                                 </InputNumber>
                             </div>
                         </CustomSectionCard>
+                        
                         <!-- Package -->
                         <CustomSectionCard index="2" title="Choose a package">
                             <template #subtitle>
@@ -211,10 +216,24 @@ watch(() => form.adult, (newValue) => {
                                 <span>{{ item.name }}</span>
                                 <span>{{ useFormatPrice(item.price) }}</span>
                             </Button>
-
                         </CustomSectionCard>
+
+                        <CustomSectionCard index="3" title="Pick-up Location">
+                            <template #subtitle>
+                                <p>Please select a pickup location.</p>
+                            </template>
+                            <Button
+                                v-for="pickupLocation in tour.pickup_location"
+                                :label="pickupLocation.location"
+                                :key="pickupLocation.id"
+                                @click="setPickupLocationId(pickupLocation.id)"
+                                plain :outlined="form.pickup_location_id !== pickupLocation.id"
+                                class="text-left"
+                            />
+                        </CustomSectionCard>
+
                         <!-- Traveller Details -->
-                        <CustomSectionCard :index="3" title="Add traveller details">
+                        <CustomSectionCard index="4" title="Add traveller details">
                             <template #subtitle>
                                 <InlineMessage severity="info" class="mb-4">
                                     This traveller will serve as the contact person for the booking.
