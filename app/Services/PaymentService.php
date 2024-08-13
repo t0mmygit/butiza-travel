@@ -43,7 +43,7 @@ class PaymentService
     public function redirectAfterPayment(): RedirectResponse
     {
         if (! Auth::check()) {
-            $this->defaultRedirect();
+            return $this->defaultRedirect();
         }
 
         $roles = $this->getCurrentAuthenticatedUserRole();
@@ -62,7 +62,7 @@ class PaymentService
             ]);
         }
 
-        $this->defaultRedirect();
+        return $this->defaultRedirect();
     }
 
     private function getCurrentAuthenticatedUserRole(): Collection
