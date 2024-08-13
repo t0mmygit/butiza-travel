@@ -27,14 +27,17 @@ class TourController extends Controller
             'availabilities' => function ($query) {
                 $query->orderBy('departure_date', 'asc');
             },
-            'bookmarks',
-            'destinations',
-            'highlights',
-            'itinerary.days', 
+            'bookmarks:id,user_id',
+            'destinations:id,name',
+            'highlights:id,description',
+            'itinerary.days:id,day_number,day_title,description', 
             'note.subjects.bulletPoints',
-            'reviews.user',
-            'reviews.tour',
-            'packages.activities',
+            'reviews' => [
+                'user:id,first_name,last_name',
+                'tour',
+            ],
+            'packages.activities:name',
+            'pickupLocation',
         ])->findOrFail($tourId);
 
         return Inertia::render('Tour/Index', [

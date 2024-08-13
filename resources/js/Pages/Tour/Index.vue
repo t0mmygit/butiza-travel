@@ -279,7 +279,7 @@ const getPackageActivities = () => {
                                     <Button label="Check Availability" class="w-full font-bold" rounded />
                                 </a>
                                 <Button v-else label="Reserve" @click="reserveTour" class="flex-1" rounded />
-                                <Button disabled label="Customize This Tour" class="flex-1" text outlined rounded />
+                                <!-- <Button disabled label="Customize This Tour" class="flex-1" text outlined rounded /> -->
                             </div>
                         </div>
 
@@ -334,11 +334,17 @@ const getPackageActivities = () => {
                 <div class="flex gap-4">
                     <TourIconBox>
                         <template #main>
-                            <div class="flex gap-2 items-center">
+                            <div class="flex gap-2">
                                 <i class="pi pi-map-marker"></i>
-                                <h3 class="font-black">Pick-up Location</h3>
+                                <div class="flex flex-col">
+                                    <h3 class="font-black">Pick-up Location</h3>
+                                    <span 
+                                        v-for="pickupLocation in tour.pickup_location"
+                                    >
+                                        {{ pickupLocation.location }}
+                                    </span>
+                                </div>
                             </div>
-                            <span>{{ tour.pickup_location }}</span>
                         </template>
                     </TourIconBox>
                 </div>
