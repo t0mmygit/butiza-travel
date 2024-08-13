@@ -52,4 +52,9 @@ class Tour extends Model
     {
         return $this->hasMany(Bookmark::class);
     }
+
+    public function pickupLocation(): HasMany
+    {
+        return $this->hasMany(PickupLocation::class);
+    }
 }
