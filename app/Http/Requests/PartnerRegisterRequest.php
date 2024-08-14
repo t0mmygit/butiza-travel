@@ -12,11 +12,4 @@ class PartnerRegisterRequest extends RegisterRequest
             'phone_number' => ['required', 'numeric'],
         ]);
     }
-
-    protected function passedValidation(): void
-    {
-        $this->merge([
-            'role' => 'partner',
-        ]);
-    }
 }

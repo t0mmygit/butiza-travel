@@ -14,9 +14,7 @@ class PartnerLoginRequest extends LoginRequest
     {
         $this->ensureIsNotRateLimited();
 
-        if (! Auth::attempt($this->only('email', 'password'), 
-            $this->boolean('remember')) && (! $this->isPartner() )
-        ) {
+        if (! $this->attemptAuthenticatedWhenUserIsPartner()) {
             RateLimiter::hit($this->throttleKey());
 
             throw ValidationException::withMessages([
@@ -27,10 +25,17 @@ class PartnerLoginRequest extends LoginRequest
         RateLimiter::clear($this->throttleKey());
     }
 
-    protected function isPartner(): bool
+    private function attemptAuthenticatedWhenUserIsPartner(): bool
     {
-        $user = User::findOrFail(Auth::id());
+        return Auth::attemptWhen(
+                credentials: $this->only('email', 'password'),
+                callbacks: fn (User $user) => $this->isPartner($user),
+                remember: $this->boolean('remember')
+        );
+    }
 
+    private function isPartner(User $user): bool
+    {
         return $user->hasRole(config('constant.role.partner'));
     }
 }
