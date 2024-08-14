@@ -1,17 +1,20 @@
-s<script setup>
-import MarginLayout from '@/Layouts/MarginLayout.vue';
-import Avatar from 'primevue/avatar';
-import Calendar from 'primevue/calendar';
-import Button from 'primevue/button';
-
+<script setup>
+import { useFormatPrice } from '@/Composables/formatPrice';
+import CustomSectionCard from '@/Components/CustomSectionCard.vue';
 import TextInput from '@/Components/TextInput.vue';
-import InputError from '@/Components/InputError.vue';
+import Card from '@/Components/Card.vue';
+import PhoneInput from '@/Components/PhoneInput.vue';
 
-import { ref, computed } from 'vue';
-import { useForm } from '@inertiajs/vue3';
+import Button from 'primevue/button';
+import Calendar from 'primevue/calendar';
+import Dropdown from '@/Components/Dropdown.vue';
+import Divider from 'primevue/divider';
+import InputNumber from 'primevue/inputnumber';
+import InlineMessage from 'primevue/inlinemessage';
+import Tag from 'primevue/tag';
 
-const selectedTour = ref(null);
-const selectedContactMethod = ref(null);
+import { computed, watch } from 'vue';
+import { useForm, usePage } from '@inertiajs/vue3';
 
 const props = defineProps({
     tour: {
@@ -24,129 +27,339 @@ const props = defineProps({
     }
 });
 
+const page = usePage();
+
 const contactIcons = [
     { call: 'pi pi-phone' },
     { email: 'pi pi-envelope' },
     { whatsapp: 'pi pi-whatsapp' }
 ];
 
+const tourDetails = [
+    {
+        header: props.tour.name,
+        info: `${props.tour.duration} Days`
+    },
+];
+
+const form = useForm({
+    package_id: null,
+    contact_method_id: null,
+    discount_id: props.tour.discount?.id ?? null,
+    pickup_location_id: null,
+    preferred_date: null,
+    adult: 0,
+    child: 0,
+    first_name: page.props.auth.user?.first_name ?? null,
+    last_name: page.props.auth.user?.last_name ?? null,
+    email: page.props.auth.user?.email ?? null,
+    phone_number: page.props.auth.user?.phone_number ?? null,
+    note: null,
+});
+
 const getContactMethodIcon = (iconName) => {
     const icon = contactIcons.find(icon => iconName.toLowerCase() in icon );
     return icon ? icon[iconName.toLowerCase()] : '';
 };
 
-const selectContactMethod = (contactMethodId) => selectedContactMethod.value = contactMethodId;
+const setPackageId = (packageId) => form.package_id = packageId;
+const setPickupLocationId = (pickUpLocationId) => form.pickup_location_id = pickUpLocationId;
+const setContactMethodId = (contactMethodId) => form.contact_method_id = contactMethodId;
 
-const reactiveTour = computed(() => props.tour.id);
+const submit = () => {
+    form.post(route('reservation.store'), {
+        preserveScroll: true,
+        onSuccess: () => form.reset(),
+        onError: (error) => {
+            console.error(error);
+        }
+    });
+};
 
-const reactiveContactMethod = computed(() => selectedContactMethod.value);
+// TODO: Make this dynamic instead (set the min date by admin)
+const minDate = computed(() => {
+    let today = new Date();
+    let month = today.getMonth();
+    let year = today.getFullYear();
+    let date = today.getDate();
 
-const form = useForm({
-    tour_id: reactiveTour,
-    contact_method: reactiveContactMethod,
-    preferred_date: null,
-    passenger: null,
-    note: null,
-    first_name: null,
-    last_name: null,
-    email: null,
-    phone_number: null
+    return new Date(year, month, date);
+});
+
+const getNumberOfTraveller = computed(() => form.adult + form.child);
+
+const getSelectedPackage = computed(() => props.tour.packages.find(item => item.id === form.package_id));
+const parseSelectedPackagePrice = computed(() => getSelectedPackage.value.price * getNumberOfTraveller.value);
+const getSelectedPackagePrice = computed(() => useFormatPrice(parseSelectedPackagePrice));
+
+const calculateTotalPrice = computed(() => parseSelectedPackagePrice.value * getNumberOfTraveller.value);
+const getTotalPrice = computed(() => useFormatPrice(calculateTotalPrice));
+
+const isPackageSelected = computed(() => form.package_id != null);
+const isNumberOfTravellerFilled = computed(() => getNumberOfTraveller.value >= props.tour.min_pax);
+const isNecessaryFieldsFilled = computed(() => isNumberOfTravellerFilled.value && isPackageSelected.value);
+
+const isFormValid = computed(() => {
+    const totalTravellers = form.adult + form.child;
+
+    return (
+        form.package_id != null &&
+        form.first_name &&
+        form.last_name &&
+        form.email &&
+        form.phone_number != null &&
+        form.contact_method_id != null &&
+        (totalTravellers >= props.tour.min_pax)
+    );
+});
+
+watch(() => form.adult, (newValue) => {
+    if (newValue < 1) {
+        form.reset('child');
+    }
 });
 
 </script>
 
 <template>
-    <MarginLayout>
-        <div class="bg-white h-fit shadow py-6">
-            <div class="max-w-sm lg:max-w-full lg:mx-16 flex items-center relative">
-                <SvgLogo />
-            </div>
-        </div>
+    <main class="my-8 mx-auto lg:flex xl:flex max-w-2xl xl:max-w-7xl">
+        <div class="flex w-full my-6 gap-6">
+            <div class="w-full">
+                 <div class="mx-auto grow max-w-full">
+                    <form>
+                        <div class="flex flex-col gap-6">
 
-        <section class="my-8 mx-auto lg:flex xl:flex max-w-2xl xl:max-w-7xl">
-            <Avatar icon="pi pi-user" class="mt-3 bg-white" size="large" shape="circle" />
-            <div class="grow">
-                <div class="mx-auto
-                    max-w-sm
-                    lg:max-w-lg
-                    xl:max-w-4xl
-                    bg-white shadow rounded py-6 px-5 relative"
-                >
-                    <!-- Title -->
-                    <section>
-                        <div class="flex items-center mb-6">
-                            <div class="bg-white rotate-45 size-4 absolute xl:left-[-6px]"></div>
-                            <h1>Hey there, We just need a few details to reserve this tour.</h1>
-                        </div>
-                        <!-- Reservation Detail -->
-                        <form @submit.prevent="form.post(route('tour.submit-reservation'))">
-                            <div class="mb-8 flex flex-col gap-2">
-                                <h4>When do you want your tour to start? *</h4>
-                                <Calendar v-model="form.preferred_date" dateFormat="dd MM yy" />
-                                <InputError :message="form.errors.preferred_date" />
-                            </div>
-                            <div class="mb-8 flex flex-col gap-2">
-                                <h4>How many people are traveling? *</h4>
-                                <TextInput v-model="form.passenger" type="number" :error="form.errors.passenger" />
-                            </div>
-                            <div class="mb-8 flex flex-col gap-2">
-                                <h2>Special Request & Questions</h2>
-                                <textarea
-                                    v-model="form.note"
-                                    placeholder="Feel free to tell us anything you'd like or how you want to make the trip perfect for you. (optional)"
-                                    class="rounded-md border-neutral-300 shadow"
-                                ></textarea>
-                                <InputError :message="form.errors.note" />
-                            </div>
-                            <div class="mb-8 flex flex-col gap-2">
-                                <h2>Contact Info</h2>
-                                <div class="flex gap-6 mt-4">
-                                    <TextInput v-model="form.first_name" label="First Name *" :error="form.errors.first_name" />
-                                    <TextInput v-model="form.last_name" label="Last Name *" :error="form.errors.last_name" />
+                            <CustomSectionCard index="1" title="Date Selection">
+                                <template #subtitle>
+                                    <p>Please select a date.</p>
+                                </template>
+                                <Calendar
+                                    v-model="form.preferred_date"
+                                    :minDate="minDate"
+                                    inline showWeek
+                                />
+                            </CustomSectionCard>
+
+                            <CustomSectionCard 
+                                index="2" 
+                                title="Number of Travellers"
+                                :error="form.errors.adult || form.errors.child"
+                            >
+                                <template #subtitle>
+                                    <p>Please select a minimum of {{ tour.min_pax }} travellers.</p>
+                                </template>
+                                <div class="bg-white px-6 py-3 flex items-center justify-between rounded-md outline outline-1 outline-surfaceBorder">
+                                    <h2>Adult</h2>
+                                    <InputNumber
+                                        v-model="form.adult"
+                                        showButtons buttonLayout="horizontal"
+                                        :min="0" :max="99" placeholder="0"
+                                        :invalid="form.errors.adult != null ? true : false"
+                                    >
+                                        <template #incrementbuttonicon>
+                                            <i class="pi pi-plus"></i>
+                                        </template>
+                                        <template #decrementbuttonicon>
+                                            <i class="pi pi-minus"></i>
+                                        </template>
+                                    </InputNumber>
                                 </div>
-                                <div class="flex gap-6 mt-4">
-                                    <TextInput v-model="form.email" label="Email *" :error="form.errors.email" />
-                                    <TextInput v-model="form.phone_number" label="Phone Number *" type="number" :error="form.errors.phone_number" />
+                                <div class="bg-white px-6 py-3 flex items-center justify-between rounded-md outline outline-1 outline-surfaceBorder">
+                                    <div>
+                                        <h2>Child</h2>
+                                        <small>Age of under 18</small>
+                                    </div>
+                                    <InputNumber
+                                        v-model="form.child"
+                                        showButtons buttonLayout="horizontal"
+                                        :min="0" :max="99" placeholder="0"
+                                        :invalid="form.errors.child != null ? true : false"
+                                        :disabled="form.adult < 1"
+                                    >
+                                        <template #incrementbuttonicon>
+                                            <i class="pi pi-plus"></i>
+                                        </template>
+                                        <template #decrementbuttonicon>
+                                            <i class="pi pi-minus"></i>
+                                        </template>
+                                    </InputNumber>
+                                </div>
+                            </CustomSectionCard>
+
+                            <CustomSectionCard index="3" title="Package Selection">
+                                <template #subtitle>
+                                    <p>Please choose a package.</p>
+                                </template>
+                                <Button
+                                    v-for="item in tour.packages"
+                                    :key="item.id"
+                                    @click="setPackageId(item.id)"
+                                    plain :outlined="form.package_id !== item.id"
+                                    class="flex flex-1 justify-between border-surfaceBorder"
+                                >
+                                    <span>{{ item.name }}</span>
+                                    <span>{{ item.price }}</span>
+                                </Button>
+                            </CustomSectionCard>
+
+                            <CustomSectionCard index="4" title="Pickup Location">
+                                <template #subtitle>
+                                    <p>Please select a pickup location.</p>
+                                </template>
+                                <Button
+                                    v-for="pickupLocation in tour.pickup_location"
+                                    :label="pickupLocation.location"
+                                    :key="pickupLocation.id"
+                                    @click="setPickupLocationId(pickupLocation.id)"
+                                    plain :outlined="form.pickup_location_id !== pickupLocation.id"
+                                    class="text-left border-surfaceBorder"
+                                />
+                            </CustomSectionCard>
+
+                            <CustomSectionCard index="4" title="Add traveller details">
+                            <template #subtitle>
+                                <InlineMessage severity="info" class="mb-4">
+                                    This traveller will serve as the contact person for the booking.
+                                </InlineMessage>
+                            </template>
+                            <div class="flex flex-col gap-2">
+                                <div class="flex gap-6">
+                                    <TextInput 
+                                        v-model="form.first_name" 
+                                        label="First Name" 
+                                        :error="form.errors.first_name" 
+                                        :disabled="$page.props.auth.user?.first_name != null"
+                                        required
+                                    />
+                                    <TextInput 
+                                        v-model="form.last_name" 
+                                        label="Last Name" 
+                                        :error="form.errors.last_name" 
+                                        :disabled="$page.props.auth.user?.last_name != null"
+                                        required 
+                                    />
+                                </div>
+                                <div class="flex gap-6">
+                                    <TextInput 
+                                        v-model="form.email" 
+                                        label="Email Address" 
+                                        :error="form.errors.email" 
+                                        :disabled="$page.props.auth.user?.email != null"
+                                        required
+                                    />
+                                    <PhoneInput
+                                        v-model="form.phone_number" 
+                                        label="Phone Number" 
+                                        :error="form.errors.phone_number" 
+                                        :disabled="$page.props.auth.user?.phone_number != null"
+                                        required
+                                    />
                                 </div>
                             </div>
-                            <div class="mb-8 flex flex-col gap-2">
-                                <h2>How should we contact you?</h2>
+                        </CustomSectionCard>
+
+                        <CustomSectionCard index="5" title="Additional details" :error="form.errors.contact_method">
+                            <TextInput v-model="form.note" label="Special Requests / Questions" type="textarea" />
+                            <div class="flex flex-col gap-2">
+                                <h5>How should we contact you?</h5>
                                 <div class="flex gap-4">
                                     <Button
                                         v-for="method in contact_methods"
                                         :key="method.id"
                                         :label="method.method_name"
                                         :icon="getContactMethodIcon(method.method_name)"
-                                        plain text raised
-                                        class="flex-1 shadow-none text-base outline outline-1 outline-gray-300 rounded hover:outline-indigo-500 hover:bg-white"
-                                        :class="[{'border-primary bg-primary-100 text-black': selectedContactMethod === method.id}]"
-                                        @click="selectContactMethod(method.id)"
+                                        @click="setContactMethodId(method.id)"
+                                        plain :outlined="form.contact_method_id !== method.id"
+                                        class="flex-1 border-surfaceBorder"
                                     />
                                 </div>
-                                <InputError :message="form.errors.contact_method" />
                             </div>
-                            <div class="flex place-content-end">
-                                <Button type="submit" label="Reserve Now" />
-                            </div>
-                        </form>
-                    </section>
+                        </CustomSectionCard>
+
+                        </div>
+                    </form>
                 </div>
             </div>
-            <div class="min-w-72 max-w-72 h-fit hidden xl:block">
-                <div class="bg-white rounded-md shadow-md mb-8">
-                    <img 
-                        src="https://static.travelstride.com/store/51/ad4f08f81843578f3ea235b037593e/b669206bb8425f9409b22d1a87c8d181.jpg"
-                        class="rounded-t-md"
-                    >
-                    <div class="p-3">
-                        <h2>{{ tour.name }}</h2>
-                        <div class="flex items-center justify-between">
-                            <span class="text-xl font-medium">{{ tour.day }} Days</span>
-                            <span class="text-xl font-medium"><small class="text-black">From</small> RM{{ tour.base_price }}</span>
+            
+            <div class="flex-col gap-6 min-w-96 max-w-96 h-fit hidden xl:flex sticky top-4">
+                <Card>
+                    <template #image>
+                        <img
+                            src="https://static.travelstride.com/store/51/ad4f08f81843578f3ea235b037593e/b669206bb8425f9409b22d1a87c8d181.jpg"
+                            class="rounded-t-md"
+                        >
+                    </template>
+                    <div class="flex flex-col gap-2">
+                        <div v-for="tour in tourDetails">
+                            <h2 class="leading-tight">{{ tour.header }}</h2>
+                            <p>{{ tour.info }}</p>
                         </div>
                     </div>
-                </div>
+                </Card>
+
+                <Card>
+                    <h1>Package Details</h1>
+                    <div v-if="isPackageSelected" class="flex flex-wrap gap-3">
+                        <Tag 
+                            v-for="activity in getSelectedPackage.activities" 
+                            :value="activity.name"
+                        />
+                    </div>
+                    <div v-else>
+                        <InlineMessage class="justify-start w-full" severity="secondary"> 
+                            <span>Please select a package.</span>
+                        </InlineMessage>
+                    </div>
+                </Card>
+
+                <Card>
+                    <h1>Price Breakdown</h1>
+                    <InlineMessage 
+                        v-if="!isNecessaryFieldsFilled" 
+                        class="justify-start w-full" 
+                        severity="secondary"
+                        pt:icon:root="flex align-start"
+                    >
+                        <div>
+                            <span>Please fill in the</span>
+                            <span v-if="!isNumberOfTravellerFilled"> number of travellers</span>
+                            <span v-if="!isNumberOfTravellerFilled && !isPackageSelected"> and </span> 
+                            <span v-if="!isPackageSelected"> package type</span>.
+                        </div>
+                    </InlineMessage>
+                    <div v-else>
+                        <div class="flex flex-col gap-2">
+                            <div class="flex justify-between">
+                                <span>{{ getSelectedPackage.name }}</span>
+                                <span>{{ getSelectedPackagePrice }}</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <small>
+                                    {{ getNumberOfTraveller }}
+                                    Travellers x
+                                    {{ getSelectedPackagePrice }}
+                                </small>
+                                <span>{{ getTotalPrice }}</span>
+                            </div>
+                            <div v-if="hasDiscount" class="flex justify-between">
+                                <span>Discount</span>
+                                <span>{{ getDiscount }}</span>
+                            </div>
+                        </div>
+                        <Divider />
+                        <div class="flex justify-between">
+                            <h3>Total Due</h3>
+                            <h3>{{ getTotalPrice }}</h3>
+                        </div>
+                    </div>
+                </Card>
+                <Button
+                    label="Continue"
+                    class="w-full justify-center" rounded
+                    :disabled="!isFormValid || form.processing"
+                    @click="submit"
+                />
             </div>
-        </section>
-    </MarginLayout>
+        </div>
+    </main>
 </template>

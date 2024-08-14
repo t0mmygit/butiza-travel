@@ -41,6 +41,10 @@ Route::controller(TourController::class)->group(function () {
     Route::post('/submit-reservation', 'submitReservation')->name('tour.submit-reservation');
 });
 
+Route::controller(ReservationController::class)->group(function () {
+    Route::get('/reservation/{tour:slug}', 'create')->name('reservation.create');
+});
+
 Route::get('/profile/bookmark', [ProfileController::class, 'bookmark'])->name('profile.bookmark');
 Route::post('/bookmark/{tour}', [BookmarkController::class, 'store'])->name('bookmark.store');
 Route::post('/customer-query', [CustomerSupportController::class, 'store'])->name('support.store');
@@ -53,7 +57,7 @@ Route::controller(BookingController::class)->group(function () {
 });
 
 Route::controller(PaymentController::class)->group(function () {
-    Route::get('/payment/{id}', 'show')->name('payment.show');
+    Route::get('/payment/{id}', 'create')->name('payment.create');
     Route::patch('/payment/{payment}', 'update')->name('payment.update'); 
 });
 

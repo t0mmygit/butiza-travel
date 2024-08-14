@@ -7,11 +7,11 @@ use Illuminate\Auth\Events\Registered;
 use Illuminate\Auth\Middleware\Authenticate;
 use Illuminate\Support\Facades\Route;
 
-Route::get('login/partner', [PartnerAuthenticationController::class, 'create'])
-            ->name('partner-login.create');
+// Route::get('login/partner', [PartnerAuthenticationController::class, 'create'])
+//             ->name('partner-login.create');
 
-Route::post('login/partner', [PartnerAuthenticationController::class, 'store'])
-            ->name('partner-login.store');
+// Route::post('login/partner', [PartnerAuthenticationController::class, 'store'])
+//             ->name('partner-login.store');
 
 Route::middleware('guest')->group(function () {
     Route::post('register', [RegisteredUserController::class, 'store'])
@@ -25,11 +25,11 @@ Route::middleware('guest')->group(function () {
 
     Route::post('login', [AuthenticatedSessionController::class, 'store']);
 
-    // Route::get('login/partner', [PartnerAuthenticationController::class, 'create'])
-    //             ->name('partner-login.create');
+    Route::get('login/partner', [PartnerAuthenticationController::class, 'create'])
+                ->name('partner-login.create');
 
-    // Route::post('login/partner', [PartnerAuthenticationController::class, 'store'])
-    //             ->name('partner-login.store');
+    Route::post('login/partner', [PartnerAuthenticationController::class, 'store'])
+                ->name('partner-login.store');
 
     Route::get('forgot-password', [PasswordResetLinkController::class, 'create'])
                 ->name('password.request');
