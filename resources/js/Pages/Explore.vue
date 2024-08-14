@@ -16,7 +16,7 @@ import Slider from 'primevue/slider';
 import Toast from 'primevue/toast';
 import { useToast } from 'primevue/usetoast';
 
-import { computed, ref } from 'vue';
+import { computed, onMounted, ref } from 'vue';
 import { router } from '@inertiajs/vue3';
 
 const props = defineProps({
@@ -25,6 +25,9 @@ const props = defineProps({
     },
     mode: {
         type: String
+    },
+    flash: {
+        type: Object,
     }
 });
 
@@ -34,6 +37,17 @@ const range = ref([1, 20]);
 const toast = useToast();
 const hostMode = ref(false);
 const selectedHostTour = ref(null);
+
+onMounted(() => {
+    if (props.flash?.status != null || props.flash?.message != null) {
+        toast.add({ 
+            severity: props.flash.status, 
+            summary: props.flash.status, 
+            detail: props.flash.message, 
+            life: 3000 
+        });
+    }
+});
 
 if (props.mode == "1") hostMode.value = true;
 else hostMode.value = false; 
@@ -136,7 +150,7 @@ const travelIntensity = {
 <template>
     <MarginLayout>
         <NavBar />
-        <Toast />
+        <Toast class="z-50" />
         <CompareBox 
             :items="items"
             @remove-compare-tour="removeCompareTour"

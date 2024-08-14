@@ -14,7 +14,8 @@ class ExploreController extends Controller
 
         return Inertia::render('Explore', [
             'tours' => $tours,
-            'mode' => $request->query('mode', "0")
+            'mode' => $request->query('mode', "0"),
+            'flash' => session()->only(['status', 'message']),
         ]);
     }
     
