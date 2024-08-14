@@ -1,6 +1,7 @@
 <script setup>
 import GuestLayout from '@/Layouts/GuestLayout.vue';
 import TextInput from '@/Components/TextInput.vue';
+import PasswordInput from '@/Components/PasswordInput.vue';
 import { useForm } from '@inertiajs/vue3';
 
 import Button from 'primevue/button';
@@ -31,6 +32,9 @@ const partnerForm = useForm({
 const submit = () => {
     form.post(route('partner-account.store'), {
         onSuccess: () => partnerForm.post(route('partner.store')),
+        // TODO: Handle in case of failure
+        onError: (error) => console.error(error),
+        onFinish: () => form.reset('password', 'password_confirmation'),
     });
 }
 
@@ -44,8 +48,20 @@ const submit = () => {
                 <TextInput v-model="form.last_name" label="Last Name" :error="form.errors.last_name" required />
                 <TextInput v-model="form.email" label="Email Address" :error="form.errors.email" required />
                 <TextInput v-model="form.phone_number" label="Phone Number" :error="form.errors.phone_number" required />
-                <TextInput v-model="form.password" name="password" label="Password" type="password" :error="form.errors.password" required />
-                <TextInput v-model="form.password_confirmation" name="password_confirmation" label="Confirm Password" type="password" :error="form.errors.confirm_password" required />
+                <PasswordInput 
+                    v-model="form.password" 
+                    name="password" 
+                    label="Password" 
+                    :error="form.errors.password" 
+                    required
+                />
+                <PasswordInput 
+                    v-model="form.password_confirmation" 
+                    name="password_confirmation" 
+                    label="Confirm Password" 
+                    :error="form.errors.confirm_password" 
+                    required
+                />
                 <div class="flex justify-center">
                     <Button dusk="submit-button" type="submit" label="Register" class="w-full" />
                 </div>
