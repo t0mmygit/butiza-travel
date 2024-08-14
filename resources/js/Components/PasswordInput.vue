@@ -37,12 +37,12 @@ const props = defineProps({
         </label>
         <Password
             v-model="model"
-            :name="name"
             :placeholder="placeholder"
             :disabled="disabled"
             :required="required"
             :feedback=false
             pt:input:root:class="w-full" 
+            :pt:input:root:name="name"
         />
         <p class="text-error text-sm mt-2">{{ error }}</p>
     </div>
