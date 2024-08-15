@@ -32,6 +32,10 @@ export default {
                     ...colors.red,
                     DEFAULT: colors.red['600']
                 },
+                link: {
+                    ...colors.blue,
+                    DEFAULT: colors.blue['800']
+                },
                 success: {
                     ...colors.emerald,
                     DEFAULT: colors.emerald['600']
