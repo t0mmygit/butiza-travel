@@ -66,6 +66,7 @@ const countries = ref([
                     :options="countries"
                     optionLabel="code"
                     placeholder="Select a Country"
+                    :disabled="disabled"
                     pt:root:class="border-none shadow-none rounded-r-none"
                     pt:trigger:class="hidden"
                 >
@@ -86,7 +87,7 @@ const countries = ref([
                 v-model="model"
                 :name="name"
                 :placeholder="placeholder"
-                :invalud="error ? true : false"
+                :invalid="error ? true : false"
                 :disabled="disabled"
                 :required="required"
                 onkeypress="return /[0-9]/i.test(event.key)"
