@@ -17,7 +17,9 @@ class BookingRequest extends FormRequest
     public function attributes(): array
     {
         return [
-            'contact_method_id' => 'contact method',
+            'package_id'         => 'package',
+            'contact_method_id'  => 'contact method',
+            'pickup_location_id' => 'pickup location',
         ];
     }
 
@@ -40,7 +42,7 @@ class BookingRequest extends FormRequest
             'note'               => ['string', 'nullable'],
             'first_name'         => ['required', 'string'],
             'last_name'          => ['required', 'string'],
-            'email'              => ['required', 'string', 'email:rfc,dns|lowercase'],
+            'email'              => ['required', 'string', 'email:rfc,dns', 'lowercase'],
             'phone_number'       => ['required', 'string'],
             'amount'             => ['required', 'decimal:0,2'],
         ];
@@ -49,8 +51,8 @@ class BookingRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'adult.required_without' => 'The traveller field is required.',
-            'child.required_without' => 'The traveller field is required.',
+            'preferred_date.required' => 'The date field is required.',
+            'adult.required_with' => 'The traveller field is required.',
         ];
     }
 

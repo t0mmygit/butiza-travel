@@ -13,7 +13,22 @@ class Booking extends Model
 {
     use HasFactory;
 
-    protected $guarded = [];
+    protected $fillable = [
+        'package_id',
+        'contact_method_id',
+        'discount_id',
+        'pickup_location_id',
+        'departure_date',
+        'finished_date',
+        'adult',
+        'child',
+        'note',
+        'first_name',
+        'last_name',
+        'email',
+        'phone_number',
+        'trip_status',
+    ];
 
     protected $casts = [
         'trip_status' => BookingStatus::class
@@ -29,9 +44,19 @@ class Booking extends Model
         return $this->belongsTo(Package::class);
     }
 
-    public function contactMethod(): HasOne
+    public function contactMethod(): BelongsTo
     {
-        return $this->hasOne(ContactMethod::class, 'id');
+        return $this->belongsTo(ContactMethod::class);
+    }
+
+    public function discount(): BelongsTo
+    {
+        return $this->belongsTo(Discount::class);
+    }
+
+    public function pickupLocation(): BelongsTo
+    {
+        return $this->belongsTo(PickupLocation::class);
     }
 
     public function payment(): HasOne
