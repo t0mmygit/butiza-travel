@@ -96,7 +96,7 @@ const tourDetails = ref([
 
 const reserveTour = () => {
     try {
-        form.get(route('tour.reserve'));
+        router.get(route('reservation.create', { tour: props.tour.slug }));
     } catch (error) {
         console.error('Error reserving tour:', error);
     }

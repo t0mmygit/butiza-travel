@@ -44,43 +44,4 @@ class TourController extends Controller
             'tour' => $tour,
         ]);
     }
-
-    public function showReserveForm(Request $request): Response
-    {
-        return Inertia::render('Tour/Reserve', [
-            'tour'            => Tour::findOrFail($request->tour_id),
-            'contact_methods' => ContactMethod::all()
-        ]);
-    }
-
-    public function submitReservation(Request $request)
-    {
-        $validated = $request->validate([
-            'tour_id'        => 'required|numeric',
-            'contact_method' => 'required|numeric',
-            'preferred_date' => 'required|date',
-            'passenger'      => 'required|numeric',
-            'note'           => 'string|nullable',
-            'first_name'     => 'required|string',
-            'last_name'      => 'required|string',
-            'email'          => 'required|string|email:rfc,dns|lowercase',
-            'phone_number'   => 'required|numeric',
-        ]);
-
-        // contact_methods is used as error message
-        $validated['contact_method_id'] = $validated['contact_method'];
-        unset($validated['contact_method']);
-
-        $validated['preferred_date'] = date('Y-m-d', strtotime($validated['preferred_date']));
-
-        $reservation = Reservation::create($validated);
-        if (Auth::check()) {
-            $user = User::find(Auth::user()->id);
-            $user->reservations()->attach($reservation->id);
-
-            return redirect(route('profile.history'));
-        }
-        // Redirection need to be changed/Add confirmation message
-        return redirect(route('tour.show', $validated['tour_id']));
-    }
 }

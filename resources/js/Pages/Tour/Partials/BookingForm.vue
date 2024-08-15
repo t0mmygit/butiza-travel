@@ -105,12 +105,10 @@ const getContactMethodIcon = (iconName) => {
 
 const setPackageId = (packageId) => form.package_id = packageId;
 const setPickupLocationId = (pickUpLocationId) => form.pickup_location_id = pickUpLocationId;
-
 const setContactMethodId = (contactMethodId) => form.contact_method_id = contactMethodId;
 
+// TODO: Discount Implementation
 const hasDiscount = computed(() => false);
-
-const calculateTotalPrice = computed(() => parseSelectedPackagePrice.value * getNumberOfTraveller.value);
 
 const getNumberOfTraveller = computed(() => form.adult + form.child);
 
@@ -119,6 +117,7 @@ const parseSelectedPackagePrice = computed(() => parseFloat(getSelectedPackage.v
 const getSelectedPackagePrice = computed(() => useFormatPrice(parseSelectedPackagePrice));
 
 const getTotalPrice = computed(() => useFormatPrice(calculateTotalPrice));
+const calculateTotalPrice = computed(() => parseSelectedPackagePrice.value * getNumberOfTraveller.value);
 
 const isPackageSelected = computed(() => form.package_id != null);
 const isNumberOfTravellerFilled = computed(() => getNumberOfTraveller.value >= props.tour.min_pax);
@@ -136,7 +135,7 @@ const isFormValid = computed(() => {
         form.phone_number != null &&
         form.contact_method_id != null &&
         (totalTravellers >= props.tour.min_pax)
-    )
+    );
 });
 
 watch(calculateTotalPrice, (newValue) => {
@@ -163,7 +162,7 @@ watch(() => form.adult, (newValue) => {
                             <template #subtitle>
                                 <p>Please select a minimum of {{ tour.min_pax }} travellers.</p>
                             </template>
-                            <div class="bg-white relative px-6 py-3 flex items-center justify-between rounded-md outline outline-1 outline-neutral-300">
+                            <div class="bg-white relative px-6 py-3 flex items-center justify-between rounded-md outline outline-1 outline-surfaceBorder">
                                 <h2>Adult</h2>
                                 <InputNumber
                                     v-model="form.adult"
@@ -179,7 +178,7 @@ watch(() => form.adult, (newValue) => {
                                     </template>
                                 </InputNumber>
                             </div>
-                            <div class="bg-white relative px-6 py-3 flex items-center justify-between rounded-md outline outline-1 outline-neutral-300">
+                            <div class="bg-white relative px-6 py-3 flex items-center justify-between rounded-md outline outline-1 outline-surfaceBorder">
                                 <div>
                                     <h2>Child</h2>
                                     <small>Age of under 18</small>
@@ -218,7 +217,7 @@ watch(() => form.adult, (newValue) => {
                             </Button>
                         </CustomSectionCard>
 
-                        <CustomSectionCard index="3" title="Pick-up Location">
+                        <CustomSectionCard index="3" title="Pickup Location">
                             <template #subtitle>
                                 <p>Please select a pickup location.</p>
                             </template>
@@ -274,8 +273,9 @@ watch(() => form.adult, (newValue) => {
                                 </div>
                             </div>
                         </CustomSectionCard>
+                        
                         <!-- Additional Details -->
-                        <CustomSectionCard :index="4" title="Additional details" :error="form.errors.contact_method">
+                        <CustomSectionCard index="5" title="Additional details" :error="form.errors.contact_method">
                             <TextInput v-model="form.note" label="Special Requests / Questions" type="textarea" />
                             <div class="flex flex-col gap-2">
                                 <h5>How should we contact you?</h5>
