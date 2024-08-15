@@ -35,12 +35,10 @@ class PartnerBookingService
         } catch (\Exception $exception) {
             DB::rollBack();
 
-            // Handle exception!
-
-            return back()->with([
+            return [
                 'message' => 'Unable to proceed with payment!',
-                'error' => $exception->getMessage(),
-            ]);
+                'error'   => $exception->getMessage(),
+            ];
         }
     }
 
@@ -50,6 +48,7 @@ class PartnerBookingService
             'package_id',
             'contact_method_id',
             'discount_id',
+            'pickup_location_id',
             'departure_date',
             'finished_date',
             'adult',

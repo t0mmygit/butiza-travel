@@ -20,15 +20,16 @@ class PartnerBookingRequest extends BookingRequest
     public function rules(): array
     {
         return [
-            'package_id'        => ['required', 'exists:packages,id'],
-            'contact_method_id' => ['required', 'exists:contact_methods,id'],
-            'discount_id'       => ['required', 'exists:discounts,id'], 
-            'departure_date'    => ['required', 'date'],
-            'finished_date'     => ['required', 'date', 'after:departure_date'],
-            'adult'             => ['required', 'numeric', 'max:99'],
-            'child'             => ['required_with:adult', 'nullable', 'numeric', 'max:99'],
-            'note'              => ['string', 'nullable'],
-            'amount'            => ['required', 'decimal:0,2'],
+            'package_id'         => ['required', 'exists:packages,id'],
+            'contact_method_id'  => ['required', 'exists:contact_methods,id'],
+            'pickup_location_id' => ['required', 'exists:pickup_locations,id'],
+            'discount_id'        => ['required', 'exists:discounts,id'],
+            'departure_date'     => ['required', 'date'],
+            'finished_date'      => ['required', 'date', 'after:departure_date'],
+            'adult'              => ['required', 'numeric', 'max:99'],
+            'child'              => ['required_with:adult', 'nullable', 'numeric', 'max:99'],
+            'note'               => ['string', 'nullable'],
+            'amount'             => ['required', 'decimal:0,2'],
         ];
     }
 
