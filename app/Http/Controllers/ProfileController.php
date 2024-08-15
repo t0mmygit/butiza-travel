@@ -22,12 +22,11 @@ class ProfileController extends Controller
 {
     public function index(): Response
     {
-        // if (!$user) {
-        //     $userId = Auth::user()->id;
-        //     $user = User::with('posts', 'reviews', 'bookings')->findOrFail($userId);
-        // }
-        $userId = Auth::user()->id;
-        $user = User::with('posts', 'reviews', 'bookings')->findOrFail($userId);
+        $user = User::with([
+            'posts',
+            'reviews',
+            'bookings',
+        ])->findOrFail(auth()->id());
 
         return Inertia::render('Profile/Account', [
             'user' => $user,
@@ -51,10 +50,6 @@ class ProfileController extends Controller
     public function update(ProfileUpdateRequest $request): RedirectResponse
     {
         $request->user()->fill($request->validated());
-
-        if ($request->user()->isDirty('email')) {
-            $request->user()->email_verified_at = null;
-        }
 
         $request->user()->save();
 

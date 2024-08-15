@@ -18,7 +18,7 @@ const hasReservations = computed(() => props.reservations.length > 0);
     <div v-if="hasReservations" class="border border-surfaceBorder rounded sm:rounded-md">
         <DataTable :value="reservations">
             <Column field="id" header="Reservation. No" />
-            <Column field="tour.name" header="Tour Name" />
+            <Column field="package.tour.name" header="Tour Name" />
             <Column field="preferred_date" header="Preferred Date" />
             <Column header="Status">
                 <template #body="{ data }">

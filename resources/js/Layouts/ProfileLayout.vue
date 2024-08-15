@@ -35,6 +35,11 @@ const items = [
         label: 'Reviews',
         icon: 'pi pi-star',
         command: () => router.get(route('profile.review'))
+    },
+    {
+        label: 'Settings',
+        icon: 'pi pi-cog',
+        command: () => router.get(route('profile.settings'))
     }
 ];
 
@@ -52,6 +57,9 @@ const currentActive = (currentActive) => {
         case 'Review': 
             headTitle.value = items[3].label;
             return 3;
+        case 'Settings':
+            headTitle.value = items[4].label;
+            return 4;
     }
 }
 
@@ -61,6 +69,7 @@ const currentActive = (currentActive) => {
     <Head :title="headTitle" />
 
     <NavBar />
+
     <div v-if="$page.props.auth.user" class="bg-neutral">
         <div class="max-w-7xl sm:px-6 lg:px-8 mx-auto">
             <TabMenu 

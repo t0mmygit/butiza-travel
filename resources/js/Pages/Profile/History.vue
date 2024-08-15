@@ -21,10 +21,14 @@ const props = defineProps({
     history: {
         type: Object,
     },
+    flash: {
+        type: Object,
+    }
 });
 
 const activeTab = ref(null);
 const onReload = ref(false);
+const toast = useToast();
 
 function handleFilterHistory() {
     let modelType = convertToModelType();
@@ -65,6 +69,15 @@ function convertModelTypeToIndex() {
 
 onMounted(() => {
     activeTab.value = convertModelTypeToIndex();
+
+    if (props.flash.status && props.flash.message) {
+        toast.add({
+            severity: props.flash.status,
+            summary: props.flash.status,
+            detail: props.flash.message,
+            life: 3000,
+        });
+    }
 });
 
 </script>
@@ -73,7 +86,7 @@ onMounted(() => {
     <ProfileLayout section="History">
         <div class="my-6">
             <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
-                <Toast />
+                <Toast class="z-50" />
                 <h1 class="text-2xl">History</h1>
 
                 <main class="border border-surfaceBorder rounded sm:rounded-lg">

@@ -19,6 +19,7 @@ class ProfileHistoryController extends Controller
         return Inertia::render('Profile/History', [
             'model' => $model,
             'history' => $this->getHistory($model),
+            'flash' => session()->only(['status', 'message']),
         ]);
     }
 
@@ -42,7 +43,7 @@ class ProfileHistoryController extends Controller
     {
         $reservations = $this->user->reservations()->get();
 
-        return $reservations;
+        return $reservations->load(['package.tour']);
     }
 
     protected function getPaymentHistory(): Collection

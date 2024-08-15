@@ -32,7 +32,6 @@ const stats = [
     <ProfileLayout section="Account">
         <div class="flex max-w-7xl mx-auto sm:px-6 lg:px-8 py-8 gap-8">
             <div class="flex-1">
-                <!-- User Information -->
                 <div class="flex flex-col items-center p-4 sm:p-6 bg-white shadow sm:rounded-lg">
                     <div class="flex flex-col items-center mb-6">
                         <Avatar icon="pi pi-user" size="xlarge" shape="circle" class="size-40 mb-2" />
@@ -47,9 +46,6 @@ const stats = [
                         </div>
                     </div>
                 </div>
-            </div>
-            <div v-if="user.id === $page.props.auth.user.id" class="flex-1">
-                <ProfileEdit />
             </div>
         </div>
     </ProfileLayout>
