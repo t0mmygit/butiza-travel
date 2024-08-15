@@ -2,14 +2,23 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\ReservationRequest;
 use App\Models\ContactMethod;
+use App\Models\Reservation;
 use App\Models\Tour;
+use App\Models\User;
+use App\Services\ReservationService;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
 
 class ReservationController extends Controller
 {
+    public function __construct(
+        private ReservationService $reservationService
+    ) {}
+
     /**
      * Show the form for creating the resource.
      */
@@ -21,7 +30,7 @@ class ReservationController extends Controller
         ]);
 
         return Inertia::render('Tour/Reserve', [
-            'tour' => $tour,
+            'tour'            => $tour,
             'contact_methods' => ContactMethod::all(),
         ]);
     }
@@ -29,9 +38,16 @@ class ReservationController extends Controller
     /**
      * Store the newly created resource in storage.
      */
-    public function store(Request $request): never
+    public function store(ReservationRequest $request): RedirectResponse
     {
-        abort(404);
+        $reservation = $this->reservationService->storeReservation($request);
+
+        session()->flash('status', config('constant.toast.success'));
+        session()->flash('message', 'Reservation '. $reservation->id .' created successfully.');
+
+        return auth()->check()
+            ? redirect(route('profile.history', ['model' => 'reservation'], absolute: false))
+            : redirect(route('explore.index', absolute: false));
     }
 
     /**

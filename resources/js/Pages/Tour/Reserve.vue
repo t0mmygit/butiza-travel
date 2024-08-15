@@ -7,7 +7,6 @@ import PhoneInput from '@/Components/PhoneInput.vue';
 
 import Button from 'primevue/button';
 import Calendar from 'primevue/calendar';
-import Dropdown from '@/Components/Dropdown.vue';
 import Divider from 'primevue/divider';
 import InputNumber from 'primevue/inputnumber';
 import InlineMessage from 'primevue/inlinemessage';
@@ -15,6 +14,7 @@ import Tag from 'primevue/tag';
 
 import { computed, watch } from 'vue';
 import { useForm, usePage } from '@inertiajs/vue3';
+import dayjs from 'dayjs';
 
 const props = defineProps({
     tour: {
@@ -35,13 +35,6 @@ const contactIcons = [
     { whatsapp: 'pi pi-whatsapp' }
 ];
 
-const tourDetails = [
-    {
-        header: props.tour.name,
-        info: `${props.tour.duration} Days`
-    },
-];
-
 const form = useForm({
     package_id: null,
     contact_method_id: null,
@@ -54,6 +47,7 @@ const form = useForm({
     last_name: page.props.auth.user?.last_name ?? null,
     email: page.props.auth.user?.email ?? null,
     phone_number: page.props.auth.user?.phone_number ?? null,
+    amount: null,
     note: null,
 });
 
@@ -86,17 +80,23 @@ const minDate = computed(() => {
     return new Date(year, month, date);
 });
 
+const formattedDate = computed((date) => dayjs(date).format('DD MMMM YYYY'));
+
 const getNumberOfTraveller = computed(() => form.adult + form.child);
 
 const getSelectedPackage = computed(() => props.tour.packages.find(item => item.id === form.package_id));
-const parseSelectedPackagePrice = computed(() => getSelectedPackage.value.price * getNumberOfTraveller.value);
+const parseSelectedPackagePrice = computed(() => getSelectedPackage.value?.price * getNumberOfTraveller.value);
 const getSelectedPackagePrice = computed(() => useFormatPrice(parseSelectedPackagePrice));
+
+const getSelectedPickupLocation = computed(() => props.tour.pickup_location.find(item => item.id === form.pickup_location_id));
 
 const calculateTotalPrice = computed(() => parseSelectedPackagePrice.value * getNumberOfTraveller.value);
 const getTotalPrice = computed(() => useFormatPrice(calculateTotalPrice));
 
 const isPackageSelected = computed(() => form.package_id != null);
-const isNumberOfTravellerFilled = computed(() => getNumberOfTraveller.value >= props.tour.min_pax);
+const isDateSelected = computed(() => form.preferred_date != null);
+const isPickupLocationSelected = computed(() => form.pickup_location_id != null);
+const isNumberOfTravellerFilled = computed(() => getNumberOfTraveller.value > 0);
 const isNecessaryFieldsFilled = computed(() => isNumberOfTravellerFilled.value && isPackageSelected.value);
 
 const isFormValid = computed(() => {
@@ -104,11 +104,13 @@ const isFormValid = computed(() => {
 
     return (
         form.package_id != null &&
+        form.contact_method_id != null &&
+        form.pickup_location_id != null &&
+        form.preferred_date != null &&
         form.first_name &&
         form.last_name &&
         form.email &&
         form.phone_number != null &&
-        form.contact_method_id != null &&
         (totalTravellers >= props.tour.min_pax)
     );
 });
@@ -117,6 +119,10 @@ watch(() => form.adult, (newValue) => {
     if (newValue < 1) {
         form.reset('child');
     }
+});
+
+watch(calculateTotalPrice, (newValue) => {
+    form.amount = newValue;
 });
 
 </script>
@@ -129,7 +135,11 @@ watch(() => form.adult, (newValue) => {
                     <form>
                         <div class="flex flex-col gap-6">
 
-                            <CustomSectionCard index="1" title="Date Selection">
+                            <CustomSectionCard 
+                                index="1" 
+                                title="Date Selection"
+                                :error="form.errors.preferred_date"
+                            >
                                 <template #subtitle>
                                     <p>Please select a date.</p>
                                 </template>
@@ -198,7 +208,7 @@ watch(() => form.adult, (newValue) => {
                                     class="flex flex-1 justify-between border-surfaceBorder"
                                 >
                                     <span>{{ item.name }}</span>
-                                    <span>{{ item.price }}</span>
+                                    <span>{{ useFormatPrice(item.price) }}</span>
                                 </Button>
                             </CustomSectionCard>
 
@@ -216,7 +226,7 @@ watch(() => form.adult, (newValue) => {
                                 />
                             </CustomSectionCard>
 
-                            <CustomSectionCard index="4" title="Add traveller details">
+                            <CustomSectionCard index="5" title="Add traveller details">
                             <template #subtitle>
                                 <InlineMessage severity="info" class="mb-4">
                                     This traveller will serve as the contact person for the booking.
@@ -290,9 +300,23 @@ watch(() => form.adult, (newValue) => {
                         >
                     </template>
                     <div class="flex flex-col gap-2">
-                        <div v-for="tour in tourDetails">
-                            <h2 class="leading-tight">{{ tour.header }}</h2>
-                            <p>{{ tour.info }}</p>
+                        <div>
+                            <h2>{{ tour.name }}</h2>
+                            <p>{{ tour.duration }} {{ tour.duration > 1 ? 'Days' : 'Day' }}</p>
+                        </div>
+                        <div>
+                            <h2>Reserved Date</h2>
+                            <p>{{ isDateSelected ? formattedDate : 'Not selected' }}</p>
+                        </div>
+                        <div v-if="isPackageSelected">
+                            <h2>{{ getSelectedPackage.name }}</h2>
+                            <p>
+                                {{ useFormatPrice(getSelectedPackage.price) }}
+                            </p>
+                        </div>
+                        <div>
+                            <h2>Pick-up Location</h2>
+                            <p>{{ isPickupLocationSelected ? getSelectedPickupLocation.location : 'Not selected' }}</p>
                         </div>
                     </div>
                 </Card>
@@ -328,8 +352,8 @@ watch(() => form.adult, (newValue) => {
                         </div>
                     </InlineMessage>
                     <div v-else>
-                        <div class="flex flex-col gap-2">
-                            <div class="flex justify-between">
+                        <div class="flex flex-col">
+                            <div class="flex gap-2 justify-between">
                                 <span>{{ getSelectedPackage.name }}</span>
                                 <span>{{ getSelectedPackagePrice }}</span>
                             </div>
@@ -339,9 +363,9 @@ watch(() => form.adult, (newValue) => {
                                     Travellers x
                                     {{ getSelectedPackagePrice }}
                                 </small>
-                                <span>{{ getTotalPrice }}</span>
+                                <small>{{ getTotalPrice }}</small>
                             </div>
-                            <div v-if="hasDiscount" class="flex justify-between">
+                            <div v-if="hasDiscount" class="flex justify-between mt-4">
                                 <span>Discount</span>
                                 <span>{{ getDiscount }}</span>
                             </div>

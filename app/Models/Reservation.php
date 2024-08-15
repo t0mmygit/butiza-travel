@@ -11,11 +11,25 @@ class Reservation extends Model
 {
     use HasFactory;
 
-    protected $guarded = [];
+    protected $fillable = [
+        'package_id',
+        'contact_method_id',
+        'discount_id',
+        'pickup_location_id',
+        'preferred_date',
+        'adult',
+        'child',
+        'first_name',
+        'last_name',
+        'email',
+        'phone_number',
+        'note',
+        'status',
+    ];
 
-    public function tour(): BelongsTo
+    public function package(): BelongsTo
     {
-        return $this->belongsTo(Tour::class);
+        return $this->belongsTo(Package::class);
     }
 
     public function contactMethod(): BelongsTo
