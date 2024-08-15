@@ -37,12 +37,12 @@ Route::controller(CustomizeController::class)->group(function () {
 });
 
 Route::controller(TourController::class)->group(function () {
-    Route::get('/reserve', 'showReserveForm')->name('tour.reserve');
     Route::post('/submit-reservation', 'submitReservation')->name('tour.submit-reservation');
 });
 
 Route::controller(ReservationController::class)->group(function () {
     Route::get('/reservation/{tour:slug}', 'create')->name('reservation.create');
+    Route::post('/reservation', 'store')->name('reservation.store');
 });
 
 Route::get('/profile/bookmark', [ProfileController::class, 'bookmark'])->name('profile.bookmark');
@@ -106,7 +106,7 @@ Route::middleware('auth')->group(function () {
     
     Route::controller(ProfileController::class)->group(function () {
         Route::get('profile', 'index')->name('profile.account');
-        Route::get('profile/edit', 'edit')->name('profile.edit');
+        Route::get('profile/settings', 'edit')->name('profile.settings');
 
         Route::get('profile/review', 'review')->name('profile.review');
         Route::patch('profile', 'update')->name('profile.update');
