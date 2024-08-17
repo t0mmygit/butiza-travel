@@ -41,7 +41,7 @@ const items = (status) => {
         },
         {
             label: 'Cancel Payment',
-            icon: 'pi pi-trash',
+            icon: 'pi pi-times',
             visible: () => status === 'pending',
             disabled: true,
         },
@@ -71,7 +71,7 @@ const toggle = (event) => overlay.value.toggle(event);
 <template>
     <div v-if="hasPayments" class="border border-surfaceBorder rounded sm:rounded-md">
         <DataTable :value="payments">
-            <Column field="id" header="Reference ID" />
+            <Column field="reference" header="Reference No." />
             <Column header="Amount">
                 <template #body="{ data }">
                     {{ useFormatPrice(data.amount) }}
@@ -80,7 +80,7 @@ const toggle = (event) => overlay.value.toggle(event);
             <Column header="Payment Method">
                 <template #body="{ data }">
                     <span v-if="data.method != null">
-                        {{ data.number }}
+                        {{ data.method }}
                     </span>
                     <p v-else>N/A</p>
                 </template>
@@ -105,7 +105,7 @@ const toggle = (event) => overlay.value.toggle(event);
                             @click="toggle"
                         />
 
-                        <OverlayPanel  ref="overlay">
+                        <OverlayPanel ref="overlay">
                             <Menu :model="items(data.status)" />
                         </OverlayPanel>
                     </div>

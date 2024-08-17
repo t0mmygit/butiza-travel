@@ -1,16 +1,15 @@
 <script setup>
-import { useFormatPrice } from '@/Composables/formatPrice';
-import { useFormatText } from '@/Composables/formatText';
-import { router } from '@inertiajs/vue3';
 import { computed, ref } from 'vue';
-import dayjs from 'dayjs';
 
+import Button from 'primevue/button';
 import Column from 'primevue/column';
 import DataTable from 'primevue/datatable';
 import Tag from 'primevue/tag';
-import ModalMessage from '@/Components/Modal/ModalMessage.vue';
+import OverlayPanel from 'primevue/overlaypanel';
+import Menu from 'primevue/menu';
+import { useForm } from '@inertiajs/vue3';
 
-const emit = defineEmits(['open-review-dialog']);
+const emit = defineEmits(['cancel-booking']);
 
 const props = defineProps({
     bookings: {
@@ -18,24 +17,52 @@ const props = defineProps({
     },
 });
 
-const isVisible = ref(false);
+const form = useForm({
+    trip_status: null, 
+});
+
+const overlay = ref();
+
+const items = (data) => {
+    const status = ref(data.trip_status);
+
+    const items = ref([
+        {
+            label: 'Cancel Booking',
+            icon: 'pi pi-times',
+            visible: () => status.value !== 'pending',
+            command: () => cancelBooking(data), 
+        }
+    ]);
+
+    return items.value;
+};
+
+function cancelBooking(booking) {
+    form.trip_status = 'cancelled';
+
+    form.patch(route('booking.update', { booking: booking.id }), {
+        onSuccess: () => emit('cancel-booking', cancelBookingMessage),
+    });
+}
+
+const cancelBookingMessage = {
+    severity: 'info',
+    summary: 'Booking Cancelled',
+    detail: 'Your booking has been cancelled.',
+    life: 6000,
+};
 
 const hasBookings = computed(() => props.bookings.length > 0);
+
+const toggle = (event) => overlay.value.toggle(event);
 
 </script>
 
 <template>
-    <!-- <ModalMessage
-        :show="isVisible"
-        type="cancel"
-        title="Cancel Booking"
-        @cancel="isVisible = false"
-        @close="isVisible = false"
-        @trigger-action="cancelBooking"
-    /> -->
     <div v-if="hasBookings" class="border border-surfaceBorder rounded sm:rounded-lg">
         <DataTable :value="bookings">
-            <Column field="id" header="Booking. No" />
+            <Column field="reference" header="Reference. No" />
             <Column field="package.tour.name" header="Tour Name" />
             <Column header="Status">
                 <template #body="{ data }">
@@ -44,6 +71,17 @@ const hasBookings = computed(() => props.bookings.length > 0);
             </Column>
             <Column field="departure_date" header="Departure Date" />
             <Column field="finished_date" header="Finished Date" />
+            <Column #body="{ data }">
+                <Button
+                    icon="pi pi-ellipsis-h"
+                    text rounded
+                    @click="toggle"
+                />
+
+                <OverlayPanel ref="overlay">
+                    <Menu :model="items(data)" />
+                </OverlayPanel>
+            </Column>
         </DataTable>
     </div>
     <p v-else>Nothing here yet...</p>

@@ -67,6 +67,10 @@ function convertModelTypeToIndex() {
     }
 }
 
+function handleToast(toastMessage) {
+    toast.add(toastMessage);
+}
+
 onMounted(() => {
     activeTab.value = convertModelTypeToIndex();
 
@@ -84,11 +88,11 @@ onMounted(() => {
 
 <template>
     <ProfileLayout section="History">
+        <Toast class="z-50" />
         <div class="my-6">
             <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
                 <Toast class="z-50" />
                 <h1 class="text-2xl">History</h1>
-
                 <main class="border border-surfaceBorder rounded sm:rounded-lg">
                     <TabView 
                         v-model:activeIndex="activeTab"
@@ -96,25 +100,32 @@ onMounted(() => {
                     >
                         <div>
                             <TabPanel header="Booking">
+
                                 <BookingTable
                                     v-if="!onReload"
                                     :bookings="history"
+                                    @cancel-booking="handleToast"
                                 />
                                 <Skeleton v-else width="100%" height="4rem" />
+
                             </TabPanel>
                             <TabPanel header="Reservation">
+
                                 <ReservationTable
                                     v-if="!onReload"
                                     :reservations="history"
                                 />
                                 <Skeleton v-else width="100%" height="4rem" />
+                                
                             </TabPanel>
                             <TabPanel header="Payment">
+
                                 <PaymentTable
                                     v-if="!onReload"
                                     :payments="history"
                                 />
                                 <Skeleton v-else width="100%" height="4rem" />
+
                             </TabPanel>
                         </div>
                     </TabView>
