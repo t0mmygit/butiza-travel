@@ -85,7 +85,7 @@ const formattedDate = computed((date) => dayjs(date).format('DD MMMM YYYY'));
 const getNumberOfTraveller = computed(() => form.adult + form.child);
 
 const getSelectedPackage = computed(() => props.tour.packages.find(item => item.id === form.package_id));
-const parseSelectedPackagePrice = computed(() => getSelectedPackage.value?.price * getNumberOfTraveller.value);
+const parseSelectedPackagePrice = computed(() => getSelectedPackage.value?.price);
 const getSelectedPackagePrice = computed(() => useFormatPrice(parseSelectedPackagePrice));
 
 const getSelectedPickupLocation = computed(() => props.tour.pickup_location.find(item => item.id === form.pickup_location_id));
