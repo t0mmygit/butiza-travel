@@ -23,7 +23,7 @@ const props = defineProps({
 const emit = defineEmits(['update:amount']);
 
 const isPackageAndNumberOfTravellersFilled = computed(
-        () => props.tourPackage != null && (props.travellers >= props.minTraveller));
+        () => props.tourPackage != null && (props.travellers > 0));
 
 const calculatePackageTotalPrice = computed(() => props.tourPackage?.price * props.travellers);
 const calculateDiscount = computed(
@@ -54,7 +54,7 @@ watch(calculateTotalPriceAfterDiscount, (newValue) => {
             Your price breakdown will be displayed here.
         </InlineMessage>
         <div v-else class="flex flex-col">
-            <div class="flex justify-between">
+            <div class="flex gap-2 justify-between">
                 <span>{{ tourPackage?.name }}</span>
                 <span>{{ displayPackagePrice }}</span>
             </div>

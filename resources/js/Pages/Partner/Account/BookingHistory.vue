@@ -2,6 +2,7 @@
 import DataTable from 'primevue/datatable';
 import Column from 'primevue/column';
 import Tag from 'primevue/tag';
+import { computed } from 'vue';
 
 const props = defineProps({
     bookings: {
@@ -9,11 +10,13 @@ const props = defineProps({
     }
 });
 
+const hasBookings = computed(() => props.bookings.length > 0);
+
 </script>
 
 <template>
     <h1 class="mb-4">Booking History</h1>
-    <div class="bg-white border border-surfaceBorder rounded sm:rounded-md">
+    <div v-if="hasBookings" class="bg-white border border-surfaceBorder rounded sm:rounded-md">
         <DataTable
             :value="bookings"
             paginator :rows="5" :rowsPerPageOptions="[5, 10, 15]"
@@ -33,4 +36,5 @@ const props = defineProps({
             <Column field="finished_date" header="Finished Date" />
         </DataTable>
     </div>
+    <p v-else>Nothing here yet...</p>
 </template>

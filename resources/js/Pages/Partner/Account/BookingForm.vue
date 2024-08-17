@@ -30,6 +30,7 @@ const form = useForm({
     package_id: null,
     contact_method_id: props.partner.settings?.contact_method_id,
     discount_id: props.partner.discount?.id,
+    pickup_location_id: null,
     departure_date: null,
     finished_date: null,
     adult: 0,
@@ -39,7 +40,9 @@ const form = useForm({
 });
 
 const packages = computed(() => selectedTour.value?.packages);
+const pickupLocations = computed(() => selectedTour.value?.pickup_location);
 
+// TODO: Make this dynamic instead (set the min date by admin)
 const minDate = computed(() => {
     let today = new Date();
     let month = today.getMonth();
@@ -85,7 +88,7 @@ function setFinishedDate(date) {
     form.finished_date = dayjs(date).add(selectedTour.value?.duration, 'day').toDate();
 }
 
-const handleAmountUpdate = (amount) => {
+function handleAmountUpdate(amount) { 
     form.amount = amount;
 }
 
@@ -121,6 +124,7 @@ watch(() => form.adult, (newValue) => {
                     v-model="form.departure_date"
                     :minDate="minDate"
                     showIcon
+                    :manualInput="false"
                     iconDisplay="input"
                     placeholder="Select departure date"
                     :disabled="!selectedTour"
@@ -138,8 +142,22 @@ watch(() => form.adult, (newValue) => {
                     :disabled="!selectedTour"
                 />
             </CustomSectionCard>
+
+            <CustomSectionCard index="4" title="Pickup Location">
+                <template #subtitle>
+                    <p>Please select a pickup location.</p>
+                </template>
+                <Dropdown
+                    v-model="form.pickup_location_id"
+                    :options="pickupLocations"
+                    optionLabel="location"
+                    optionValue="id"
+                    placeholder="Select a pickup location"
+                    :disabled="!selectedTour"
+                />
+            </CustomSectionCard>
         
-            <CustomSectionCard index="4" title="Number of Travellers">
+            <CustomSectionCard index="5" title="Number of Travellers">
                 <template #subtitle>
                     <p v-if="selectedTour">Please select a minimum of {{ selectedTour?.min_pax }} travellers.</p>
                 </template>
@@ -181,7 +199,8 @@ watch(() => form.adult, (newValue) => {
                     </InputNumber>
                 </div>
             </CustomSectionCard>
-            <CustomSectionCard index="5" title="Note">
+
+            <CustomSectionCard index="6" title="Note">
                 <TextInput
                     v-model="form.note"
                     type="textarea"
@@ -196,7 +215,6 @@ watch(() => form.adult, (newValue) => {
                     :tour-package="selectedPackage"
                     :departure-date="form.departure_date"
                     :finished-date="form.finished_date"
-                    :travellers="getNumberOfTravellers"
                 />
                 <PriceBreakdownPanel
                     :min-traveller="selectedTour?.min_pax"

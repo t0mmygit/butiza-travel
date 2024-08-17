@@ -18,9 +18,6 @@ const props = defineProps({
     finishedDate: {
         type: [Date, null],
     },
-    travellers: {
-        type: [Number, null],
-    },
 });
 
 const displayTourDuration = computed(() => {
@@ -35,7 +32,6 @@ const displayFinishedDate = computed(() => dayjs(props.finishedDate).format('DD 
 
 const hasTour = computed(() => props.tour != null);
 const hasPackage = computed(() => props.tourPackage != null);
-const hasMinimumNumberOfTravellers = computed(() => props.travellers >= props.tour?.min_pax);
 
 </script>
 
@@ -63,11 +59,6 @@ const hasMinimumNumberOfTravellers = computed(() => props.travellers >= props.to
             <div v-if="finishedDate" class="flex flex-col">
                 <strong>Finished Date</strong>
                 <span>{{ displayFinishedDate }}</span>
-            </div>
-            
-            <div v-if="hasMinimumNumberOfTravellers" class="flex flex-col">
-                <strong>Number of Travellers</strong>
-                <span>{{ travellers }}</span>
             </div>
         </div>
     </Panel>

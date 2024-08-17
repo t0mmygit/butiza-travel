@@ -23,15 +23,16 @@ class PartnerFormRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'first_name' => ['required', 'string'],
-            'last_name' => ['required', 'string'],
-            'email' => ['required', 'email:rfc,dns'],
-            'phone_number' => ['required', 'numeric'],
+            'first_name'    => ['required', 'string'],
+            'last_name'     => ['required', 'string'],
+            'email'         => ['required'],
+            // TODO: fix email
+            'phone_number'  => ['required', 'numeric'],
             'business_name' => ['required', 'string'],
-            'website' => ['required', 'url'],
-            'country' => ['required', 'string'],
-            'city' => ['required', 'string'],
-            'message' => ['nullable', 'string', 'max:255'],
+            'website'       => ['required', 'url'],
+            'country'       => ['required', 'string'],
+            'city'          => ['required', 'string'],
+            'message'       => ['nullable', 'string', 'max:255'],
         ];
     }
 }
