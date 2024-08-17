@@ -37,12 +37,12 @@ class NewPartnerNotification extends Notification
 
     public function toDatabase(object $notifiable): array
     {
-        $notificationType = NotificationType::where('event', $this->databaseType($notifiable))->first();
-        $notification = NotificationMessage::where('notification_type_id', $notificationType->id)->first();
-
+        // $notificationType = NotificationType::where('event', $this->databaseType($notifiable))->first();
+        // $notification = NotificationMessage::where('notification_type_id', $notificationType->id)->first();
+        
         return [
-            'subject' => $notification->subject,
-            'body'    => $notification->message,
+            'subject' => 'New Partner Notification',
+            'body'    => 'Text Example',
         ];
     }
 }

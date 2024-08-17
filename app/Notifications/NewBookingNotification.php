@@ -33,7 +33,7 @@ class NewBookingNotification extends Notification implements ShouldQueue
     {
         return [
             'title'     => 'New Booking',
-            'body'      => 'You have a new booking ('. $this->booking->id .')!',
+            'body'      => 'You have a new booking ('. $this->booking->id .').',
             'icon'      => 'heroicon-o-check-circle',
             'iconColor' => 'success',
             'status'    => 'success',
