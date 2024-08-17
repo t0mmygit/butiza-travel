@@ -55,19 +55,4 @@ class BookingRequest extends FormRequest
             'adult.required_with' => 'The traveller field is required.',
         ];
     }
-
-    protected function prepareForValidation(): void
-    {
-        $this->merge([
-            'phone_number' => (string) $this->phone_number,
-        ]);
-    }
-
-    protected function passedValidation(): void
-    {
-        $this->merge([
-            'departure_date' => date('Y-m-d', strtotime($this->validated('departure_date'))),
-            'finished_date'  => date('Y-m-d', strtotime($this->validated('finished_date'))),
-        ]);
-    }
 }

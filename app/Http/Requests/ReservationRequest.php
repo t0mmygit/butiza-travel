@@ -38,12 +38,12 @@ class ReservationRequest extends FormRequest
             'preferred_date'     => ['required', 'date'],
             'adult'              => ['required_with:child', 'numeric', 'max:99'],
             'child'              => ['sometimes', 'nullable', 'numeric', 'max:99'],
-            'note'               => ['nullable', 'string', 'max:255'],
             'first_name'         => ['required', 'string'],
             'last_name'          => ['required', 'string'],
             'email'              => ['required', 'string', 'email:rfc,dns', 'lowercase'],
             'phone_number'       => ['required', 'string'],
             'amount'             => ['required', 'decimal:0,2'],
+            'note'               => ['nullable', 'string', 'max:255'],
         ];
     }
 
@@ -53,13 +53,6 @@ class ReservationRequest extends FormRequest
             'preferred_date.required' => 'The date field is required.',
             'adult.required_with' => 'The traveller field is required.',
         ];
-    }
-
-    protected function prepareForValidation(): void
-    {
-        $this->merge([
-            'phone_number' => (string) $this->phone_number,
-        ]);
     }
 
     protected function passedValidation(): void
