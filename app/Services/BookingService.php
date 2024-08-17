@@ -6,8 +6,8 @@ use App\Models\Availability;
 use App\Models\Booking;
 use App\Models\Payment;
 use App\Models\User;
+use Barryvdh\Debugbar\Facades\Debugbar;
 use Illuminate\Support\Arr;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
 
@@ -20,21 +20,19 @@ class BookingService
         protected Booking $booking, 
     ) { }
 
-    public function store(array $validatedData, Availability $availability): string 
+    public function store(array $data, Availability $availability): array | string
     {
-        $bookingData = $this->filterValidatedData($validatedData);
-        $amount = $validatedData['amount'];
-
+        
         try {
             DB::beginTransaction();
-
-            $this->booking = Booking::create($bookingData);
-
-            $this->attachUserToBooking();
-
-            $this->updateAvailabilitySlot($availability->id);
-
-            $payment = $this->associateBookingWithPayment($amount);
+            
+            $booking = $this->createBooking($data);
+            
+            $this->attachUserToBooking($booking);
+            
+            $this->updateAvailabilitySlot($availability);
+            
+            $payment = $this->associateBookingWithPayment($booking, Arr::get($data, 'amount'));
 
             $this->associateUserWithPayment($payment);
 
@@ -44,38 +42,42 @@ class BookingService
         } catch (\Exception $exception) {
             DB::rollBack();
 
-            return back()->with([
+            Debugbar::error($exception);
+
+            throw $exception;
+
+            return [
                 'status' => config('constant.toast.error'),
-                'message' => 'Unable to proceed with payment! ' . $exception->getMessage(),
-            ]);
+                'message' => 'Something went wrong. Unable to proceed with payment.',
+            ];
         }
     }
 
-    private function filterValidatedData(array $data): array
+    private function createBooking(array $data): Booking
     {
-        return Arr::except($data, 'amount'); 
+        return Booking::create(Arr::except($data, 'amount'));
     }
 
-    private function updateAvailabilitySlot(int $availabilityId): void
+    private function updateAvailabilitySlot(Availability $availability): void
     {
-        // TODO: Handle exceptions if availability is not found
-        Availability::findOrFail($availabilityId)->increment('occupied_slot');
+        $availability->increment('occupied_slot');
     }
     
-    private function attachUserToBooking(): void
+    private function attachUserToBooking(Booking $booking): void
     {   
-        if (! Auth::check()) return;
+        if (! auth()->check()) return;
         
-        $user = User::where('email', $this->booking->email)->firstOrFail();
-        $user->bookings()->attach($this->booking->id);
+        $user = User::where('email', $booking->email)->firstOrFail();
+        $user->bookings()->attach($booking->id);
     }
 
-    private function associateBookingWithPayment(float $amount): Payment
+    private function associateBookingWithPayment(Booking $booking, float $amount): Payment
     {
-        $payment = new Payment();
-
-        $payment->booking()->associate($this->booking->id);
-        $payment->fill(['amount' => $amount]);
+        $payment = Payment::make([
+            'amount' => $amount,
+        ]);
+        
+        $payment->booking()->associate($booking);
         $payment->save();
 
         return $payment;
@@ -83,6 +85,8 @@ class BookingService
 
     private function associateUserWithPayment(Payment $payment): void
     {
-        $payment->user()->attach(Auth::id());
+        if (! auth()->check()) return;
+
+        $payment->user()->attach(auth()->id());
     }
 }

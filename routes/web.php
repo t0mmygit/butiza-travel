@@ -28,16 +28,21 @@ Route::controller(UploadController::class)->group(function () {
     Route::delete('/upload/{path}', 'destroy')->name('upload.destroy');
 });
 
-Route::resource('/explore', ExploreController::class)->only(['index', 'show']);
-Route::resource('tour', TourController::class)->only(['index', 'show']);
-
 Route::controller(CustomizeController::class)->group(function () {
     Route::get('/customize', 'index')->name('customize');
     Route::post('/customize/store', 'store')->name('customize.store');
 });
 
+Route::resource('/explore', ExploreController::class)->only(['index', 'show']);
+
 Route::controller(TourController::class)->group(function () {
-    Route::post('/submit-reservation', 'submitReservation')->name('tour.submit-reservation');
+    Route::get('tour/{tour:slug}', 'show')->name('tour.show');
+});
+
+Route::controller(BookingController::class)->group(function () {
+    Route::get('tour/{tour:slug}/booking/{availability}', 'show')->name('booking.show');
+    Route::post('book/{availability}', 'store')->name('booking.store');
+    Route::patch('profile/booking/{booking}', 'update')->name('booking.update');
 });
 
 Route::controller(ReservationController::class)->group(function () {
@@ -49,12 +54,6 @@ Route::get('/profile/bookmark', [ProfileController::class, 'bookmark'])->name('p
 Route::post('/bookmark/{tour}', [BookmarkController::class, 'store'])->name('bookmark.store');
 Route::post('/customer-query', [CustomerSupportController::class, 'store'])->name('support.store');
 Route::delete('/bookmark/{bookmark}', [BookmarkController::class, 'destroy'])->name('bookmark.destroy');
-
-Route::controller(BookingController::class)->group(function () {
-    Route::get('/book/{availabilityId}', 'show')->name('booking.show');
-    Route::post('/book/{availability}', 'store')->name('booking.store');
-    Route::patch('/profile/booking/{booking}', 'update')->name('booking.update');
-});
 
 Route::controller(PaymentController::class)->group(function () {
     Route::get('/payment/{id}', 'create')->name('payment.create');

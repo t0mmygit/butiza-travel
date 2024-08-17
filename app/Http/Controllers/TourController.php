@@ -2,13 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-
 use App\Models\Tour;
-use App\Models\Reservation;
-use App\Models\ContactMethod;
-use App\Models\User;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -21,9 +15,10 @@ class TourController extends Controller
         ]);
     }
 
-    public function show($tourId): Response
+    public function show(Tour $tour): Response
     {
-        $tour = Tour::with([
+
+        $tour->load([
             'availabilities' => function ($query) {
                 $query->orderBy('departure_date', 'asc');
             },
@@ -38,7 +33,7 @@ class TourController extends Controller
             ],
             'packages.activities:name',
             'pickupLocation',
-        ])->findOrFail($tourId);
+        ])->get();
 
         return Inertia::render('Tour/Index', [
             'tour' => $tour,

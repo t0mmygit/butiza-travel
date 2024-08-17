@@ -18,7 +18,7 @@ import TourStepper from '@/Components/Tour/TourStepper.vue';
 import TourIconBox from '@/Components/Tour/TourIconBox.vue';
 import TourTextBox from '@/Components/Tour/TourTextBox.vue';
 
-import { router, useForm, usePage } from '@inertiajs/vue3';
+import { router, usePage } from '@inertiajs/vue3';
 import { computed, defineProps, ref } from 'vue';
 import { useFormatText } from '@/Composables/formatText';
 import { useFormatPrice } from '@/Composables/formatPrice';
@@ -31,10 +31,6 @@ const props = defineProps({
         type: Object,
         required: true,
     }
-});
-
-const form = useForm({
-    tour_id: props.tour.id
 });
 
 const maximumMeter = ref(0);
@@ -104,7 +100,7 @@ const reserveTour = () => {
 
 const bookDate = (availabilityId) => {
     try {
-        form.get(route('booking.show', { availabilityId: availabilityId }));
+        router.get(route('booking.show', { tour: props.tour.slug, availability: availabilityId }));
     } catch (error) {
         console.error('Error reserving tour:', error);
     }
@@ -320,16 +316,6 @@ const getPackageActivities = () => {
 
         <!-- Section -->
         <div class="mx-auto h-full lg:w-5/6 xl:max-w-7xl mb-6">
-            <!-- Navigation Menu -->
-            <!-- <div class="bg-white m-auto h-12 rounded-full shadow w-fit flex items-center justify-around gap-16 px-8 font-bold">
-                <a href="#detail">Details</a>
-                <a href="#itinerary">Itinerary</a>
-                <a href="#available">Dates & Availability</a>
-                <a href="#note">Notes</a>
-                <a href="#review">Reviews</a>
-            </div> -->
-
-            <!-- Details -->
             <TourContent id="detail" title="Details">
                 <div class="flex gap-4">
                     <TourIconBox>
@@ -379,34 +365,45 @@ const getPackageActivities = () => {
 
             <!-- Availability -->
             <TourContent id="available" title="Dates & Availability">
-                <DataTable v-if="tour.availabilities.length != 0" :value="tour.availabilities" stripedRows tableStyle="max-width: 100%">
-                    <Column header="Departure Date">
-                        <template #body="{ data }">
-                            <span>{{ dayjs(data.departure_date).format('DD MMM YYYY') }}</span>
-                        </template>
-                    </Column>
-                    <Column header="Finished Date">
-                        <template #body="{ data }">
-                            <span>{{ dayjs(data.finished_date).format('DD MMM YYYY') }}</span>
-                        </template>
-                    </Column>
-                    <Column header="Availability">
-                        <template #body="{ data }">
-                            <span v-if="data.maximum_slot > data.occupied_slot">{{ data.maximum_slot - data.occupied_slot }} slots left</span>
-                            <h4 v-else class="text-error">Occupied</h4>
-                        </template>
-                    </Column>
-                    <Column>
-                        <template #body="{ data }">
-                            <Button 
-                                label="Book"
-                                :disabled="data.maximum_slot <= data.occupied_slot"
-                                @click="bookDate(data.pivot.availability_id)"
-                                text rounded outlined
-                            />
-                        </template>
-                    </Column>
-                </DataTable>
+                <div v-if="tour.availabilities.length != 0">
+                    <DataTable :value="tour.availabilities" stripedRows tableStyle="max-width: 100%">
+                        <Column header="Departure Date">
+                            <template #body="{ data }">
+                                <span>{{ dayjs(data.departure_date).format('DD MMM YYYY') }}</span>
+                            </template>
+                        </Column>
+                        <Column header="Finished Date">
+                            <template #body="{ data }">
+                                <span>{{ dayjs(data.finished_date).format('DD MMM YYYY') }}</span>
+                            </template>
+                        </Column>
+                        <Column header="Availability">
+                            <template #body="{ data }">
+                                <span v-if="data.maximum_slot > data.occupied_slot">{{ data.maximum_slot - data.occupied_slot }} slots left</span>
+                                <h4 v-else class="text-error">Occupied</h4>
+                            </template>
+                        </Column>
+                        <Column>
+                            <template #body="{ data }">
+                                <Button
+                                    label="Book"
+                                    :disabled="data.maximum_slot <= data.occupied_slot"
+                                    @click="bookDate(data.pivot.availability_id)"
+                                    text rounded outlined
+                                />
+                            </template>
+                        </Column>
+                    </DataTable>
+                    <div class="flex items-center mt-2">
+                        <p>Prefer a specific date? Click</p>
+                        <Button 
+                            label="Reserve" 
+                            @click="reserveTour" 
+                            text
+                        />
+                        <p>to choose your preferred date.</p>
+                    </div>
+                </div>
                 <div v-else>
                     <p>No available dates currently. Click <a href="#reserve" class="underline">'Reserve'</a> to reserve a slot for this tour.</p>
                 </div>

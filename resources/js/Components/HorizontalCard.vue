@@ -23,9 +23,7 @@ const emit = defineEmits(['compare-tour', 'host-tour', 'add-bookmark'])
 
 const viewTour = () => {
     try {
-        router.get(route('tour.show', {
-            id: props.tour.id
-        }));
+        router.get(route('tour.show', { tour: props.tour.slug }));
     } catch (error) {
         console.error('Error viewing tours:', error);
     }

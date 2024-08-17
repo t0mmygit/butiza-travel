@@ -19,28 +19,26 @@ class BookingController extends Controller
         protected BookingService $bookingService
     ) {}
 
-    public function update(Booking $booking): RedirectResponse
+    public function update(Request $request, Booking $booking): RedirectResponse
     {
         $this->authorize('update', $booking);
 
-        // Currently status only update to 'cancelled'
-        $booking->status = 'cancelled';
+        $booking->update([
+            'trip_status' => $request['trip_status'],
+        ]);
         $booking->save();
+        // TODO: status is not being updated as expected
 
-        return redirect()->route('profile.history');
+        return redirect(route('profile.history', absolute: false));
     }
 
-    public function show(Request $request, $availabilityId): Response
+    public function show(Tour $tour, Availability $availability): Response
     {   
-        $tour = Tour::with([
-                    'packages.activities',
-                    'pickupLocation'
-                ])
-                ->findOrFail($request->tour_id);
+        $tour->load(['packages.activities','pickupLocation'])->get();
 
         return Inertia::render('Tour/Book', [
             'tour'            => $tour,
-            'availability'    => Availability::findOrFail($availabilityId),
+            'availability'    => $availability,
             'contact_methods' => ContactMethod::all(),
             'flash'           => session()->only(['status', 'message']),
          ]);
@@ -48,8 +46,10 @@ class BookingController extends Controller
 
     public function store(BookingRequest $request, Availability $availability)
     {
-        $paymentId = $this->bookingService->store($request->validated(), $availability);
+        $response = $this->bookingService->store($request->validated(), $availability);
 
-        return redirect(route('payment.show', ['id' => $paymentId], absolute: true));    
+        return is_array($response)
+                ? back()->with(['status' => $response['status'], 'message' => $response['message']])
+                : redirect(route('payment.create', ['id' => $response], absolute: true));
     }
 }
