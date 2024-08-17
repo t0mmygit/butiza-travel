@@ -8,20 +8,15 @@ use App\Models\User;
 use App\Notifications\NewReservationNotification;
 use App\Notifications\UserReservationNotification;
 use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Notification;
 
 class ReservationService
 {
-    public function storeReservation($request): Reservation
+    public function storeReservation(ReservationRequest $request): Reservation
     {
         $reservation = $this->createReservation($request);
 
-        $user = $this->getUser();
-
-        if ($user instanceof User) {
-            $user->reservations()->attach($reservation->id);
-        }
+        $user = $this->attachUserToReservation($reservation);
 
         $this->handleNotification($user, $reservation);
 
@@ -30,30 +25,35 @@ class ReservationService
 
     private function createReservation(ReservationRequest $request): Reservation
     {
-        $reservation = Reservation::create(
-            $request->only([
-                'package_id',
-                'contact_method_id',
-                'discount_id',
-                'pickup_location_id',
-                'preferred_date',
-                'adult',
-                'child',
-                'first_name',
-                'last_name',
-                'email',
-                'phone_number',
-                'note',
-                'amount',
-            ])
-        );
-
-        return $reservation;
+        $data = $request->only([
+            'package_id',
+            'contact_method_id',
+            'discount_id',
+            'pickup_location_id',
+            'preferred_date',
+            'adult',
+            'child',
+            'first_name',
+            'last_name',
+            'email',
+            'phone_number',
+            'amount',
+            'note',
+        ]);
+        
+        return Reservation::create($data);
     }
 
-    private function getUser(): User | null
+    private function attachUserToReservation(Reservation $reservation): User | null
     {
-        return auth()->check() ? User::findOrFail(auth()->id()) : null;
+        if (! auth()->check()) {
+            return null;
+        }
+
+        $user = User::findOrFail(auth()->id());
+        $user->reservations()->attach($reservation->id);
+
+        return $user;
     }
 
     private function handleNotification(?User $user, Reservation $reservation)
