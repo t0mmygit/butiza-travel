@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\BookingStatus;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Auth;
@@ -17,9 +18,10 @@ class ProfileHistoryController extends Controller
         $this->user = User::find(Auth::id());
 
         return Inertia::render('Profile/History', [
-            'model' => $model,
+            'model'   => $model,
             'history' => $this->getHistory($model),
-            'flash' => session()->only(['status', 'message']),
+            'cases'   => $this->getModelCases($model),
+            'flash'   => session()->only(['status', 'message']),
         ]);
     }
 
@@ -27,8 +29,15 @@ class ProfileHistoryController extends Controller
     {
         return match ($model) {
             'reservation' => $this->getReservationHistory(),
-            'payment' => $this->getPaymentHistory(),
-            default => $this->getBookingHistory(),
+            'payment'     => $this->getPaymentHistory(),
+            default       => $this->getBookingHistory(),
+        };
+    }
+
+    protected function getModelCases(string $model): array
+    {
+        return match ($model) {
+            default => BookingStatus::values(),
         };
     }
 
