@@ -7,14 +7,6 @@ return [
         'partner' => 'partner',
     ],
 
-    'notifications' => [
-        'new_partner' => [
-            'sender_id' => '1',
-            'subject' => 'Lorem Ipsum',
-            'message' => 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
-        ]
-    ],
-
     'test' => [
         'partner' => [
             'first_name' => 'John',
@@ -32,7 +24,7 @@ return [
 
     'toast' => [
         'success' => 'success',
-        'error' => 'danger',
+        'error' => 'error',
         'warn' => 'warning',
         'info' => 'info',
         'secondary' => 'secondary',
