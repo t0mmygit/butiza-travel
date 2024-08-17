@@ -17,8 +17,13 @@ class PartnerRequestController extends Controller
 
     public function store(Request $request): RedirectResponse
     {
-        $partner = new Partner;
-        $partner->fill($request->all());
+        $partner = Partner::make($request->only([
+                'country',
+                'business_name',
+                'city',
+                'website',
+                'message',
+        ]));
 
         $partner->user()->associate(auth()->user());
         $partner->save();
