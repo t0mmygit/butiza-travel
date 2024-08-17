@@ -39,10 +39,6 @@ const navButton = [
         icon: 'pi pi-home'
     },
     {
-        label: 'Bookmarks',
-        icon: 'pi pi-bookmark'
-    },
-    {
         label: 'Notifications',
         icon: 'pi pi-bell'
     },
