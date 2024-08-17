@@ -2,7 +2,7 @@
 
 namespace App\Providers;
 
-use App\Actions\StoreNotificationTypes;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -17,11 +17,9 @@ class AppServiceProvider extends ServiceProvider
 
     /**
      * Bootstrap any application services.
-     */
+    */
     public function boot(): void
     {
-        if (env('APP_ENV') === 'local') {
-            (new StoreNotificationTypes)();
-        }
+        Model::preventSilentlyDiscardingAttributes(app()->isLocal());
     }
 }
