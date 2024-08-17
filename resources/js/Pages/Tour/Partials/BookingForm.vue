@@ -9,8 +9,6 @@ import InputNumber from 'primevue/inputnumber';
 import InlineMessage from 'primevue/inlinemessage';
 import Divider from 'primevue/divider';
 import Tag from 'primevue/tag';
-import Toast from 'primevue/toast';
-import { useToast } from 'primevue/usetoast';
 
 import { computed, watch } from 'vue';
 import { useForm, usePage } from '@inertiajs/vue3';
@@ -38,7 +36,6 @@ const props = defineProps({
 });
 
 const page = usePage();
-const toast = useToast();
 
 const contactIcons = [
     { call: 'pi pi-phone' },
@@ -69,10 +66,6 @@ const submit = () => {
     form.post(route('booking.store', { availability: props.availability.id}), {
         preserveScroll: true,
         onSuccess: () => form.reset(),
-        onError: (error) => {
-            console.error(error);
-            toast.add({ severity: 'error', summary: 'Error', detail: 'Please fill in all required fields correctly.', life: 3000 });
-        },
     });
 };
 
@@ -116,8 +109,8 @@ const getSelectedPackage = computed(() => props.tour.packages.find(item => item.
 const parseSelectedPackagePrice = computed(() => parseFloat(getSelectedPackage.value?.price));
 const getSelectedPackagePrice = computed(() => useFormatPrice(parseSelectedPackagePrice));
 
-const getTotalPrice = computed(() => useFormatPrice(calculateTotalPrice));
 const calculateTotalPrice = computed(() => parseSelectedPackagePrice.value * getNumberOfTraveller.value);
+const getTotalPrice = computed(() => useFormatPrice(calculateTotalPrice));
 
 const isPackageSelected = computed(() => form.package_id != null);
 const isNumberOfTravellerFilled = computed(() => getNumberOfTraveller.value >= props.tour.min_pax);
@@ -152,7 +145,6 @@ watch(() => form.adult, (newValue) => {
 
 <template>
     <div class="flex w-full gap-6 my-6">
-        <Toast />
         <div class="flex w-full">
             <div class="mx-auto grow max-w-full">
                 <form>
