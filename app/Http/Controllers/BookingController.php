@@ -8,6 +8,7 @@ use Illuminate\Http\RedirectResponse;
 use App\Models\Availability;
 use App\Models\Booking;
 use App\Models\ContactMethod;
+use App\Models\Payment;
 use App\Models\Tour;
 use App\Services\BookingService;
 use Inertia\Inertia;
@@ -21,13 +22,20 @@ class BookingController extends Controller
 
     public function update(Request $request, Booking $booking): RedirectResponse
     {
+        // TODO: Separate of Concerns
+        // if (auth()->check()) {
+            // }
         $this->authorize('update', $booking);
 
         $booking->update([
-            'trip_status' => $request['trip_status'],
+            'trip_status' => $request->input('trip_status'),
         ]);
-        $booking->save();
-        // TODO: status is not being updated as expected
+
+        if ($booking->trip_status === Booking::STATUS_CANCELLED) {
+            $booking->payment->update([
+                'status' => Payment::STATUS_CANCELLED,
+            ]);
+        }
 
         return redirect(route('profile.history', absolute: false));
     }
@@ -50,6 +58,6 @@ class BookingController extends Controller
 
         return is_array($response)
                 ? back()->with(['status' => $response['status'], 'message' => $response['message']])
-                : redirect(route('payment.create', ['id' => $response], absolute: true));
+                : redirect(route('payment.create', ['id' => $response], absolute: false));
     }
 }

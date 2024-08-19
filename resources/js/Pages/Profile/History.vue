@@ -4,6 +4,7 @@ import BookingTable from '@/Pages/Profile/HistoryPartials/BookingTable.vue';
 import ReservationTable from '@/Pages/Profile/HistoryPartials/ReservationTable.vue';
 import PaymentTable from '@/Pages/Profile/HistoryPartials/PaymentTable.vue';
 
+import ConfirmDialog from 'primevue/confirmdialog';
 import Skeleton from 'primevue/skeleton';
 import TabView from 'primevue/tabview';
 import TabPanel from 'primevue/tabpanel';
@@ -89,9 +90,9 @@ onMounted(() => {
 <template>
     <ProfileLayout section="History">
         <Toast class="z-50" />
+        <ConfirmDialog />
         <div class="my-6">
             <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
-                <Toast class="z-50" />
                 <h1 class="text-2xl">History</h1>
                 <main class="border border-surfaceBorder rounded sm:rounded-lg">
                     <TabView 
@@ -114,6 +115,7 @@ onMounted(() => {
                                 <ReservationTable
                                     v-if="!onReload"
                                     :reservations="history"
+                                    @cancel-reservation="handleToast"
                                 />
                                 <Skeleton v-else width="100%" height="4rem" />
                                 

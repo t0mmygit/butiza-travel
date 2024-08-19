@@ -33,8 +33,8 @@ enum BookingStatus: string
     {
         return match($this) {
             self::CONFIRMED => 'Confirmed',
-            self::PROGRESS => 'In Progress',
-            self::PENDING => 'Pending',
+            self::PROGRESS  => 'In Progress',
+            self::PENDING   => 'Pending',
             self::COMPLETED => 'Completed',
             self::CANCELLED => 'Cancelled',
         };
@@ -44,8 +44,8 @@ enum BookingStatus: string
     {
         return match($this) {
             self::CONFIRMED => 'info',
-            self::PROGRESS => 'secondary',
-            self::PENDING => 'secondary',
+            self::PROGRESS  => 'secondary',
+            self::PENDING   => 'secondary',
             self::COMPLETED => 'success',
             self::CANCELLED => 'danger',
         };

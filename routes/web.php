@@ -41,13 +41,14 @@ Route::controller(TourController::class)->group(function () {
 
 Route::controller(BookingController::class)->group(function () {
     Route::get('tour/{tour:slug}/booking/{availability}', 'show')->name('booking.show');
-    Route::post('book/{availability}', 'store')->name('booking.store');
-    Route::patch('profile/booking/{booking}', 'update')->name('booking.update');
+    Route::post('booking/{availability}', 'store')->name('booking.store');
+    Route::patch('booking/{booking}', 'update')->name('booking.update');
 });
 
 Route::controller(ReservationController::class)->group(function () {
-    Route::get('/reservation/{tour:slug}', 'create')->name('reservation.create');
-    Route::post('/reservation', 'store')->name('reservation.store');
+    Route::get('reservation/{tour:slug}', 'create')->name('reservation.create');
+    Route::post('reservation', 'store')->name('reservation.store');
+    Route::patch('reservation/{reservation}', 'update')->name('reservation.update');
 });
 
 Route::get('/profile/bookmark', [ProfileController::class, 'bookmark'])->name('profile.bookmark');

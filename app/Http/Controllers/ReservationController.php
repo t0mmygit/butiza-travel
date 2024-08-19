@@ -35,9 +35,6 @@ class ReservationController extends Controller
         ]);
     }
 
-    /**
-     * Store the newly created resource in storage.
-     */
     public function store(ReservationRequest $request): RedirectResponse
     {
         $reservation = $this->reservationService->storeReservation($request);
@@ -50,35 +47,16 @@ class ReservationController extends Controller
             : redirect(route('explore.index', absolute: false));
     }
 
-    /**
-     * Display the resource.
-     */
-    public function show()
+    public function update(Request $request, Reservation $reservation): RedirectResponse
     {
-        //
-    }
+        // TODO: Authorize authenticated user
 
-    /**
-     * Show the form for editing the resource.
-     */
-    public function edit()
-    {
-        //
-    }
+        $reservation->update([
+            'status' => $request->input('status'),
+        ]);
 
-    /**
-     * Update the resource in storage.
-     */
-    public function update(Request $request)
-    {
-        //
-    }
+        // TODO: Handle reservation cancellation
 
-    /**
-     * Remove the resource from storage.
-     */
-    public function destroy(): never
-    {
-        abort(404);
+        return redirect(route('profile.history', ['model' => 'reservation'], absolute: false));
     }
 }
