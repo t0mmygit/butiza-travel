@@ -3,8 +3,6 @@ import '../css/app.css';
 import 'primeicons/primeicons.css';
 import 'primevue/resources/themes/aura-light-indigo/theme.css';
 
-// import './bootstrap';
-
 import { createApp, h } from 'vue';
 import { createInertiaApp } from '@inertiajs/vue3';
 import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
@@ -13,6 +11,7 @@ import { ZiggyVue } from '../../vendor/tightenco/ziggy';
 // PrimeVue Plugin 
 import PrimeVue from 'primevue/config';
 import ToastService from 'primevue/toastservice';
+import ConfirmationService from 'primevue/confirmationservice';
 import BadgeDirective from 'primevue/badgedirective';
 
 import ApplicationLogo from '@/Components/ApplicationLogo.vue';
@@ -29,6 +28,7 @@ createInertiaApp({
             .use(ZiggyVue)
             .use(PrimeVue)
             .use(ToastService)
+            .use(ConfirmationService)
             .directive('badge', BadgeDirective)
             .component('ApplicationLogo', ApplicationLogo)
             .component('ModalAuthenticate', ModalAuthenticate)
