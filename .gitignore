@@ -5,6 +5,7 @@
 /public/hot
 /public/storage
 /storage/*.key
+/config/debugbar.php
 /vendor
 .env
 .env.backup
