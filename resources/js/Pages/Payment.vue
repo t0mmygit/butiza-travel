@@ -28,7 +28,6 @@ const form = useForm({
 const submit = () => {
     // TODO: Encrypt the payment ID
     form.patch(route('payment.update', { id: props.payment.id }), {
-        onSuccess: () => console.log('Success!'),
         onError: (error) => handleToast('error', 'Error', `Failed to update payment method. ${error.response.data.message}`),
         onFinish: () => form.reset(),
     });
