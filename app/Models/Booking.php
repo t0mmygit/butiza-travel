@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-use App\Enums\BookingStatus;
 use App\Traits\HasReferenceNumber;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -33,10 +32,6 @@ class Booking extends Model
         'email',
         'phone_number',
         'trip_status',
-    ];
-
-    protected $casts = [
-        'trip_status' => BookingStatus::class
     ];
 
     public function user(): BelongsToMany
