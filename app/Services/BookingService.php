@@ -22,7 +22,6 @@ class BookingService
 
     public function store(array $data, Availability $availability): array | string
     {
-        
         try {
             DB::beginTransaction();
             
@@ -43,8 +42,6 @@ class BookingService
             DB::rollBack();
 
             Debugbar::error($exception);
-
-            throw $exception;
 
             return [
                 'status' => config('constant.toast.error'),

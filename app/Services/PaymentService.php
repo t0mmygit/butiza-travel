@@ -6,12 +6,11 @@ use App\Events\BookingPaid;
 use App\Http\Requests\PaymentUpdateRequest;
 use App\Models\Booking;
 use App\Models\Payment;
+use App\Models\User;
 use Illuminate\Contracts\Encryption\DecryptException;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Crypt;
-use Illuminate\Support\Facades\Redirect;
 
 class PaymentService
 {
@@ -63,7 +62,7 @@ class PaymentService
     private function handleSuccessfulPayment(Payment $payment): RedirectResponse
     {
         // TODO: Generate Invoice
-        $booking = $payment->booking()->get()->first();
+        $booking = $payment->booking;
 
         $booking->update([
             'trip_status' => Booking::STATUS_CONFIRMED,
@@ -81,9 +80,7 @@ class PaymentService
 
     private function handleCancelledPayment(Payment $payment): RedirectResponse
     {
-        $booking = $payment->booking()->get()->first();
-
-        $booking->update([
+        $payment->booking->update([
             'trip_status' => Booking::STATUS_CANCELLED,
         ]);
 
@@ -95,7 +92,7 @@ class PaymentService
 
     private function redirectAfterSuccessfulPayment(): RedirectResponse
     {
-        if (! Auth::check()) {
+        if (! auth()->check()) {
             return $this->defaultRedirect();
         }
 
@@ -120,7 +117,7 @@ class PaymentService
 
     private function getCurrentAuthenticatedUserRole(): Collection
     {
-        return Auth::user()->getRoleNames();
+        return auth()->user()->getRoleNames();
     }
 
     private function decrypt(string $encryptedId): string
