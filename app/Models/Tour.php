@@ -57,4 +57,9 @@ class Tour extends Model
     {
         return $this->hasMany(PickupLocation::class);
     }
+
+    public function discount(): BelongsTo
+    {
+        return $this->belongsTo(Discount::class);
+    }
 }
