@@ -46,7 +46,9 @@ const getTourName = () => {
 }
 
 const getPaymentPackagePrice = () => {
-    return useFormatPrice(props.payment.booking.package.price);
+    const price = parseFloat(props.payment.amount);
+
+    return useFormatPrice(price, 2, false);
 }
 
 </script>
