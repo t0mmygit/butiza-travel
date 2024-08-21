@@ -22,11 +22,6 @@ class BookingController extends Controller
 
     public function update(Request $request, Booking $booking): RedirectResponse
     {
-        // TODO: Separate of Concerns
-        // if (auth()->check()) {
-            // }
-        $this->authorize('update', $booking);
-
         $booking->update([
             'trip_status' => $request->input('trip_status'),
         ]);
@@ -42,7 +37,11 @@ class BookingController extends Controller
 
     public function show(Tour $tour, Availability $availability): Response
     {   
-        $tour->load(['packages.activities','pickupLocation'])->get();
+        $tour->load([
+            'packages.activities',
+            'pickupLocation',
+            'discount:id,type,percentage'
+            ])->get();
 
         return Inertia::render('Tour/Book', [
             'tour'            => $tour,

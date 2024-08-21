@@ -86,11 +86,6 @@ const form = useForm({
     amount: 0,
 });
 
-function getDiscount() {
-    // TODO: get the discount
-    return null;
-}
-
 const getContactMethodIcon = (iconName) => {
     const icon = contactIcons.find(icon => iconName.toLowerCase() in icon );
     return icon ? icon[iconName.toLowerCase()] : '';
@@ -101,10 +96,9 @@ const setPickupLocationId = (pickUpLocationId) => form.pickup_location_id = pick
 const setContactMethodId = (contactMethodId) => form.contact_method_id = contactMethodId;
 
 // TODO: Discount Implementation
-const hasDiscount = computed(() => false);
+const hasDiscount = computed(() => props.tour.discount != null);
 
 const getNumberOfTraveller = computed(() => form.adult + form.child);
-
 const getSelectedPackage = computed(() => props.tour.packages.find(item => item.id === form.package_id));
 const parseSelectedPackagePrice = computed(() => parseFloat(getSelectedPackage.value?.price));
 const getSelectedPackagePrice = computed(() => useFormatPrice(parseSelectedPackagePrice));
@@ -112,9 +106,16 @@ const getSelectedPackagePrice = computed(() => useFormatPrice(parseSelectedPacka
 const calculateTotalPrice = computed(() => parseSelectedPackagePrice.value * getNumberOfTraveller.value);
 const getTotalPrice = computed(() => useFormatPrice(calculateTotalPrice));
 
+const calculateDiscountedPrice = computed(() => calculateTotalPrice.value * (props.tour.discount.percentage / 100));
+const calculateDiscount = computed(() => calculateTotalPrice.value - calculateDiscountedPrice.value);
+
+const getDiscount = computed(() => useFormatPrice(calculateDiscountedPrice.value, 2, false, '-'));
+const getTotalPriceAfterDiscount = computed(() => useFormatPrice(calculateDiscount.value, 2, false));
+
 const isPackageSelected = computed(() => form.package_id != null);
-const isNumberOfTravellerFilled = computed(() => getNumberOfTraveller.value >= props.tour.min_pax);
+const isNumberOfTravellerFilled = computed(() => getNumberOfTraveller.value > 0);
 const isNecessaryFieldsFilled = computed(() => isNumberOfTravellerFilled.value && isPackageSelected.value);
+const getFinalPrice = computed(() => hasDiscount ? calculateDiscount.value : getTotalPrice.value);
 
 const isFormValid = computed(() => {
     const totalTravellers = form.adult + form.child;
@@ -131,7 +132,7 @@ const isFormValid = computed(() => {
     );
 });
 
-watch(calculateTotalPrice, (newValue) => {
+watch(getFinalPrice, (newValue) => {
     form.amount = newValue;
 });
 
@@ -335,29 +336,33 @@ watch(() => form.adult, (newValue) => {
                         <span v-if="!isPackageSelected"> package type</span>.
                     </div>
                 </InlineMessage>
-                <div v-else>
-                    <div class="flex flex-col gap-2">
-                        <div class="flex justify-between">
-                            <span>{{ getSelectedPackage.name }}</span>
-                            <span>{{ getSelectedPackagePrice }}</span>
+                <div v-else class="flex flex-col">
+                    <div class="flex gap-2 justify-between">
+                        <span>{{ getSelectedPackage.name }}</span>
+                        <span>{{ getSelectedPackagePrice }}</span>
+                    </div>
+                    <div class="flex justify-between mb-4">
+                        <small>
+                            {{ getNumberOfTraveller }}
+                            Travellers x
+                            {{ getSelectedPackagePrice }}
+                        </small>
+                        <small>{{ getTotalPrice }}</small>
+                    </div>
+
+                    <div v-if="hasDiscount" class="flex justify-between">
+                        <div class="flex flex-col">
+                            <span>
+                                {{ tour.discount.percentage }}% Discount
+                            </span>
+                            <small>{{ tour.discount.type }}</small>
                         </div>
-                        <div class="flex justify-between">
-                            <small>
-                                {{ getNumberOfTraveller }}
-                                Travellers x
-                                {{ getSelectedPackagePrice }}
-                            </small>
-                            <span>{{ getTotalPrice }}</span>
-                        </div>
-                        <div v-if="hasDiscount" class="flex justify-between">
-                            <span>Discount</span>
-                            <span>{{ getDiscount }}</span>
-                        </div>
+                        <span class="text-error">{{ getDiscount }}</span>
                     </div>
                     <Divider />
                     <div class="flex justify-between">
                         <h3>Total Due</h3>
-                        <h3>{{ getTotalPrice }}</h3>
+                        <h3>{{ hasDiscount ? getTotalPriceAfterDiscount : getTotalPrice }}</h3>
                     </div>
                 </div>
             </Card>
