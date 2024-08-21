@@ -24,13 +24,14 @@ class TourController extends Controller
             },
             'bookmarks:id,user_id',
             'destinations:id,name',
-            'highlights:id,description',
+            'highlights',
             'itinerary.days:id,day_number,day_title,description', 
             'note.subjects.bulletPoints',
             'reviews' => [
                 'user:id,first_name,last_name',
                 'tour',
             ],
+            'discount:id,percentage',
             'packages.activities:name',
             'pickupLocation',
         ])->get();
