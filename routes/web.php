@@ -22,6 +22,7 @@ Route::get('/question', function () {
 })->name('question');
 
 Route::get('/community', [CommunityController::class, 'index'])->name('community');
+Route::get('promotion', [PromotionController::class, 'index'])->name('promotion');
 
 Route::controller(UploadController::class)->group(function () {
     Route::post('/upload', 'store')->name('upload.store');
@@ -58,6 +59,7 @@ Route::delete('/bookmark/{bookmark}', [BookmarkController::class, 'destroy'])->n
 
 Route::controller(PaymentController::class)->group(function () {
     Route::get('/payment/{id}', 'create')->name('payment.create');
+    Route::get('/payment/{payment}/edit', 'edit')->name('payment.edit');
     Route::patch('/payment/{payment}', 'update')->name('payment.update'); 
 });
 
