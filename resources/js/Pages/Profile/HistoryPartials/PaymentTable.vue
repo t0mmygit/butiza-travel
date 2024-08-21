@@ -4,11 +4,10 @@ import { useFormatPrice } from '@/Composables/formatPrice';
 import Column from 'primevue/column';
 import DataTable from 'primevue/datatable';
 import Tag from 'primevue/tag';
-import Button from 'primevue/button';
-import OverlayPanel from 'primevue/overlaypanel';
-import Menu from 'primevue/menu';
+import SplitButton from 'primevue/splitbutton';
 
 import { computed, ref } from 'vue';
+import { router } from '@inertiajs/vue3';
 
 import localizedFormat from 'dayjs/plugin/localizedFormat';
 import dayjs from 'dayjs';
@@ -20,34 +19,38 @@ const props = defineProps({
     },
 });
 
-const overlay = ref();
+const items = (data) => {
+    const status = ref(data.status);
 
-const items = (status) => {
-    console.log(status);
-    // Somehow it only take the latest record's status
+    switch (status.value) {
+        case 'successful':
+            return successItems(data);
+        case 'pending': 
+            return pendingItems(data);
+    }
+}
 
-    const items = ref([
+const successItems = (data) => {
+    return [
         {
-            label: 'View Invoice', 
-            icon: 'pi pi-file', 
-            visible: () => status === 'successful', 
-            disabled: true,
+            label: 'View Invoice',
+            icon: 'pi pi-file',
         },
+    ];
+}
+
+const pendingItems = (data) => {
+    return [
         {
             label: 'Retry Payment',
             icon: 'pi pi-refresh',
-            visible: () => status === 'pending',
-            disabled: true,
+            command: () => retryPayment(data),
         },
-        {
-            label: 'Cancel Payment',
-            icon: 'pi pi-times',
-            visible: () => status === 'pending',
-            disabled: true,
-        },
-    ]);
+    ];
+}
 
-    return items.value;
+function retryPayment(data) {
+    router.get(route('payment.edit', { payment: data.id }));
 }
 
 function handleTagSeverity(status) {
@@ -63,18 +66,23 @@ function handleTagSeverity(status) {
 
 const hasPayments = computed(() => props.payments.length > 0);
 
-const isFailed = (status) => status === 'failed';
-const toggle = (event) => overlay.value.toggle(event);
+const displayAmount = amount => useFormatPrice(parseFloat(amount), 2, false)
+const isCancelled = status => status === 'cancelled';
+const isFailed = status => status === 'failed';
 
 </script>
 
 <template>
     <div v-if="hasPayments" class="border border-surfaceBorder rounded sm:rounded-md">
-        <DataTable :value="payments">
+        <DataTable 
+            :value="payments"
+            paginator
+            :rows="5" :rowsPerPageOptions="[5, 10, 20, 50]"
+        >
             <Column field="reference" header="Reference No." />
             <Column header="Amount">
                 <template #body="{ data }">
-                    {{ useFormatPrice(data.amount) }}
+                    {{ displayAmount(data.amount) }}
                 </template>
             </Column>
             <Column header="Payment Method">
@@ -97,18 +105,14 @@ const toggle = (event) => overlay.value.toggle(event);
             </Column>
             <Column>
                 <template #body="{ data }">
-                    <div class="">
-                        <Button
-                            v-if="! isFailed(data.status)"
-                            icon="pi pi-ellipsis-h"
-                            text rounded
-                            @click="toggle"
-                        />
-
-                        <OverlayPanel ref="overlay">
-                            <Menu :model="items(data.status)" />
-                        </OverlayPanel>
-                    </div>
+                    <SplitButton
+                        v-if="!isCancelled(data.status) && !isFailed(data.status)"
+                        :model="items(data)"
+                        menuButtonIcon="pi pi-ellipsis-h"
+                        pt:button:root:class="hidden"
+                        pt:menuButton:root:class="rounded-full"
+                        text
+                    />
                 </template>
             </Column>
         </DataTable>

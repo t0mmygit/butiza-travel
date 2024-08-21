@@ -41,4 +41,13 @@ class PaymentController extends Controller
 
         return $response;
     }
+
+    public function edit(Payment $payment): Response
+    {
+        // TODO: Encrypt the payment ID on the frontend
+        // Or store the hash in the database
+        return Inertia::render('Payment', [
+            'payment' => $payment->load('booking.package.tour'),
+        ]);
+    }
 }
