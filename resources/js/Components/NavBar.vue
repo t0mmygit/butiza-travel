@@ -83,7 +83,7 @@ const directToUserAccount = () => {
                     label="Promotion" 
                     plain text rounded 
                     class="text-sm"
-                    @click="contactDialog = true"
+                    @click="$inertia.get(route('promotion'))"
                 />
                 <Button 
                     label="Contact Us" 

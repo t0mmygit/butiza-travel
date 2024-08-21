@@ -44,14 +44,14 @@ const isFocused = ref(false);
 const classes = computed(() => 
     props.error
     ? 'border-red-error rounded-md transition-none'
-    : 'group-focus:border-primary border-neutral-300 border rounded-md transition-none'
+    : 'group-focus:border-primary rounded-md'
 );
 
 </script>
 
 <template>
     <div class="flex flex-col flex-1">    
-        <label v-if="label" class="text-neutral-500 text-sm mb-2">{{ label }}
+        <label v-if="label" class="text-neutral-500 text-sm mb-1">{{ label }}
             <span v-if="required" class="text-error">*</span>
         </label>
         <Textarea 
