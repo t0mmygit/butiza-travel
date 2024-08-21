@@ -1,7 +1,6 @@
 <script setup>
 import PrimaryButton from '@/Components/PrimaryButton.vue'
 import SecondaryButton from '@/Components/SecondaryButton.vue'
-import PrimeButton from 'primevue/button';
 import { router, usePage, Link } from '@inertiajs/vue3';
 import { computed, ref } from 'vue';
 import { useFormatPrice } from '@/Composables/formatPrice.js';
@@ -66,20 +65,23 @@ const triggerBookmark = () => {
     });
 };
 
-const getLowestPackagePrice = () => {
-    var lowestPrice = props.tour.packages[0].price;
+const getLowestPackagePrice = computed(() => {
+    var lowestPrice = parseInt(props.tour.packages[0].price);
     props.tour.packages.forEach(item => {
-        if (lowestPrice > item.price) {
-            lowestPrice = item.price;
+        var itemPrice = parseInt(item.price);
+        
+        if (lowestPrice > itemPrice) {
+            lowestPrice = itemPrice;
         }
     });
 
     return lowestPrice;
-};
+});;
 
-const getPricePerDay = () => {
-    return getLowestPackagePrice() / props.tour.duration;
-}
+const calculatePricePerDay = computed(() => getLowestPackagePrice.value / props.tour.duration);
+
+const displayLowestPackagePrice = computed(() => useFormatPrice(getLowestPackagePrice.value, 0));
+const displayPricePerDay = computed(() => useFormatPrice(calculatePricePerDay.value, 0));
 
 const itemsListener = computed(() => {
     let index = props.items.findIndex(item => item.id === props.tour.id);
@@ -159,9 +161,9 @@ const formatDestination = destinations => destinations.map(destination => destin
             <div class="grid grid-rows-2 min-w-max">
                 <div class="flex flex-col">
                     <span>From</span>
-                    <strong class="text-2xl">{{ useFormatPrice(getLowestPackagePrice()) }}</strong>
+                    <strong class="text-2xl">{{ displayLowestPackagePrice }}</strong>
                     <span>Price per day</span>
-                    <strong>{{ useFormatPrice(getPricePerDay()) }}</strong>
+                    <strong>{{ displayPricePerDay }}</strong>
                 </div>
                 <div class="flex flex-col place-self-end gap-2">
                     <PrimaryButton @click="viewTour">
