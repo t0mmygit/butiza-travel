@@ -1,5 +1,6 @@
 <script setup>
 import MarginLayout from '@/Layouts/MarginLayout.vue'; 
+import TourCarouselSection from '@/Pages/Tour/Partials/TourCarouselSection.vue';
 
 import Avatar from 'primevue/avatar';
 import Accordion from 'primevue/accordion';
@@ -8,7 +9,6 @@ import DataTable from 'primevue/datatable';
 import Column from 'primevue/column';
 import Rating from 'primevue/rating';
 import MeterGroup from 'primevue/metergroup';
-import Galleria from 'primevue/galleria';
 import Button from 'primevue/button';
 
 import NavBar from '@/Components/NavBar.vue';
@@ -18,10 +18,8 @@ import TourStepper from '@/Components/Tour/TourStepper.vue';
 import TourIconBox from '@/Components/Tour/TourIconBox.vue';
 import TourTextBox from '@/Components/Tour/TourTextBox.vue';
 
-import { router, usePage } from '@inertiajs/vue3';
+import { router } from '@inertiajs/vue3';
 import { computed, defineProps, ref } from 'vue';
-import { useFormatText } from '@/Composables/formatText';
-import { useFormatPrice } from '@/Composables/formatPrice';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
 import dayjs from 'dayjs';
 dayjs.extend(customParseFormat);
@@ -35,60 +33,6 @@ const props = defineProps({
 
 const maximumMeter = ref(0);
 const averageRating = ref(0.0);
-const displayGalleria = ref(false);
-
-const images = ref([
-    {
-        itemImageSrc: 'https://cdn.tourradar.com/s3/tour/1500x800/228465_624e71afe4389.jpg',
-        thumbnailImageSrc: 'https://cdn.tourradar.com/s3/tour/1500x800/228465_624e71afe4389.jpg'
-    },
-    {
-        itemImageSrc: 'https://primefaces.org/cdn/primevue/images/galleria/galleria1.jpg',
-        thumbnailImageSrc: 'https://primefaces.org/cdn/primevue/images/galleria/galleria1.jpg'
-    },
-    {
-        itemImageSrc: 'https://primefaces.org/cdn/primevue/images/galleria/galleria4.jpg',
-        thumbnailImageSrc: 'https://primefaces.org/cdn/primevue/images/galleria/galleria4.jpg'
-    },
-    {
-        itemImageSrc: 'https://primefaces.org/cdn/primevue/images/galleria/galleria6.jpg',
-        thumbnailImageSrc: 'https://primefaces.org/cdn/primevue/images/galleria/galleria6.jpg'
-    },
-]);
-
-const responsiveOptions = ref([
-    {
-        breakpoint: '991px',
-        numVisible: 4
-    },
-    {
-        breakpoint: '767px',
-        numVisible: 3
-    },
-    {
-        breakpoint: '575px',
-        numVisible: 1
-    }
-]); 
-
-const tourDetails = ref([
-    {
-        icon: 'pi pi-users',
-        label: `Min. Group Size: ${props.tour.min_pax}`
-    },
-    {
-        icon: 'pi pi-clock',
-        label: `${dayjs(props.tour.start_time, 'HH:mm').format('HH:mm')} - ${dayjs(props.tour.end_time,'HH:mm').format('HH:mm')}`,
-    },
-    {
-        icon: 'pi pi-flag',
-        label: `Guide Type: ${useFormatText(props.tour.guide_type)}`
-    },
-    {
-        icon: 'pi pi-car',
-        label: `Travel Intensity: ${useFormatText(props.tour.travel_intensity)}`
-    },
-]);
 
 const reserveTour = () => {
     try {
@@ -148,43 +92,6 @@ const ratingMeterList = computed(() => {
     return ratings.value;
 });
 
-const bookmark = computed(() => {
-    const bookmarks = ref(props.tour.bookmarks);
-
-    if (usePage().props.auth.user) {
-        return bookmarks.value.find(bookmark => 
-            parseInt(bookmark.user_id) === usePage().props.auth.user.id);
-    } else {
-        return bookmarks.value.find(bookmark => 
-            bookmark.user_id == usePage().props.cookie.guest_id);
-    }
-});
-
-const triggerBookmark = () => {
-    const bookmarks = ref(props.tour.bookmarks);
-    if (bookmarks.value.length > 0) {
-        if (usePage().props.auth.user != null) {
-            const bookmark = bookmarks.value.find(bookmark => 
-                parseInt(bookmark.user_id) === usePage().props.auth.user.id);
-            if (bookmark) {
-                router.delete(route('bookmark.destroy', bookmark.id, { preserveScroll: true }));
-                return;
-            }
-        } else {
-            const bookmark = bookmarks.value.find(bookmark => 
-                bookmark.user_id === usePage().props.cookie.guest_id);
-            if (bookmark) {
-                router.delete(route('bookmark.destroy', bookmark.id, { preserveScroll: true }));
-                return;
-            }
-        }
-    }
-    router.post(route('bookmark.store', props.tour.id, { preserveScroll: true }), {
-        onSuccess: () => emit('add-bookmark'),
-        onError: (error) => console.log(error),
-    });
-};
-
 const getMeterLabel = meterData => {
     const rating = ref(meterData);
     return rating.value[0].label;
@@ -193,21 +100,6 @@ const getMeterLabel = meterData => {
 const getMeterValue = meterData => {
     const rating = ref(meterData);
     return rating.value[0].value !== undefined ? rating.value[0].value : 0;
-};
-
-const getLowestPackagePrice = () => {
-    var lowestPrice = props.tour.packages[0].price;
-    props.tour.packages.forEach(item => {
-        if (lowestPrice > item.price) {
-            lowestPrice = item.price;
-        }
-    });
-
-    return lowestPrice;
-};
-
-const getPricePerDay = () => {
-    return getLowestPackagePrice() / props.tour.duration;
 };
 
 const getPackageActivities = () => {
@@ -227,90 +119,14 @@ const getPackageActivities = () => {
 </script>
 
 <template>
-    <!-- Navbar -->
     <MarginLayout>
         <NavBar />
         <!-- <Breadcrumb  /> -->
         <div class="bg-white">
             <div class="mx-auto h-full lg:w-5/6 xl:max-w-7xl py-4">
-                <div class="flex items-center justify-between">
-                    <h1 class="text-3xl mb-3">{{ tour.name }}</h1>
-                </div>
-                <div class="flex flex-nowrap justify-center mb-4 w-full h-full gap-6">
-                    <div class="flex-1 w-full h-full rounded-xl cursor-pointer" @click="displayGalleria = true">
-                        <!-- Carousel -->
-                        <Galleria :value="images" :responsiveOptions="responsiveOptions" :numVisible="5" 
-                            :circular="true" :showThumbnails="false" :autoPlay="true" :transitionInterval="10000"
-                        >
-                            <template #item="slotProps">
-                                <img :src="slotProps.item.itemImageSrc" :alt="slotProps.item.alt" class="w-full aspect-video object-cover rounded-xl" />
-                            </template>
-                            <template #thumbnail="slotProps">
-                                <img :src="slotProps.item.thumbnailImageSrc" :alt="slotProps.item.alt" style="display: block;" />
-                            </template>
-                        </Galleria>
 
-                        <Galleria v-model:visible="displayGalleria" :value="images" :responsiveOptions="responsiveOptions" :numVisible="4" containerStyle="max-width: 50%" :circular="true" :fullScreen="true" :showItemNavigators="true">
-                            <template #item="slotProps">
-                                <img :src="slotProps.item.itemImageSrc" :alt="slotProps.item.alt" class="w-full aspect-video object-cover rounded-xl" />
-                            </template>
-                            <template #thumbnail="slotProps">
-                                <img :src="slotProps.item.thumbnailImageSrc" :alt="slotProps.item.alt" class="w-full aspect-video" />
-                            </template>
-                        </Galleria>
-                    </div>
+                <TourCarouselSection :tour="tour" />
 
-                    <!-- Buttons -->
-                    <!-- <section class="flex flex-col gap-6"> -->
-                    <section class="grid h-fit gap-6">
-                        <div class="shadow-md outline outline-1 outline-primary-200 rounded-2xl p-4 h-fit">
-                            <div class="flex flex-col justify-start w-full pb-3">
-                                <span class="text-sm">From</span>
-                                <strong class="text-xl">{{ useFormatPrice(getLowestPackagePrice()) }}</strong>
-                                <small>Price per day</small>
-                                <small>{{ useFormatPrice(getPricePerDay()) }}</small>
-                            </div>
-                            <div class="flex flex-col gap-3 lg:min-w-[300px]">
-                                <a v-if="tour.availabilities.length > 1" href="#available" class="flex-1">
-                                    <Button label="Check Availability" class="w-full font-bold" rounded />
-                                </a>
-                                <Button v-else label="Reserve" @click="reserveTour" class="flex-1" rounded />
-                                <!-- <Button disabled label="Customize This Tour" class="flex-1" text outlined rounded /> -->
-                            </div>
-                        </div>
-
-                        <!-- Details -->
-                        <div class="bg-primary-100/25 outline outline-2 outline-primary shadow-md rounded-2xl flex flex-col p-4 h-fit gap-2">
-                            <div v-for="tour in tourDetails" class="flex items-center gap-3">
-                                <i :class="tour.icon"></i>
-                                <span>{{ tour.label }}</span>
-                            </div>
-                            <a v-if="tour.itinerary.days.length" href="#itinerary"><Button 
-                                label="See itinerary details" icon="pi pi-map"
-                                severity="constrast" class="w-full" rounded outlined
-                            /></a>
-                        </div>
-
-                        <div class="flex gap-3 text-sm justify-between">
-                            <div
-                                class="flex items-center cursor-pointer hover:text-primary"
-                                @click="displayGalleria = true"
-                            >
-                                <i class="pi pi-images"></i>
-                                <span class="ml-2">View Gallery</span>
-                            </div>
-                            <div
-                                class="flex items-center cursor-pointer hover:text-primary"
-                                @click="triggerBookmark"
-                            >
-                                <i :class="!bookmark ? 'pi pi-bookmark' : 'pi pi-bookmark-fill'"></i>
-                                <span class="ml-2">{{ !bookmark ? 'Save to bookmark' : 'Saved to bookmark' }}</span>
-                            </div>
-                        </div>
-
-                        <!-- <Button label="Download Brochure" severity="constrast" rounded text outlined /> -->
-                    </section>
-                </div>
             </div>
         </div>
 
@@ -357,11 +173,10 @@ const getPackageActivities = () => {
             </TourContent>
 
             <!-- Customize -->
-             <TourContent title="Customize Your Trip" titleCenter gradient>
+             <!-- <TourContent title="Customize Your Trip" titleCenter gradient>
                 <div class="flex justify-between">
-                    <!-- <Button label="Customize" severity="plain" outlined rounded /> -->
                 </div>
-             </TourContent>
+             </TourContent> -->
 
             <!-- Availability -->
             <TourContent id="available" title="Dates & Availability">
@@ -447,6 +262,7 @@ const getPackageActivities = () => {
                     <p>No reviews currently.</p>
                 </div>
             </TourContent>
+
             <div v-if="tour.reviews.length != 0" class="grid lg:grid-cols-2 gap-6 mt-6">
                 <div v-for="review in tour.reviews" class="bg-white flex flex-col p-4 shadow rounded-lg">
                     <div class="flex min-h-full">
@@ -459,8 +275,8 @@ const getPackageActivities = () => {
                     </div>
                 </div>
             </div>
-            
         </div>
+        
         <Footer />
     </MarginLayout>
 </template>
