@@ -94,6 +94,7 @@ onMounted(() => {
         <div class="my-6">
             <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
                 <h1 class="text-2xl">History</h1>
+
                 <main class="border border-surfaceBorder rounded sm:rounded-lg">
                     <TabView 
                         v-model:activeIndex="activeTab"
@@ -106,20 +107,25 @@ onMounted(() => {
                                     v-if="!onReload"
                                     :bookings="history"
                                     @cancel-booking="handleToast"
+                                    @review-booking="handleToast"
+                                    @tour-direct-failed="handleToast"
                                 />
                                 <Skeleton v-else width="100%" height="4rem" />
 
                             </TabPanel>
+
                             <TabPanel header="Reservation">
 
                                 <ReservationTable
                                     v-if="!onReload"
                                     :reservations="history"
                                     @cancel-reservation="handleToast"
+                                    @tour-direct-failed="handleToast"
                                 />
                                 <Skeleton v-else width="100%" height="4rem" />
                                 
                             </TabPanel>
+
                             <TabPanel header="Payment">
 
                                 <PaymentTable

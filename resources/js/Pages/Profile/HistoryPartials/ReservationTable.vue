@@ -1,14 +1,17 @@
 <script setup>
+import { DEFAULT_DATE_FORMAT, TOAST_ERROR, TOAST_INFO, TOAST_SUCCESS, TOAST_WARNING } from '@/constant';
+import { useFormatPrice } from '@/Composables/formatPrice';
 import { computed, ref } from 'vue';
-import { useForm } from '@inertiajs/vue3';
+import { router, useForm } from '@inertiajs/vue3';
 
 import Column from 'primevue/column';
 import DataTable from 'primevue/datatable';
 import Tag from 'primevue/tag';
 import SplitButton from 'primevue/splitbutton';
 import { useConfirm } from 'primevue/useconfirm';
+import dayjs from 'dayjs';
 
-const emit = defineEmits(['cancel-reservation']);
+const emit = defineEmits(['cancel-reservation', 'tour-direct-failed']);
 
 const props = defineProps({
     reservations: {
@@ -55,24 +58,48 @@ const confirmCancelReservation = (reservation) => {
     });
 }
 
-const cancelReservationMessage = {
-    severity: 'info',
-    summary: 'Reservation Cancelled',
-    detail: 'Your reservation has been cancelled.',
-    life: 6000,
-};
+function createMessage(severity, summary, detail, life) {
+    return {
+        severity,
+        summary,
+        detail,
+        life,
+    };
+}
 
 function cancelReservation(reservation) {
     form.status = 'cancelled';
     
     form.patch(route('reservation.update', { reservation: reservation.id }), {
-        onSuccess: () => 
-        emit('cancel-reservation', cancelReservationMessage),
+        onSuccess: () => emit('cancel-reservation', cancelReservationMessage),
     });
 }
 
-const isCancelled = (status) => status === 'cancelled';
+const directToTour = tour => {
+    router.get(route('tour.show', { tour: tour.slug }), {
+        onError: (error) => emit('tour-direct-failed', failedDirectTourMessage),
+    })
+};
 
+function handleStatusSeverity(status) {
+    switch (status) {
+        case 'completed':
+            return TOAST_SUCCESS;
+        case 'pending':
+            return TOAST_WARNING;
+        case 'cancelled':
+            return TOAST_ERROR;
+        case 'rejected':
+            return TOAST_ERROR;
+        default:
+            return TOAST_INFO;
+    }
+}
+
+const cancelReservationMessage = createMessage(TOAST_INFO, 'Reservation Cancelled', 'Your reservation has been cancelled.', 6000);
+const failedDirectTourMessage = createMessage(TOAST_ERROR, 'Redirection Failed', 'Please try again later.', 6000);
+const displayAmount = amount => useFormatPrice(parseFloat(amount), 2, false)
+const isCancelled = status => status === 'cancelled';
 const hasReservations = computed(() => props.reservations.length > 0);
 
 </script>
@@ -81,12 +108,23 @@ const hasReservations = computed(() => props.reservations.length > 0);
     <div v-if="hasReservations" class="border border-surfaceBorder rounded sm:rounded-md">
         <DataTable :value="reservations">
             <Column field="reference" header="Reservation. No" />
-            <Column field="package.tour.name" header="Tour Name" />
-            <Column field="preferred_date" header="Preferred Date" />
-            <Column header="Status">
-                <template #body="{ data }">
-                    <Tag :value="data.status" severity="info" />
-                </template>
+            <Column header="Tour Name" #body="{ data }">
+                <a 
+                    href="#" 
+                    @click="directToTour(data.package.tour)" 
+                    class="hover:underline"
+                >
+                    {{ data.package.tour.name }}
+                </a>
+            </Column>
+            <Column header="Preferred Date" #body="{ data }">
+                {{ dayjs(data.preferred_date).format(DEFAULT_DATE_FORMAT) }}
+            </Column>
+            <Column header="Amount" #body="{ data }">
+                {{ displayAmount(data.amount) }}
+            </Column>
+            <Column header="Status" #body="{ data }">
+                <Tag :value="data.status" :severity="handleStatusSeverity(data.status)" />
             </Column>
             <Column #body="{ data }">
                 <SplitButton
