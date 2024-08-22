@@ -2,41 +2,24 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\ReviewRequest;
+use App\Models\Booking;
 use App\Models\Review;
 use App\Models\Tour;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
 
 class ReviewController extends Controller
 {
-    public function store(Request $request, Tour $tour): RedirectResponse
+    public function store(ReviewRequest $request, Tour $tour, Booking $booking): RedirectResponse
     {
-        $user = $request->user();
+        $review = Review::make($request->validated());
 
-        $validated = $request->validate([
-            'booking_id' => 'required|numeric',
-            'rating' => 'required|numeric',
-            'title' => 'required|string',
-            'content' => 'required|string',
-        ]);
+        $review->tour()->associate($tour);
+        $review->booking()->associate($booking);
+        $review->user()->associate($request->user());
 
-        // FOR (LOGGED IN) USER
-        $review = Review::make([
-            'booking_id' => $validated['booking_id'],
-            'tour_id' => $tour->id,
-            'rating' => $validated['rating'],
-            'title' => $validated['title'],
-            'content' => $validated['content'],
-            'status' => 'approved',
-        ]);
-
-        $user->reviews()->save($review);
+        $review->save();
 
         return redirect()->route('profile.history');
     }
-
-    // public function update(Request $request, Review $review)
-    // {
-        
-    // }
 }
