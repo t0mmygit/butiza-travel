@@ -35,13 +35,13 @@ class BookingController extends Controller
         return redirect(route('profile.history', absolute: false));
     }
 
-    public function show(Tour $tour, Availability $availability): Response
+    public function create(Tour $tour, Availability $availability): Response
     {   
         $tour->load([
             'packages.activities',
             'pickupLocation',
             'discount:id,type,percentage'
-            ])->get();
+        ]);
 
         return Inertia::render('Tour/Book', [
             'tour'            => $tour,

@@ -41,7 +41,7 @@ Route::controller(TourController::class)->group(function () {
 });
 
 Route::controller(BookingController::class)->group(function () {
-    Route::get('tour/{tour:slug}/booking/{availability}', 'show')->name('booking.show');
+    Route::get('tour/{tour:slug}/booking/{availability}', 'create')->name('booking.create');
     Route::post('booking/{availability}', 'store')->name('booking.store');
     Route::patch('booking/{booking}', 'update')->name('booking.update');
 });
@@ -64,7 +64,7 @@ Route::controller(PaymentController::class)->group(function () {
 });
 
 Route::controller(ReviewController::class)->group(function () {
-    Route::post('/profile/review/{tour}', 'store')->name('review.store');
+    Route::post('profile/review/tour/{tour:slug}/booking/{booking}', 'store')->name('review.store');
 });
 
 Route::controller(PartnerRequestController::class)->group(function () {
