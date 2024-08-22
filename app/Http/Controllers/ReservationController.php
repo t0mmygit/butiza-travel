@@ -19,14 +19,12 @@ class ReservationController extends Controller
         private ReservationService $reservationService
     ) {}
 
-    /**
-     * Show the form for creating the resource.
-     */
     public function create(Tour $tour): Response
     {
         $tour->load([
             'packages.activities',
-            'pickupLocation'
+            'pickupLocation',
+            'discount:id,type,percentage'
         ]);
 
         return Inertia::render('Tour/Reserve', [
