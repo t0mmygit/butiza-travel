@@ -24,7 +24,7 @@ return [
 
     'toast' => [
         'success' => 'success',
-        'error' => 'error',
+        'error' => 'danger',
         'warn' => 'warning',
         'info' => 'info',
         'secondary' => 'secondary',
