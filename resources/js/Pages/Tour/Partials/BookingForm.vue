@@ -95,7 +95,6 @@ const setPackageId = (packageId) => form.package_id = packageId;
 const setPickupLocationId = (pickUpLocationId) => form.pickup_location_id = pickUpLocationId;
 const setContactMethodId = (contactMethodId) => form.contact_method_id = contactMethodId;
 
-// TODO: Discount Implementation
 const hasDiscount = computed(() => props.tour.discount != null);
 
 const getNumberOfTraveller = computed(() => form.adult + form.child);
@@ -359,6 +358,7 @@ watch(() => form.adult, (newValue) => {
                         </div>
                         <span class="text-error">{{ getDiscount }}</span>
                     </div>
+                    
                     <Divider />
                     <div class="flex justify-between">
                         <h3>Total Due</h3>
