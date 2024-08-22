@@ -1,20 +1,11 @@
 <script setup>
-import { useFormatPrice } from '@/Composables/formatPrice';
-import CustomSectionCard from '@/Components/CustomSectionCard.vue';
-import TextInput from '@/Components/TextInput.vue';
-import Card from '@/Components/Card.vue';
-import PhoneInput from '@/Components/PhoneInput.vue';
+import ReservationForm from '@/Pages/Tour/Partials/ReservationForm.vue';
+import ReservationDetailPanel from './Partials/ReservationDetailPanel.vue';
 
-import Button from 'primevue/button';
-import Calendar from 'primevue/calendar';
-import Divider from 'primevue/divider';
-import InputNumber from 'primevue/inputnumber';
-import InlineMessage from 'primevue/inlinemessage';
-import Tag from 'primevue/tag';
+import Toast from 'primevue/toast';
+import { useToast } from 'primevue/usetoast';
 
-import { computed, watch } from 'vue';
 import { useForm, usePage } from '@inertiajs/vue3';
-import dayjs from 'dayjs';
 
 const props = defineProps({
     tour: {
@@ -28,12 +19,7 @@ const props = defineProps({
 });
 
 const page = usePage();
-
-const contactIcons = [
-    { call: 'pi pi-phone' },
-    { email: 'pi pi-envelope' },
-    { whatsapp: 'pi pi-whatsapp' }
-];
+const toast = useToast();
 
 const form = useForm({
     package_id: null,
@@ -51,79 +37,21 @@ const form = useForm({
     note: null,
 });
 
-const getContactMethodIcon = (iconName) => {
-    const icon = contactIcons.find(icon => iconName.toLowerCase() in icon );
-    return icon ? icon[iconName.toLowerCase()] : '';
-};
+const handleToast = (severity, summary, detail, life = 6000) => {
+    toast.add({ severity: severity, summary: summary, detail: detail, life: life })
+}
 
-const setPackageId = (packageId) => form.package_id = packageId;
-const setPickupLocationId = (pickUpLocationId) => form.pickup_location_id = pickUpLocationId;
-const setContactMethodId = (contactMethodId) => form.contact_method_id = contactMethodId;
-
-const submit = () => {
+const submitReservation = () => {
     form.post(route('reservation.store'), {
         preserveScroll: true,
         onSuccess: () => form.reset(),
-        onError: (error) => {
-            console.error(error);
-        }
+        onError: (error) => handleToast(TOAST_ERROR, 'Something went wrong', 'Please double check your inputs and try again.'),
     });
 };
 
-// TODO: Make this dynamic instead (set the min date by admin)
-const minDate = computed(() => {
-    let today = new Date();
-    let month = today.getMonth();
-    let year = today.getFullYear();
-    let date = today.getDate();
-
-    return new Date(year, month, date);
-});
-
-const formattedDate = computed((date) => dayjs(date).format('DD MMMM YYYY'));
-
-const getNumberOfTraveller = computed(() => form.adult + form.child);
-
-const getSelectedPackage = computed(() => props.tour.packages.find(item => item.id === form.package_id));
-const parseSelectedPackagePrice = computed(() => getSelectedPackage.value?.price);
-const getSelectedPackagePrice = computed(() => useFormatPrice(parseSelectedPackagePrice));
-
-const getSelectedPickupLocation = computed(() => props.tour.pickup_location.find(item => item.id === form.pickup_location_id));
-
-const calculateTotalPrice = computed(() => parseSelectedPackagePrice.value * getNumberOfTraveller.value);
-const getTotalPrice = computed(() => useFormatPrice(calculateTotalPrice));
-
-const isPackageSelected = computed(() => form.package_id != null);
-const isDateSelected = computed(() => form.preferred_date != null);
-const isPickupLocationSelected = computed(() => form.pickup_location_id != null);
-const isNumberOfTravellerFilled = computed(() => getNumberOfTraveller.value > 0);
-const isNecessaryFieldsFilled = computed(() => isNumberOfTravellerFilled.value && isPackageSelected.value);
-
-const isFormValid = computed(() => {
-    const totalTravellers = form.adult + form.child;
-
-    return (
-        form.package_id != null &&
-        form.contact_method_id != null &&
-        form.pickup_location_id != null &&
-        form.preferred_date != null &&
-        form.first_name &&
-        form.last_name &&
-        form.email &&
-        form.phone_number != null &&
-        (totalTravellers >= props.tour.min_pax)
-    );
-});
-
-watch(() => form.adult, (newValue) => {
-    if (newValue < 1) {
-        form.reset('child');
-    }
-});
-
-watch(calculateTotalPrice, (newValue) => {
-    form.amount = newValue;
-});
+function updateAmount(amount) {
+    form.amount = amount;
+}
 
 </script>
 
@@ -132,257 +60,26 @@ watch(calculateTotalPrice, (newValue) => {
         <div class="flex w-full my-6 gap-6">
             <div class="w-full">
                  <div class="mx-auto grow max-w-full">
-                    <form>
-                        <div class="flex flex-col gap-6">
 
-                            <CustomSectionCard 
-                                index="1" 
-                                title="Date Selection"
-                                :error="form.errors.preferred_date"
-                            >
-                                <template #subtitle>
-                                    <p>Please select a date.</p>
-                                </template>
-                                <Calendar
-                                    v-model="form.preferred_date"
-                                    :minDate="minDate"
-                                    inline showWeek
-                                />
-                            </CustomSectionCard>
-
-                            <CustomSectionCard 
-                                index="2" 
-                                title="Number of Travellers"
-                                :error="form.errors.adult || form.errors.child"
-                            >
-                                <template #subtitle>
-                                    <p>Please select a minimum of {{ tour.min_pax }} travellers.</p>
-                                </template>
-                                <div class="bg-white px-6 py-3 flex items-center justify-between rounded-md outline outline-1 outline-surfaceBorder">
-                                    <h2>Adult</h2>
-                                    <InputNumber
-                                        v-model="form.adult"
-                                        showButtons buttonLayout="horizontal"
-                                        :min="0" :max="99" placeholder="0"
-                                        :invalid="form.errors.adult != null ? true : false"
-                                    >
-                                        <template #incrementbuttonicon>
-                                            <i class="pi pi-plus"></i>
-                                        </template>
-                                        <template #decrementbuttonicon>
-                                            <i class="pi pi-minus"></i>
-                                        </template>
-                                    </InputNumber>
-                                </div>
-                                <div class="bg-white px-6 py-3 flex items-center justify-between rounded-md outline outline-1 outline-surfaceBorder">
-                                    <div>
-                                        <h2>Child</h2>
-                                        <small>Age of under 18</small>
-                                    </div>
-                                    <InputNumber
-                                        v-model="form.child"
-                                        showButtons buttonLayout="horizontal"
-                                        :min="0" :max="99" placeholder="0"
-                                        :invalid="form.errors.child != null ? true : false"
-                                        :disabled="form.adult < 1"
-                                    >
-                                        <template #incrementbuttonicon>
-                                            <i class="pi pi-plus"></i>
-                                        </template>
-                                        <template #decrementbuttonicon>
-                                            <i class="pi pi-minus"></i>
-                                        </template>
-                                    </InputNumber>
-                                </div>
-                            </CustomSectionCard>
-
-                            <CustomSectionCard index="3" title="Package Selection">
-                                <template #subtitle>
-                                    <p>Please choose a package.</p>
-                                </template>
-                                <Button
-                                    v-for="item in tour.packages"
-                                    :key="item.id"
-                                    @click="setPackageId(item.id)"
-                                    plain :outlined="form.package_id !== item.id"
-                                    class="flex flex-1 justify-between border-surfaceBorder"
-                                >
-                                    <span>{{ item.name }}</span>
-                                    <span>{{ useFormatPrice(item.price) }}</span>
-                                </Button>
-                            </CustomSectionCard>
-
-                            <CustomSectionCard index="4" title="Pickup Location">
-                                <template #subtitle>
-                                    <p>Please select a pickup location.</p>
-                                </template>
-                                <Button
-                                    v-for="pickupLocation in tour.pickup_location"
-                                    :label="pickupLocation.location"
-                                    :key="pickupLocation.id"
-                                    @click="setPickupLocationId(pickupLocation.id)"
-                                    plain :outlined="form.pickup_location_id !== pickupLocation.id"
-                                    class="text-left border-surfaceBorder"
-                                />
-                            </CustomSectionCard>
-
-                            <CustomSectionCard index="5" title="Add traveller details">
-                            <template #subtitle>
-                                <InlineMessage severity="info" class="mb-4">
-                                    This traveller will serve as the contact person for the booking.
-                                </InlineMessage>
-                            </template>
-                            <div class="flex flex-col gap-2">
-                                <div class="flex gap-6">
-                                    <TextInput 
-                                        v-model="form.first_name" 
-                                        label="First Name" 
-                                        :error="form.errors.first_name" 
-                                        :disabled="$page.props.auth.user?.first_name != null"
-                                        required
-                                    />
-                                    <TextInput 
-                                        v-model="form.last_name" 
-                                        label="Last Name" 
-                                        :error="form.errors.last_name" 
-                                        :disabled="$page.props.auth.user?.last_name != null"
-                                        required 
-                                    />
-                                </div>
-                                <div class="flex gap-6">
-                                    <TextInput 
-                                        v-model="form.email" 
-                                        label="Email Address" 
-                                        :error="form.errors.email" 
-                                        :disabled="$page.props.auth.user?.email != null"
-                                        required
-                                    />
-                                    <PhoneInput
-                                        v-model="form.phone_number" 
-                                        label="Phone Number" 
-                                        :error="form.errors.phone_number" 
-                                        :disabled="$page.props.auth.user?.phone_number != null"
-                                        required
-                                    />
-                                </div>
-                            </div>
-                        </CustomSectionCard>
-
-                        <CustomSectionCard index="5" title="Additional details" :error="form.errors.contact_method">
-                            <TextInput v-model="form.note" label="Special Requests / Questions" type="textarea" />
-                            <div class="flex flex-col gap-2">
-                                <h5>How should we contact you?</h5>
-                                <div class="flex gap-4">
-                                    <Button
-                                        v-for="method in contact_methods"
-                                        :key="method.id"
-                                        :label="method.method_name"
-                                        :icon="getContactMethodIcon(method.method_name)"
-                                        @click="setContactMethodId(method.id)"
-                                        plain :outlined="form.contact_method_id !== method.id"
-                                        class="flex-1 border-surfaceBorder"
-                                    />
-                                </div>
-                            </div>
-                        </CustomSectionCard>
-
-                        </div>
-                    </form>
+                    <ReservationForm 
+                        :tour="tour" 
+                        :form="form"
+                        :contact_methods="contact_methods"
+                    />
+                    
                 </div>
             </div>
             
             <div class="flex-col gap-6 min-w-96 max-w-96 h-fit hidden xl:flex sticky top-4">
-                <Card>
-                    <template #image>
-                        <img
-                            src="https://static.travelstride.com/store/51/ad4f08f81843578f3ea235b037593e/b669206bb8425f9409b22d1a87c8d181.jpg"
-                            class="rounded-t-md"
-                        >
-                    </template>
-                    <div class="flex flex-col gap-2">
-                        <div>
-                            <h2>{{ tour.name }}</h2>
-                            <p>{{ tour.duration }} {{ tour.duration > 1 ? 'Days' : 'Day' }}</p>
-                        </div>
-                        <div>
-                            <h2>Reserved Date</h2>
-                            <p>{{ isDateSelected ? formattedDate : 'Not selected' }}</p>
-                        </div>
-                        <div v-if="isPackageSelected">
-                            <h2>{{ getSelectedPackage.name }}</h2>
-                            <p>
-                                {{ useFormatPrice(getSelectedPackage.price) }}
-                            </p>
-                        </div>
-                        <div>
-                            <h2>Pick-up Location</h2>
-                            <p>{{ isPickupLocationSelected ? getSelectedPickupLocation.location : 'Not selected' }}</p>
-                        </div>
-                    </div>
-                </Card>
 
-                <Card>
-                    <h1>Package Details</h1>
-                    <div v-if="isPackageSelected" class="flex flex-wrap gap-3">
-                        <Tag 
-                            v-for="activity in getSelectedPackage.activities" 
-                            :value="activity.name"
-                        />
-                    </div>
-                    <div v-else>
-                        <InlineMessage class="justify-start w-full" severity="secondary"> 
-                            <span>Please select a package.</span>
-                        </InlineMessage>
-                    </div>
-                </Card>
-
-                <Card>
-                    <h1>Price Breakdown</h1>
-                    <InlineMessage 
-                        v-if="!isNecessaryFieldsFilled" 
-                        class="justify-start w-full" 
-                        severity="secondary"
-                        pt:icon:root="flex align-start"
-                    >
-                        <div>
-                            <span>Please fill in the</span>
-                            <span v-if="!isNumberOfTravellerFilled"> number of travellers</span>
-                            <span v-if="!isNumberOfTravellerFilled && !isPackageSelected"> and </span> 
-                            <span v-if="!isPackageSelected"> package type</span>.
-                        </div>
-                    </InlineMessage>
-                    <div v-else>
-                        <div class="flex flex-col">
-                            <div class="flex gap-2 justify-between">
-                                <span>{{ getSelectedPackage.name }}</span>
-                                <span>{{ getSelectedPackagePrice }}</span>
-                            </div>
-                            <div class="flex justify-between">
-                                <small>
-                                    {{ getNumberOfTraveller }}
-                                    Travellers x
-                                    {{ getSelectedPackagePrice }}
-                                </small>
-                                <small>{{ getTotalPrice }}</small>
-                            </div>
-                            <div v-if="hasDiscount" class="flex justify-between mt-4">
-                                <span>Discount</span>
-                                <span>{{ getDiscount }}</span>
-                            </div>
-                        </div>
-                        <Divider />
-                        <div class="flex justify-between">
-                            <h3>Total Due</h3>
-                            <h3>{{ getTotalPrice }}</h3>
-                        </div>
-                    </div>
-                </Card>
-                <Button
-                    label="Continue"
-                    class="w-full justify-center" rounded
-                    :disabled="!isFormValid || form.processing"
-                    @click="submit"
+                <ReservationDetailPanel 
+                    :tour="tour"
+                    :form="form"
+                    @update-amount="updateAmount"
+                    @reset-child="form.reset('child')"
+                    @submit-reservation="submitReservation"
                 />
+
             </div>
         </div>
     </main>
