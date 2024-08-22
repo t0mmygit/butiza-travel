@@ -40,6 +40,7 @@ export default {
                     ...colors.emerald,
                     DEFAULT: colors.emerald['600']
                 },
+                inputError: '#f87171',
                 surfaceInput: 'var(--surface-400)',
                 surfaceHover: 'var(--surface-hover)',
                 surfaceBorder: 'var(--surface-border)',
