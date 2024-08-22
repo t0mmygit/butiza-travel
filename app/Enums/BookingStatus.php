@@ -24,11 +24,6 @@ enum BookingStatus: string
     // Booking that has been cancelled by the user
     case CANCELLED = 'cancelled';
 
-    public static function values(): array
-    {
-        return array_column(self::cases(), 'value');
-    }
-
     public function getValue(): string
     {
         return match($this) {
