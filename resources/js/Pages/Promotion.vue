@@ -62,10 +62,12 @@ const dummyImage = 'https://www.datocms-assets.com/101439/1708607396-chureito-pa
         <div class="mx-auto h-full lg:w-5/6 xl:max-w-7xl">
             <div class="my-8">
 
+                <!-- Title Section -->
                 <div class="mb-4">
                     <h1 class="text-2xl">Promotion</h1>
                 </div>
 
+                <!-- Tour Promotion Section -->
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                     <div 
                         v-for="tour in tours" 
@@ -79,7 +81,7 @@ const dummyImage = 'https://www.datocms-assets.com/101439/1708607396-chureito-pa
 
                         <div>
                             <h2 class="line-clamp-1">{{ tour.name }}</h2>
-                            <p class="line-clamp-3">{{ tour.description }}</p>
+                            <p class="line-clamp-3 text-justify">{{ tour.description }}</p>
                             <Divider />
                             <div class="flex justify-between items-center">
                                 <div class="flex flex-col">
