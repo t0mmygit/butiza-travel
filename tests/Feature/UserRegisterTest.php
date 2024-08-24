@@ -27,7 +27,6 @@ test('a partner can register successfully', function () {
         'email' => 'john.doe@example.com',
         'password' => 'Password@123',
         'password_confirmation' => 'Password@123',
-        'role' => config('constant.user_roles.partner'),
     ]);
     
     $this
@@ -38,7 +37,6 @@ test('a partner can register successfully', function () {
 
     $response
         ->assertStatus(302);
-        // ->assertRedirect(route('/home', absolute: false));
 });
 
 
