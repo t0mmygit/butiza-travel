@@ -1,10 +1,17 @@
 <script setup>
-import PrimaryButton from '@/Components/PrimaryButton.vue'
-import SecondaryButton from '@/Components/SecondaryButton.vue'
-import { router, usePage, Link } from '@inertiajs/vue3';
-import { computed, ref } from 'vue';
 import { useFormatPrice } from '@/Composables/formatPrice.js';
 import { useFormatText } from '@/Composables/formatText';
+
+import PrimaryButton from '@/Components/PrimaryButton.vue';
+import SecondaryButton from '@/Components/SecondaryButton.vue';
+
+import Tag from 'primevue/tag';
+
+import { router, usePage } from '@inertiajs/vue3';
+import { computed, ref } from 'vue';
+import { TOAST_ERROR, TOAST_SECONDARY, TOAST_SUCCESS } from '@/constant';
+
+const emit = defineEmits(['compare-tour', 'host-tour', 'add-bookmark', 'view-tour-failed'])
 
 const props = defineProps({
     tour: {
@@ -18,15 +25,24 @@ const props = defineProps({
     }
 });
 
-const emit = defineEmits(['compare-tour', 'host-tour', 'add-bookmark'])
 
 const viewTour = () => {
-    try {
-        router.get(route('tour.show', { tour: props.tour.slug }));
-    } catch (error) {
-        console.error('Error viewing tours:', error);
-    }
+    router.get(route('tour.show', { tour: props.tour.slug }), {
+        onError: (error) => emit('view-tour-failed', viewTourFailedMessage),
+    });
 };
+
+function customMessage(severity, summary, detail, life = 6000) {
+    return {
+        severity,
+        summary,
+        detail,
+        life,
+    };
+}
+
+const viewTourFailedMessage = () => customMessage(TOAST_ERROR, 'Something went wrong!', `Tour could not be found.`);
+const addBookmarkMessage = () => customMessage('success', 'Bookmark Added', 'You have successfully added a bookmark.');
 
 const bookmark = computed(() => {
     const bookmarks = ref(props.tour.bookmarks);
@@ -60,7 +76,7 @@ const triggerBookmark = () => {
         }
     }
     router.post(route('bookmark.store', props.tour.id, { preserveScroll: true }), {
-        onSuccess: () => emit('add-bookmark'),
+        onSuccess: () => emit('add-bookmark', addBookmarkMessage),
         onError: (error) => console.log(error),
     });
 };
@@ -78,24 +94,57 @@ const getLowestPackagePrice = computed(() => {
     return lowestPrice;
 });;
 
-const calculatePricePerDay = computed(() => getLowestPackagePrice.value / props.tour.duration);
-
-const displayLowestPackagePrice = computed(() => useFormatPrice(getLowestPackagePrice.value, 0));
-const displayPricePerDay = computed(() => useFormatPrice(calculatePricePerDay.value, 0));
-
 const itemsListener = computed(() => {
     let index = props.items.findIndex(item => item.id === props.tour.id);
+
     return index != -1 ?  true : false;
 });
 
 const rating = computed(() => {
     var reviewRatings = 0;
+
     props.tour.reviews.forEach(review => {
         reviewRatings += review.rating;
     });
 
     return parseFloat(reviewRatings / props.tour.reviews.length).toFixed(1);
 });
+
+const calculatePricePerDay = computed(() => getLowestPackagePrice.value / props.tour.duration);
+
+const calculatePriceAfterDiscount = computed(() => {
+    if (! hasDiscount.value) {
+        return;
+    }
+
+    var lowestPrice = getLowestPackagePrice.value;
+    var discount = props.tour.discount.percentage;
+
+    return lowestPrice - (lowestPrice * (discount / 100));
+});
+
+const calculatePricePerDayAfterDiscount = computed(() => calculatePriceAfterDiscount.value / props.tour.duration) 
+
+const displayLowestPackagePrice = computed(() => useFormatPrice(getLowestPackagePrice.value, 2));
+
+const displayPricePerDay = computed(() => useFormatPrice(calculatePricePerDay.value));
+const displayDiscount = computed(() => props.tour.discount?.percentage + '% Discount');
+const displayDiscountType = computed(() => props.tour.discount?.type);
+const displayPriceAfterDiscount = computed(() => useFormatPrice(calculatePriceAfterDiscount.value, 2, false));
+const displayPricePerDayAfterDiscount = computed(() => useFormatPrice(calculatePricePerDayAfterDiscount.value, 2, false));
+
+const hasDiscount = computed(() => props.tour.discount != null);
+
+const tags = computed(() => hasDiscount.value ? [
+    {
+        'value': displayDiscountType.value,
+        'severity': TOAST_SECONDARY,
+    },
+    {
+        'value': displayDiscount.value,
+        'severity': TOAST_SUCCESS
+    },
+] : []);
 
 const formatDestination = destinations => destinations.map(destination => destination.name).join(', ');
 
@@ -121,6 +170,9 @@ const formatDestination = destinations => destinations.map(destination => destin
 
             <!-- Card Details -->
             <div class="mr-auto w-full">
+                <div class="flex gap-2">
+                    <Tag v-for="tag in tags" :value="tag.value" :severity="tag.severity" />
+                </div>
                 <h1 class="line-clamp-2">{{ tour.name }}</h1>
                 <div class="font-medium text-gray-500 mb-4">
                     <div v-if="tour.reviews.length != 0" class="flex items-center gap-1">
@@ -146,10 +198,6 @@ const formatDestination = destinations => destinations.map(destination => destin
                         <h3 class="font-bold">Travel Intensity</h3>
                         <span>{{ useFormatText(tour.travel_intensity) }}</span>
                     </div>
-                    <!-- <div>
-                        <h3 class="font-bold">Lodging Level</h3>
-                        <span>Excellent</span>
-                    </div> -->
                     <div>
                         <h3 class="font-bold">Durations</h3>
                         <span>{{ tour.duration > 1 ? `${tour.duration} Days` : `${tour.duration} Day` }}</span>
@@ -160,10 +208,20 @@ const formatDestination = destinations => destinations.map(destination => destin
             <!-- Card Price -->
             <div class="grid grid-rows-2 min-w-max">
                 <div class="flex flex-col">
-                    <span>From</span>
-                    <strong class="text-2xl">{{ displayLowestPackagePrice }}</strong>
-                    <span>Price per day</span>
-                    <strong>{{ displayPricePerDay }}</strong>
+                    <div v-if="! hasDiscount" class="flex flex-col justify-start w-full mb-3">
+                        <span class="text-sm">From</span>
+                        <strong class="text-xl">{{ displayLowestPackagePrice }}</strong>
+                        <small>Price per day</small>
+                        <small>{{ displayPricePerDay }}</small>
+                    </div>
+                    <div v-else class="flex flex-col mb-3">
+                        <div class="flex justify-between items-center">
+                            <span class="text-sm">From <span class="line-through">{{ displayLowestPackagePrice }}</span></span>
+                        </div>
+                        <span class="font-bold text-xl">{{ displayPriceAfterDiscount }}</span>
+                        <small>Price per day</small>
+                        <small>{{ displayPricePerDayAfterDiscount }}</small>
+                    </div>
                 </div>
                 <div class="flex flex-col place-self-end gap-2">
                     <PrimaryButton @click="viewTour">
